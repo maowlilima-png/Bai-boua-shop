@@ -3350,11 +3350,15 @@ function bbV70RepriceCartAgainstProducts() {
 const bbV70BaseOpenCart = openCart;
 openCart = function() { bbV70RepriceCartAgainstProducts(); bbV70BaseOpenCart(); };
 
-const bbV70BaseCreateOrder = createOrderFromCart;
-createOrderFromCart = async function(customer, address, kind = 'ready') {
-  bbV70RepriceCartAgainstProducts();
-  return bbV70BaseCreateOrder(customer, address, kind);
-};
+// v83 fix: older code expected createOrderFromCart, but this app uses createOrder.
+// Wrapping createOrder prevents ReferenceError and lets later delete/sync repairs run.
+if (typeof createOrder === 'function') {
+  const bbV70BaseCreateOrder = createOrder;
+  createOrder = function() {
+    bbV70RepriceCartAgainstProducts();
+    return bbV70BaseCreateOrder.apply(this, arguments);
+  };
+}
 
 function bbV70NormalizeVariantPricesForExistingProducts() {
   const list = products(); let changed = false;
@@ -5538,6 +5542,7 @@ setTimeout(() => { bbV81ApplyDeleteFilters().then(() => { if (state.page === 'ad
    - Keep public.agents/public.bb_customers as mirrors only; bb_state + tombstones are source of truth.
 */
 const BB_V82_VERSION = 'v82 hard delete and sync repair';
+const BB_V83_VERSION = 'v83 createOrder console error fix';
 DB.deletedCustomers = DB.deletedCustomers || 'BB4_deletedCustomers';
 DB.deletedOrders = DB.deletedOrders || 'BB4_deletedOrders';
 DB.deletedAgents = DB.deletedAgents || 'BB4_deletedAgents';
@@ -5959,8 +5964,10 @@ if (bbV82BaseAdminOrders) {
 }
 
 window.BB_V82_VERSION = BB_V82_VERSION;
+window.BB_V83_VERSION = BB_V83_VERSION;
 Object.assign(window, {
   BB_V82_VERSION,
+  BB_V83_VERSION,
   bbV82RepairNow,
   bbV82PullAllTombstones,
   bbV82LoadAgentsTableSafe,
