@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Bai Boua Shop</title>
+  <link rel="stylesheet" href="styles.css?v=82" />
+</head>
+<body>
+  <div id="bb-auth-gate" class="bb-auth-gate" aria-live="polite">
+    <div class="bb-auth-panel">
+      <div class="bb-auth-logo">🪷</div>
+      <h1>Bai Boua</h1>
+      <p class="bb-auth-sub">ເຂົ້າສູ່ລະບົບກ່ອນໃຊ້ງານ</p>
+
+      <div class="bb-auth-main-tabs" id="bb-auth-tabs">
+        <button type="button" class="active" data-auth-role="customer">ລູກຄ້າ</button>
+        <button type="button" data-auth-role="agent">ຕົວແທນ</button>
+        <button type="button" data-auth-role="admin">Admin</button>
+      </div>
+
+      <div class="bb-auth-card">
+        <h2 id="bb-auth-title">ລູກຄ້າຮ້ານໃບບົວ</h2>
+        <div id="bb-customer-register-hint" class="bb-auth-hint">
+          ຖ້າຍັງບໍ່ມີບັນຊີ ກົດ “ສ້າງບັນຊີລູກຄ້າໃໝ່” ກ່ອນ
+        </div>
+        <input id="bb-auth-name" class="bb-auth-name" placeholder="ຊື່" autocomplete="name" />
+        <input id="bb-auth-id" placeholder="+856 20 ແລ້ວຕາມດ້ວຍເບີ 8 ຕົວ" inputmode="text" autocomplete="username" />
+        <input id="bb-auth-pass" placeholder="ລະຫັດຜ່ານ" type="password" autocomplete="current-password" />
+        <div class="bb-auth-actions">
+          <button type="button" id="bb-register-btn">ສ້າງບັນຊີລູກຄ້າໃໝ່</button>
+          <button type="button" class="primary" id="bb-login-btn">ເຂົ້າສູ່ລະບົບ</button>
+        </div>
+        <div class="bb-auth-help" id="bb-auth-help"><a class="wa-help" target="_blank" rel="noopener" href="https://wa.me/8562099809749?text=%E0%BA%AA%E0%BA%B0%E0%BA%9A%E0%BA%B2%E0%BA%8D%E0%BA%94%E0%BA%B5%20Admin%20Bai%20Boua%2C%20%E0%BA%82%E0%BB%89%E0%BA%AD%E0%BA%8D%E0%BA%A5%E0%BA%B7%E0%BA%A1%E0%BA%A5%E0%BA%B0%E0%BA%AB%E0%BA%B1%E0%BA%94">ລືມລະຫັດ? ກົດຕິດຕໍ່ Admin WhatsApp: +856 20 9980 9749</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bb-profile-chip" class="bb-profile-chip" role="button" tabindex="0"></div>
+  <div id="bb-profile-modal" class="bb-profile-modal">
+    <div class="bb-profile-box">
+      <button class="bb-profile-close" id="bb-profile-close" type="button">×</button>
+      <div class="bb-profile-avatar" id="bb-profile-avatar">🪷</div>
+      <h2 id="bb-profile-name">Bai Boua</h2>
+      <p id="bb-profile-role">ຮ້ານໃບບົວ</p>
+      <div class="bb-profile-info" id="bb-profile-info"></div>
+      <div class="profile-modal-actions">
+        <button type="button" class="outline" id="bb-profile-open-page">ເບິ່ງໂປຣໄຟລ໌</button>
+        <button type="button" class="bb-logout-btn" id="bb-logout-btn">ອອກຈາກລະບົບ</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">🌸 Loading...</div>
+  <div class="sparkles"></div>
+
+  <header class="topbar">
+    <button class="profile-pill left-profile" id="profileQuickBtn" type="button">👤 ໂປຣໄຟລ໌</button>
+    <button class="icon-btn" id="homeBtn" type="button" aria-label="home">🏡</button>
+    <div class="brand">
+      <div class="lotus">🪷</div>
+      <div>
+        <h1>Bai Boua</h1>
+        <p>ຮ້ານຂາຍເຄື່ອງນ່າຮັກ</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="musicBtn" type="button" aria-label="music">🎵</button>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="sound">🔊</button>
+      <button class="icon-btn notify-btn" id="notifyBtn" type="button" aria-label="notifications">🔔 <span id="notifyCount" class="notify-badge hidden">0</span></button>
+      <button class="cart-pill" id="cartBtn" type="button">🛒 <span id="cartCount">0</span></button>
+    </div>
+  </header>
+
+  <nav class="nav-tabs" id="mainNav">
+    <button type="button" data-page="home" class="active">ໜ້າຫຼັກ</button>
+    <button type="button" data-page="products">ສິນຄ້າ</button>
+    <button type="button" data-page="wishlist">ລາຍການໂປດ</button>
+    <button type="button" data-page="profile" class="customer-only">ອໍເດີຂອງຂ້ອຍ</button>
+  </nav>
+  <div class="private-access" id="roleAccess">
+    <button class="outline tiny" type="button" data-page="agent">ຈັດການອໍເດີ້ຂອງຕົວແທນ</button>
+    <button class="outline tiny" type="button" data-page="admin">Admin</button>
+  </div>
+
+  <main>
+    <section id="home" class="page active-page">
+      <div class="hero scrapbook-card">
+        <div class="hero-copy">
+          <span class="sticker">Bai Boua ✨</span>
+          <h2>ຮ້ານ Bai Boua</h2>
+          <p>ສັ່ງຊື້ໄດ້ທັງສິນຄ້າພ້ອມສົ່ງ ແລະ Pre-order, ມີລະບົບອໍເດີ, ແຈ້ງຍອດ, ຕິດຕາມສະຖານະ, ຕົວແທນ ແລະ Admin.</p>
+          <button class="primary" type="button" data-go="products">ເລືອກຊື້ເລີຍ</button>
+        </div>
+        <div class="hero-art">
+          <div class="store-frame"><img loading="lazy" src="assets/bai-boua-storefront.jpeg" alt="Bai Boua storefront" /><span class="glimmer">✨</span></div>
+        </div>
+      </div>
+      <h3 class="section-title">ສິນຄ້າແນະນຳ</h3>
+      <div id="featuredGrid" class="product-grid"></div>
+      <div class="quick-grid below">
+        <div class="mini-card">💳 ສະແກນ QR ແລ້ວອັບ Slip</div>
+        <div class="mini-card">📦 ຕິດຕາມສະຖານະອໍເດີ</div>
+        <div class="mini-card">👤 ລະບົບຕົວແທນ</div>
+        <div class="mini-card">💬 ຕິດຕໍ່ Admin ຜ່ານ WhatsApp</div>
+      </div>
+    </section>
+
+    <section id="products" class="page">
+      <div class="section-head">
+        <div><h2>ສິນຄ້າ</h2><p class="muted">ຄົ້ນຫາ, ກອງ ແລະ ເລືອກສິນຄ້າໃສ່ກະຕ່າ</p></div>
+        <input id="searchInput" placeholder="ຄົ້ນຫາ..." autocomplete="off" />
+      </div>
+      <div class="filter-title">ປະເພດອໍເດີ</div>
+      <div class="chip-row" id="typeFilters"></div>
+      <div class="filter-title">ສຳລັບ</div>
+      <div class="chip-row" id="genderFilters"></div>
+      <div class="filter-title">ໝວດສິນຄ້າ</div>
+      <div class="chip-row" id="categoryFilters"></div>
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+
+    <section id="wishlist" class="page">
+      <div class="section-head"><div><h2>ລາຍການໂປດ 💖</h2><p class="muted">ສິນຄ້າທີ່ກົດຫົວໃຈໄວ້</p></div></div>
+      <div class="filter-title">ກອງລາຍການໂປດ</div>
+      <div class="chip-row" id="wishTypeFilters"></div>
+      <div id="wishlistGrid" class="product-grid"></div>
+    </section>
+
+    <section id="profile" class="page">
+      <div id="customerAuth" class="auth-grid"></div>
+      <div id="profileContent"></div>
+    </section>
+
+    <section id="agent" class="page">
+      <div id="agentPanel"></div>
+    </section>
+
+    <section id="admin" class="page">
+      <div id="adminPanel"></div>
+    </section>
+  </main>
+
+  <aside id="cartDrawer" class="drawer" aria-label="cart">
+    <div class="drawer-head"><h2>ກະຕ່າຂອງຂ້ອຍ</h2><button class="icon-btn" id="closeCart" type="button">✕</button></div>
+    <div id="cartItems"></div>
+    <div class="cart-total"><span>ຍອດລວມ</span><strong id="cartTotal">0 Kip</strong></div>
+    <button class="primary full" id="checkoutBtn" type="button">ຢືນຢັນອໍເດີ</button>
+  </aside>
+
+  <div id="modalLayer" class="modal-layer hidden"></div>
+  <audio id="bgMusic" preload="auto"></audio>
+  <div id="toast" class="toast hidden"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js?v=82"></script>
+</body>
+</html>
