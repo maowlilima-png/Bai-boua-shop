@@ -150,6 +150,7 @@ let state = {
   adminStatus: 'all',
   adminKind: 'all',
   adminSearch: '',
+  adminSummaryDate: '',
   agentStatus: 'all',
   productDetail: null,
   editProductImages: [],
@@ -1477,6 +1478,7 @@ function attachAdminOrderEvents(root = document) {
   $$('[data-admin-cancel]', root).forEach(btn => btn.onclick = () => cancelOrder(btn.dataset.adminCancel));
   $$('[data-admin-delete]', root).forEach(btn => btn.onclick = () => deleteOrder(btn.dataset.adminDelete));
   $$('[data-bill-upload]', root).forEach(input => input.onchange = () => uploadBill(input.dataset.billUpload, input.files[0]));
+  attachZoomableImages(root);
 }
 
 function canReview(o) { return currentRole() === 'customer' && o.userId === currentCustomer()?.id && ['bill_sent', 'shipped', 'completed'].includes(o.status); }
@@ -1565,11 +1567,11 @@ function renderAgent() {
 }
 
 function tabName(tab) {
-  return {overview:'ພາບລວມ', orders:'ອໍເດີ', products:'ສິນຄ້າ', categories:'ໝວດ', agents:'ຕົວແທນ', customers:'ລູກຄ້າ', settings:'ຕັ້ງຄ່າ'}[tab] || tab;
+  return {overview:'ພາບລວມ', summary:'ສະຫຼຸບອໍເດີ', orders:'ອໍເດີ', products:'ສິນຄ້າ', categories:'ໝວດ', agents:'ຕົວແທນ', customers:'ລູກຄ້າ', settings:'ຕັ້ງຄ່າ'}[tab] || tab;
 }
 function renderAdmin() {
   if (currentRole() !== 'admin') { $('#adminPanel').innerHTML = ''; return; }
-  const tabs = ['overview', 'orders', 'products', 'categories', 'agents', 'customers', 'settings'];
+  const tabs = ['overview', 'summary', 'orders', 'products', 'categories', 'agents', 'customers', 'settings'];
   $('#adminPanel').innerHTML = `<div class="section-head"><div><h2>Admin Dashboard</h2><p class="muted">ຈັດການຮ້ານ, ສິນຄ້າ, ອໍເດີ, ລູກຄ້າ ແລະ ຕົວແທນ</p></div><button type="button" class="danger" id="adminLogoutBtn">ອອກ</button></div><div class="staff-tabs">${tabs.map(t => `<button type="button" class="${state.adminTab === t ? 'active' : ''}" data-admin-tab="${t}">${tabName(t)}</button>`).join('')}</div><div id="adminContent"></div>`;
   $('#adminLogoutBtn').onclick = bbAuthLogout;
   $$('[data-admin-tab]', $('#adminPanel')).forEach(btn => btn.onclick = () => { state.adminTab = btn.dataset.adminTab; renderAdmin(); play('click'); });
@@ -1577,6 +1579,7 @@ function renderAdmin() {
 }
 function renderAdminTab(tab) {
   if (tab === 'overview') return adminOverview();
+  if (tab === 'summary') return adminSummary();
   if (tab === 'orders') return adminOrders();
   if (tab === 'products') return adminProducts();
   if (tab === 'categories') return adminCategories();
@@ -1584,6 +1587,89 @@ function renderAdminTab(tab) {
   if (tab === 'customers') return adminCustomers();
   if (tab === 'settings') return adminSettings();
 }
+function bbSummaryDateKey(value) {
+  const d = value ? new Date(value) : new Date();
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function bbSummaryDateLabel(key) {
+  if (!key) return '-';
+  const d = new Date(key + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return key;
+  try {
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  } catch (err) {
+    return key;
+  }
+}
+function bbSummaryDates() {
+  return Array.from(new Set(orders().map(o => bbSummaryDateKey(o.createdAt)).filter(Boolean))).sort((a, b) => b.localeCompare(a));
+}
+function bbSummaryBuyerPreview(setLike) {
+  const names = Array.from(setLike || []).filter(Boolean);
+  if (!names.length) return 'ບໍ່ມີຂໍ້ມູນ';
+  const head = names.slice(0, 4).map(name => esc(name)).join(', ');
+  return names.length > 4 ? `${head} +${names.length - 4}` : head;
+}
+function adminSummary() {
+  const allOrders = orders().slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  const dates = bbSummaryDates();
+  if (!state.adminSummaryDate || !dates.includes(state.adminSummaryDate)) state.adminSummaryDate = dates[0] || '';
+  const selectedDate = state.adminSummaryDate || '';
+  const dayOrders = selectedDate ? allOrders.filter(o => bbSummaryDateKey(o.createdAt) === selectedDate) : [];
+  const validOrders = dayOrders.filter(o => !['cancelled', 'rejected'].includes(o.status));
+  const flatItems = [];
+  dayOrders.forEach(o => {
+    (o.items || []).forEach(item => {
+      flatItems.push({
+        ...item,
+        __orderId: o.id,
+        __createdAt: o.createdAt,
+        __customerName: o.customer?.name || '-',
+        __customerPhone: o.customer?.phone || '',
+        __status: o.status
+      });
+    });
+  });
+  const productMap = new Map();
+  flatItems.forEach(item => {
+    const key = [item.productId || item.name || '-', item.variantName || '-', moneyValue(item.price || 0)].join('|');
+    if (!productMap.has(key)) {
+      productMap.set(key, {
+        name: item.name || '-',
+        variantName: item.variantName || '-',
+        image: item.image || '',
+        emoji: item.emoji || '🪷',
+        qty: 0,
+        amount: 0,
+        orders: new Set(),
+        buyers: new Set()
+      });
+    }
+    const row = productMap.get(key);
+    row.qty += Number(item.qty || 0);
+    row.amount += lineTotal(item);
+    row.orders.add(item.__orderId);
+    row.buyers.add(item.__customerName);
+    if (!row.image && item.image) row.image = item.image;
+  });
+  const productRows = Array.from(productMap.values()).sort((a, b) => (b.qty - a.qty) || (b.amount - a.amount) || String(a.name).localeCompare(String(b.name)));
+  const totalSales = validOrders.reduce((sum, o) => sum + Number(displayOrderTotal(o) || o.total || 0), 0);
+  const customerCount = new Set(dayOrders.map(o => [o.customer?.name || '-', o.customer?.phone || ''].join('|'))).size;
+  const itemQty = flatItems.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const dateOptions = dates.map(d => `<option value="${esc(d)}" ${selectedDate === d ? 'selected' : ''}>${bbSummaryDateLabel(d)} (${allOrders.filter(o => bbSummaryDateKey(o.createdAt) === d).length} ອໍເດີ)</option>`).join('') || '<option value="">ຍັງບໍ່ມີອໍເດີ</option>';
+  $('#adminContent').innerHTML = `<div class="admin-toolbar"><select id="adminSummaryDate">${dateOptions}</select><button type="button" class="outline" id="adminSummaryRefresh">Refresh</button></div><div class="panel-grid"><div class="panel-card"><h3>ວັນທີ່</h3><h2>${selectedDate ? bbSummaryDateLabel(selectedDate) : '-'}</h2><small>ອໍເດີຂອງມື້ນີ້</small></div><div class="panel-card"><h3>ຈຳນວນອໍເດີ</h3><h2>${dayOrders.length}</h2><small>ທັງໝົດໃນວັນນີ້</small></div><div class="panel-card"><h3>ຈຳນວນລູກຄ້າ</h3><h2>${customerCount}</h2><small>ຜູ້ສັ່ງຊື້ບໍ່ຊ້ຳ</small></div><div class="panel-card"><h3>ຍອດຂາຍ</h3><h2>${money(totalSales)}</h2><small>ບໍ່ນັບ cancelled/rejected</small></div></div><div class="auth-card"><h3>ສະຫຼຸບຕາມສິນຄ້າ</h3><div class="price-check"><span>ຈຳນວນຊິ້ນລວມ</span><b>${itemQty}</b></div><div class="order-item-list">${productRows.map(row => `<div class="order-item-row">${itemThumbHtml({ image: row.image, emoji: row.emoji }, 'order-item-thumb')}<div><b>${esc(row.name)}</b><br><span class="muted">${esc(row.variantName || '-')}</span><br><span class="muted">ລູກຄ້າ: ${row.buyers.size} ຄົນ · ອໍເດີ: ${row.orders.size}</span><br><span class="muted">ໃຜສັ່ງ: ${bbSummaryBuyerPreview(row.buyers)}</span></div><div class="item-qty">x${row.qty}</div><div class="item-price">${money(row.amount)}</div></div>`).join('') || '<div class="note">ບໍ່ມີລາຍການສິນຄ້າໃນວັນນີ້</div>'}</div></div><div class="auth-card" style="margin-top:14px"><h3>ອໍເດີຂອງວັນນີ້</h3><div class="admin-card-grid">${dayOrders.map(o => adminOrderCard(o)).join('') || '<div class="note">ບໍ່ມີອໍເດີໃນວັນນີ້</div>'}</div></div>`;
+  const dateEl = $('#adminSummaryDate');
+  if (dateEl) dateEl.onchange = e => { state.adminSummaryDate = e.target.value; adminSummary(); };
+  const refreshBtn = $('#adminSummaryRefresh');
+  if (refreshBtn) refreshBtn.onclick = adminSummary;
+  attachAdminOrderEvents($('#adminContent'));
+  attachZoomableImages($('#adminContent'));
+}
+
 function adminOverview() {
   const os = orders();
   const valid = os.filter(o => !['cancelled', 'rejected'].includes(o.status));
@@ -4148,7 +4234,7 @@ let bbV76SyncBusy = false;
 let bbV76UserInteractingUntil = 0;
 
 function bbV76ValidAdminTab(tab) {
-  return ['overview','orders','products','categories','agents','customers','settings'].includes(tab);
+  return ['overview','summary','orders','products','categories','agents','customers','settings'].includes(tab);
 }
 function bbV76SetAdminTab(tab, opts = {}) {
   if (!bbV76ValidAdminTab(tab)) tab = 'overview';
@@ -4177,7 +4263,7 @@ bbV76RestoreAdminTab();
 renderAdmin = function() {
   if (currentRole() !== 'admin') { $('#adminPanel').innerHTML = ''; return; }
   bbV76RestoreAdminTab();
-  const tabs = ['overview', 'orders', 'products', 'categories', 'agents', 'customers', 'settings'];
+  const tabs = ['overview', 'summary', 'orders', 'products', 'categories', 'agents', 'customers', 'settings'];
   $('#adminPanel').innerHTML = `<div class="section-head"><div><h2>Admin Dashboard</h2><p class="muted">ຈັດການຮ້ານ, ສິນຄ້າ, ອໍເດີ, ລູກຄ້າ ແລະ ຕົວແທນ</p></div><button type="button" class="danger" id="adminLogoutBtn">ອອກ</button></div><div class="staff-tabs admin-tabs-safe" id="adminTabsSafe">${tabs.map(t => `<button type="button" class="${state.adminTab === t ? 'active' : ''}" data-admin-tab="${t}">${tabName(t)}</button>`).join('')}</div><div id="adminContent" class="admin-content-safe"></div>`;
   $('#adminLogoutBtn').onclick = bbAuthLogout;
   const tabBox = $('#adminTabsSafe');
