@@ -17,3 +17,10 @@
 5. Settings → Pages → Deploy from branch → main / root
 
 ຢ່າອັບໂຟນເດີທັງກ້ອນເຂົ້າ repo, ໃຫ້ອັບແຕ່ໄຟລ໌ຂ້າງໃນ.
+
+
+V10 update:
+- Mobile-first UI improvements for phone screens.
+- Login/shop intro text simplified.
+- Admin tables become readable cards on mobile.
+- No need to zoom for most forms/tables.

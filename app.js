@@ -276,3 +276,58 @@ async function addProductAdmin(){ const name=val('pName'); const type=val('pType
 function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No']]; db.orders.filter(o=>!o.status.includes('ຍົກເລີກ')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export ແລ້ວ') }
 
 initCloudDB().finally(()=>render());
+
+
+/* v10 mobile UX patch: compact login/shop + responsive admin tables */
+function renderLogin(){
+  document.getElementById('app').innerHTML = `
+  <div class="screen login-wrap mobile-login">
+    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="hero mobile-compact-hero">
+      <div class="hero-badge">🪷 Bai Boua Shop</div>
+      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
+      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
+    </div>
+    <div class="login-card">
+      <div class="role-tabs">
+        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        <button class="${state.loginRole==='admin'?'active':''}" onclick="loginRole('admin')">ແອັດມິນ</button>
+      </div>
+      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+      <div class="login-help-text">${state.loginRole==='customer'?'ລູກຄ້າສາມາດສະໝັກເອງໄດ້':'ໃຊ້ ID ທີ່ຮ້ານກຳນົດໃຫ້'}</div>
+      <div class="field"><label>${state.loginRole==='admin'?'Username':'ເບີໂທ / ID'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+      ${state.loginRole==='customer'?`<div class="register-box"><b>ສະໝັກລູກຄ້າໃໝ່</b><div class="form-grid" style="margin-top:10px"><div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div><div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div><div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div></div><button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button></div>`:''}
+      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+    </div>
+  </div>`;
+}
+
+function renderProducts(){
+  normalizeNewFields();
+  const colors=allProductColors();
+  const list=productsFiltered();
+  return `<section class="banner shop-banner-compact"><div><h1>ເລືອກສິນຄ້າ</h1><div class="banner-actions"><span class="pill">QR BCEL + LDB</span><span class="pill">Wishlist</span><span class="pill">Tracking</span></div></div><div class="card desktop-carousel" style="padding:14px"><b>ສິນຄ້າແນະນຳ</b><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
+  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">ທັງໝົດ</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="filter-grid"><div class="field"><label>ຄົ້ນຫາ</label><div class="search" style="min-width:0"><span>🔎</span><input placeholder="ຊື່ / code / ສີ / ໄຊ້" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>ປະເພດ</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>ທຸກປະເພດ</option><option value="ready" ${state.filterType==='ready'?'selected':''}>ພ້ອມສົ່ງ</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>ພຣີອໍເດີ້</option></select></div><div class="field"><label>ສີ</label><select onchange="state.filterColor=this.value;render()"><option value="all" ${state.filterColor==='all'?'selected':''}>ທຸກສີ</option>${colors.map(c=>`<option value="${esc(c)}" ${state.filterColor===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>ຈັດລຽງ</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>ຄ່າເລີ່ມຕົ້ນ</option><option value="low" ${state.priceSort==='low'?'selected':''}>ລາຄາຕ່ຳ → ສູງ</option><option value="high" ${state.priceSort==='high'?'selected':''}>ລາຄາສູງ → ຕ່ຳ</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock ຫຼາຍກ່ອນ</option></select></div><button class="btn light" onclick="resetProductFilters()">ລ້າງ Filter</button></div><div class="filter-result">ພົບ ${list.length} ສິນຄ້າ</div></div>
+  <div class="grid">${list.map(productCard).join('') || `<div class="empty">ບໍ່ພົບສິນຄ້າ</div>`}</div>`;
+}
+
+function enhanceMobileTables(){
+  document.querySelectorAll('.table-wrap').forEach(w=>{
+    const table=w.querySelector('table.table');
+    if(!table || !table.rows || table.rows.length<2) return;
+    const headers=Array.from(table.rows[0].cells).map(c=>c.textContent.trim());
+    if(!headers.length) return;
+    w.classList.add('mobile-card-table');
+    Array.from(table.rows).slice(1).forEach(row=>{
+      Array.from(row.cells).forEach((cell,i)=>cell.setAttribute('data-label',headers[i]||''));
+    });
+  });
+}
+const baiBouaRenderV10 = render;
+render = function(){
+  baiBouaRenderV10();
+  setTimeout(enhanceMobileTables,0);
+};
