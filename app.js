@@ -331,3 +331,119 @@ render = function(){
   baiBouaRenderV10();
   setTimeout(enhanceMobileTables,0);
 };
+
+/* v12 fix: protect app from empty Supabase app_state + force login/register to enter shop */
+function normalizeDBShapeV12(d){
+  const base = defaultData();
+  d = (d && typeof d === 'object' && !Array.isArray(d)) ? d : {};
+  const fixed = {
+    ...base,
+    ...d,
+    categories: Array.isArray(d.categories) && d.categories.length ? d.categories : base.categories,
+    users: Array.isArray(d.users) ? d.users : [],
+    agents: Array.isArray(d.agents) ? d.agents : [],
+    products: Array.isArray(d.products) && d.products.length ? d.products : base.products,
+    orders: Array.isArray(d.orders) ? d.orders : [],
+    wishlist: (d.wishlist && typeof d.wishlist === 'object' && !Array.isArray(d.wishlist)) ? d.wishlist : {},
+    promo: { ...base.promo, ...((d.promo && typeof d.promo === 'object' && !Array.isArray(d.promo)) ? d.promo : {}) }
+  };
+  return fixed;
+}
+
+removeSeedRecords = function(d){
+  d = normalizeDBShapeV12(d);
+  d.users = (d.users || []).filter(u => !((u.id === 'C001' || u.phone === '02099809749') && u.password === '1234'));
+  d.agents = (d.agents || []).filter(a => !((a.id === 'AG001' || a.phone === '02022223333') && a.password === 'agent123'));
+  return d;
+};
+
+function cleanPhoneV12(v){ return String(v || '').replace(/\D/g, ''); }
+function saveSessionV12(){
+  try{
+    if(state.user){ localStorage.setItem('bai_boua_current_session_v12', JSON.stringify({role:state.role,id:state.user.id,phone:state.user.phone || ''})); }
+  }catch(e){}
+}
+function clearSessionV12(){ try{ localStorage.removeItem('bai_boua_current_session_v12'); }catch(e){} }
+
+const oldLogoutV12 = logout;
+logout = function(){ clearSessionV12(); oldLogoutV12(); };
+
+registerCustomer = function(){
+  db = removeSeedRecords(db);
+  const name = val('regName');
+  const phone = cleanPhoneV12(val('regPhone'));
+  const pass = val('regPass');
+  if(!name || !phone || !pass) return toast('ກະລຸນາກອກຊື່ ເບີໂທ ແລະ ລະຫັດ','danger');
+  if(db.users.some(u => cleanPhoneV12(u.phone) === phone)) return toast('ເບີນີ້ມີບັນຊີແລ້ວ','danger');
+  const u = { id: uid('C'), role:'customer', name, phone, password:pass, active:true, createdAt:Date.now() };
+  db.users.push(u);
+  state.user = u;
+  state.role = 'customer';
+  state.tab = 'shop';
+  state.cart = [];
+  saveSessionV12();
+  saveDB();
+  toast('ສະໝັກສຳເລັດ ເຂົ້າໜ້າຊື້ເຄື່ອງແລ້ວ');
+  render();
+  showWelcome();
+};
+
+doLogin = function(){
+  db = removeSeedRecords(db);
+  const rawId = document.getElementById('loginId').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const r = state.loginRole;
+  if(r === 'admin'){
+    if(rawId === ADMIN_USER && pass === ADMIN_PASS){
+      state.user = {id:'ADMIN', name:'Bai Boua Admin'};
+      state.role = 'admin';
+      state.adminTab = 'dashboard';
+      saveSessionV12();
+      toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
+      render();
+    }else toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+    return;
+  }
+  const idDigits = cleanPhoneV12(rawId);
+  if(r === 'customer'){
+    const u = db.users.find(x => (cleanPhoneV12(x.phone) === idDigits || x.id === rawId || x.id === idDigits) && x.password === pass);
+    if(!u) return toast('ບໍ່ພົບບັນຊີລູກຄ້າ ຫຼື ລະຫັດບໍ່ຖືກ','danger');
+    if(u.active === false) return toast('ບັນຊີນີ້ຖືກປິດ ກະລຸນາຕິດຕໍ່ແອັດມິນ','danger');
+    state.user = u;
+    state.role = 'customer';
+    state.tab = 'shop';
+    saveSessionV12();
+    toast('ຍິນດີຕ້ອນຮັບ');
+    render();
+    showWelcome();
+    return;
+  }
+  if(r === 'agent'){
+    const u = db.agents.find(x => (cleanPhoneV12(x.phone) === idDigits || x.id === rawId || x.id === idDigits) && x.password === pass);
+    if(!u) return toast('ບໍ່ພົບບັນຊີຕົວແທນ ຫຼື ລະຫັດບໍ່ຖືກ','danger');
+    if(!u.active) return toast('ບັນຊີຕົວແທນຖືກປິດ ກະລຸນາຕິດຕໍ່ແອັດມິນ','danger');
+    state.user = u;
+    state.role = 'agent';
+    state.tab = 'shop';
+    saveSessionV12();
+    toast('ເຂົ້າລະບົບຕົວແທນແລ້ວ');
+    render();
+    showWelcome();
+  }
+};
+
+const oldRenderV12 = render;
+render = function(){
+  db = removeSeedRecords(db);
+  if(state.user && state.role === 'customer'){
+    const fresh = db.users.find(u => u.id === state.user.id || cleanPhoneV12(u.phone) === cleanPhoneV12(state.user.phone));
+    if(fresh) state.user = fresh;
+  }
+  if(state.user && state.role === 'agent'){
+    const fresh = db.agents.find(a => a.id === state.user.id || cleanPhoneV12(a.phone) === cleanPhoneV12(state.user.phone));
+    if(fresh) state.user = fresh;
+  }
+  oldRenderV12();
+};
+
+try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}

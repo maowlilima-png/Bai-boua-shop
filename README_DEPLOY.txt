@@ -1,26 +1,17 @@
-# Bai Boua Shop - GitHub Pages Ready v9
+Bai Boua Shop - GitHub Pages Mobile Fix v12
 
-ໂຟນເດີນີ້ແຍກໄຟລ໌ໃຫ້ແລ້ວ:
+ໄຟລ໌ທີ່ຕ້ອງອັບຂຶ້ນ GitHub repo root:
+- index.html
+- style.css
+- app.js
+- .nojekyll
+- database/ (optional)
 
-- `index.html` = ໜ້າເວັບຫຼັກ
-- `style.css` = ໜ້າຕາ/ສີ/ການຈັດວາງ
-- `app.js` = ລະບົບເວັບ/ຟັງຊັນທັງໝົດ
-- `database/BaiBoua_supabase_setup.sql` = SQL ສຳລັບ Run ໃນ Supabase
-- `.nojekyll` = ຊ່ວຍໃຫ້ GitHub Pages ອ່ານໄຟລ໌ຖືກ
+v12 ແກ້:
+- Supabase app_state ຖ້າເປັນ {} ຫຼື ຂໍ້ມູນບໍ່ຄົບ ລະບົບຈະຕື່ມ default data ໃຫ້ອັດຕະໂນມັດ
+- ສະໝັກລູກຄ້າແລ້ວຈະເຂົ້າໜ້າຊື້ເຄື່ອງທັນທີ
+- Login ດ້ວຍເບີໂທຈະຕັດຊ່ອງວ່າງ/ຂີດ/ສັນຍາລັກອອກໃຫ້
 
-## ວິທີອັບ GitHub Pages
-
-1. ແຕກ ZIP
-2. ເປີດໂຟນເດີ `BaiBoua_github_pages_with_app_v9`
-3. ອັບໄຟລ໌ຂ້າງໃນທັງໝົດເຂົ້າ repo root
-4. ຕ້ອງເຫັນ `index.html`, `style.css`, `app.js` ຢູ່ຂ້າງນອກສຸດຂອງ repo
-5. Settings → Pages → Deploy from branch → main / root
-
-ຢ່າອັບໂຟນເດີທັງກ້ອນເຂົ້າ repo, ໃຫ້ອັບແຕ່ໄຟລ໌ຂ້າງໃນ.
-
-
-V10 update:
-- Mobile-first UI improvements for phone screens.
-- Login/shop intro text simplified.
-- Admin tables become readable cards on mobile.
-- No need to zoom for most forms/tables.
+Supabase:
+- ຖ້າ Run SQL v11 ແລ້ວ ບໍ່ຕ້ອງ Run ໃໝ່
+- ຖ້າຍັງບໍ່ Run, ໃຫ້ Run database/BaiBoua_supabase_sync_views_v11.sql ໃນ Supabase SQL Editor
