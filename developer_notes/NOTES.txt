@@ -1,0 +1,18 @@
+Developer Notes
+===============
+
+Current latest file:
+- latest/BaiBoua_shop_supabase_v8.html
+
+Supabase project URL used in code:
+- https://yvqpfaxcphoqzfiybqag.supabase.co
+
+Main database approach in current prototype:
+- Saves application data into app_state table.
+
+Important next production steps:
+1. Separate customer/agent/admin authentication into Supabase Auth.
+2. Add Row Level Security policies.
+3. Move sensitive admin operations to Edge Functions or backend API.
+4. Store product images/slips/bill images in Supabase Storage.
+5. Split the one-file HTML into frontend project files if deploying to Vercel/hosting.
