@@ -1,15 +1,19 @@
-Bai Boua Shop - GitHub Pages Ready
+# Bai Boua Shop - GitHub Pages Ready v9
 
-วิธีอัปโหลดให้หน้าเว็บขึ้นจริง:
-1) แตกไฟล์ ZIP นี้
-2) เอาไฟล์ทั้งหมดด้านในโฟลเดอร์ BaiBoua_github_pages_ready ไปวางไว้ที่ root ของ GitHub repository
-   สำคัญ: ต้องมีไฟล์ index.html อยู่หน้าแรกของ repo ไม่ใช่อยู่ในโฟลเดอร์ latest หรือ database
-3) ไปที่ GitHub > Settings > Pages
-4) Source: Deploy from a branch
-5) Branch: main / root แล้วกด Save
-6) รอ 1-3 นาที แล้วเปิดลิงก์ GitHub Pages ใหม่
+ໂຟນເດີນີ້ແຍກໄຟລ໌ໃຫ້ແລ້ວ:
 
-ไฟล์หลักของเว็บคือ: index.html
-ไฟล์ SQL สำหรับ Supabase อยู่ที่: database/BaiBoua_supabase_setup.sql
+- `index.html` = ໜ້າເວັບຫຼັກ
+- `style.css` = ໜ້າຕາ/ສີ/ການຈັດວາງ
+- `app.js` = ລະບົບເວັບ/ຟັງຊັນທັງໝົດ
+- `database/BaiBoua_supabase_setup.sql` = SQL ສຳລັບ Run ໃນ Supabase
+- `.nojekyll` = ຊ່ວຍໃຫ້ GitHub Pages ອ່ານໄຟລ໌ຖືກ
 
-ถ้ายังเห็นหน้า README หรือชื่อ repo แปลว่า index.html ยังไม่ได้อยู่ที่ root ของ repo หรือ Pages ยังไม่ได้ deploy ใหม่
+## ວິທີອັບ GitHub Pages
+
+1. ແຕກ ZIP
+2. ເປີດໂຟນເດີ `BaiBoua_github_pages_with_app_v9`
+3. ອັບໄຟລ໌ຂ້າງໃນທັງໝົດເຂົ້າ repo root
+4. ຕ້ອງເຫັນ `index.html`, `style.css`, `app.js` ຢູ່ຂ້າງນອກສຸດຂອງ repo
+5. Settings → Pages → Deploy from branch → main / root
+
+ຢ່າອັບໂຟນເດີທັງກ້ອນເຂົ້າ repo, ໃຫ້ອັບແຕ່ໄຟລ໌ຂ້າງໃນ.
