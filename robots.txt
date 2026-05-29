@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maowlilima-png.github.io/Bai-boua-shop/sitemap.xml
