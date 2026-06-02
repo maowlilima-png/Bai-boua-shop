@@ -447,3 +447,118 @@ render = function(){
 };
 
 try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
+
+/* === v15: admin password visibility + customer status message templates === */
+function copyText(text){
+  const value = String(text ?? '');
+  const done = () => toast('Copy ແລ້ວ');
+  if(navigator.clipboard){ navigator.clipboard.writeText(value).then(done).catch(()=>fallbackCopy(value, done)); }
+  else fallbackCopy(value, done);
+}
+function fallbackCopy(text, done){
+  const t=document.createElement('textarea');
+  t.value=text;
+  document.body.appendChild(t);
+  t.select();
+  document.execCommand('copy');
+  t.remove();
+  if(done) done();
+}
+function copyUserPassword(type,id){
+  const arr = type==='agent' ? db.agents : db.users;
+  const u = arr.find(x=>x.id===id);
+  if(!u) return toast('ບໍ່ພົບ ID','danger');
+  copyText(u.password || '');
+}
+function passwordCell(u,type){
+  const pass = u.password || '-';
+  return `<div class="password-cell"><code>${esc(pass)}</code><button class="btn light small" onclick="copyUserPassword('${type}','${u.id}')">Copy</button></div>`;
+}
+function userTable(type){
+  const arr = type==='customer' ? db.users : db.agents;
+  const isAgent = type==='agent';
+  const title = isAgent ? 'ຈັດການຕົວແທນ' : 'ຈັດການລູກຄ້າ';
+  const totalUsers = arr.length;
+  const activeAgents = isAgent ? arr.filter(a=>a.active).length : 0;
+  return `<div class="section-title"><h2>${title}</h2></div>
+  <div class="admin-glow-panel"><h3>${isAgent?'Agent Center':'Customer Center'}</h3><div class="meta">${isAgent?`ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents}`:`ລູກຄ້າທັງໝົດ ${totalUsers} · ແອັດມິນສາມາດເບິ່ງ ID/ລະຫັດ/ອໍເດີ້ ແລະ ລຶບ ID ໄດ້`}</div></div>
+  <div class="notice"><b>ໝາຍເຫດ:</b> ລະຫັດນີ້ໃຫ້ແອັດມິນເຫັນເພື່ອຊ່ວຍລູກຄ້າ/ຕົວແທນເວລາລືມລະຫັດ. ຢ່າສົ່ງໃຫ້ຄົນອື່ນ.</div>
+  <div class="table-wrap elevated-table"><table class="table"><tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ລະຫັດ</th><th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>${arr.map(u=>{ const orders=db.orders.filter(o=>o.userId===u.id&&o.role===type); const total=orders.reduce((sum,o)=>sum+o.total,0); const inactive=isAgent && !u.active; return `<tr class="${inactive?'row-muted':''}"><td><b>${u.id}</b></td><td>${u.name}</td><td>${u.phone}</td><td>${passwordCell(u,type)}</td><td>${orders.length}</td><td><b>${money(total)}</b></td><td>${isAgent?`<span class="status-pill ${u.active?'':'off'}">${u.active?'ເປີດໃຊ້':'ປິດໃຊ້'}</span>`:`<span class="status-pill">ເປີດໃຊ້</span>`}</td><td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${u.id}','${type}')">ເບິ່ງອໍເດີ້</button>${isAgent?`<button class="btn ${u.active?'danger':'sage'} small" onclick="toggleAgent('${u.id}')">${u.active?'ປິດ ID':'ເປີດ ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${u.id}')">ລຶບ ID</button>`}</div></td></tr>` }).join('') || `<tr><td colspan="8"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}</table></div>`;
+}
+function customerWaNumber(phone){
+  let d=String(phone||'').replace(/\D/g,'');
+  if(d.startsWith('020')) d='856'+d.slice(1);
+  else if(d.startsWith('20')) d='856'+d;
+  return d;
+}
+function statusAutoMessage(o){
+  if(!o) return '';
+  const name=o.customer?.name||'ລູກຄ້າ';
+  const id=o.id||'';
+  const status=o.status||'';
+  const total=money(o.total||0);
+  const base=`ສະບາຍດີ ${name} 🪷\nອໍເດີ້ ${id} · ຍອດ ${total}\n`;
+  if(status==='ລໍຖ້າຍອດໂອນ') return base+`ຕອນນີ້ລະບົບຍັງລໍຖ້າຍອດໂອນ. ຫຼັງໂອນແລ້ວກະລຸນາອັບໂຫຼດສະລິບໃນໜ້າອໍເດີ້ເດີ້.`;
+  if(status==='ລໍຖ້າກວດສອບການໂອນ') return base+`ແອັດມິນໄດ້ຮັບສະລິບການໂອນແລ້ວ ກຳລັງກວດສອບຍອດໃຫ້. ຖ້າກວດແລ້ວຈະອັບເດດໄປສະຖານະຕໍ່ໄປເດີ້.`;
+  if(status==='ກວດສອບການໂອນ') return base+`ແອັດມິນກວດການໂອນແລ້ວ ✅ ອໍເດີ້ຂອງເຈົ້າກຳລັງໄປສະຖານະຕໍ່ໄປ.`;
+  if(status==='ກຽມຝາກເຄື່ອງ') return base+`ຮ້ານກຳລັງກຽມຈັດຝາກເຄື່ອງໃຫ້ເຈົ້າ. ຖ້າຝາກແລ້ວຈະແຈ້ງບິນໃຫ້ທັນທີ.`;
+  if(status==='ສັ່ງເຄື່ອງ') return base+`ຮ້ານໄດ້ສັ່ງເຄື່ອງພຣີອໍເດີ້ໃຫ້ແລ້ວ. ຈະອັບເດດໃຫ້ອີກຮອບເມື່ອເຂົ້າສູ່ຊ່ວງລໍຖ້າເຄື່ອງ 14-18 ມື້.`;
+  if(status==='ລໍຖ້າເຄື່ອງ 14-18 ມື້') return base+`ຕອນນີ້ອໍເດີ້ຢູ່ຂັ້ນຕອນລໍຖ້າເຄື່ອງຈາກຈີນ 14-18 ມື້. ຖ້າເຄື່ອງຮອດແລ້ວແອັດມິນຈະແຈ້ງທັນທີ.`;
+  if(status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ') return base+`ເຄື່ອງຮອດແລ້ວ ✅ ຮ້ານກຳລັງກຽມຝາກເຄື່ອງໃຫ້. ຝາກແລ້ວຈະແຈ້ງບິນໃຫ້ເດີ້.`;
+  if(status==='ແຈ້ງບິນ') return base+`ຮ້ານແຈ້ງບິນແລ້ວ ✅ ${o.billNo?`ເລກບິນ: ${o.billNo}`:''} ລູກຄ້າສາມາດເຊັກໃນໜ້າສະຖານະອໍເດີ້ໄດ້ເລີຍ.`;
+  if(status==='ສະລິບບໍ່ຖືກຕ້ອງ') return base+`ສະລິບການໂອນບໍ່ຖືກຕ້ອງ ຫຼື ຂໍ້ມູນຍັງບໍ່ຄົບ. ກະລຸນາອັບໂຫຼດສະລິບໃໝ່ ຫຼື ທັກແອັດມິນເພື່ອກວດສອບເດີ້.`;
+  return base+`ສະຖານະປັດຈຸບັນ: ${status}. ຮ້ານຈະອັບເດດໃຫ້ເປັນລຳດັບເດີ້.`;
+}
+function customerStatusWaLink(o){
+  const d=customerWaNumber(o?.customer?.phone);
+  return d ? `https://wa.me/${d}?text=${encodeURIComponent(statusAutoMessage(o))}` : '#';
+}
+function statusMessagePanel(o){
+  const msg=statusAutoMessage(o);
+  return `<div class="card status-message-panel" style="padding:16px;margin-top:16px"><h3>ຂໍ້ຄວາມແຈ້ງລູກຄ້າຕາມສະຖານະ</h3><div class="meta">ແອັດມິນສາມາດ Copy ຫຼື ກົດທັກ WhatsApp ໄປຫາລູກຄ້າໄດ້ເລີຍ</div><textarea readonly rows="6" style="width:100%;margin-top:10px;border-radius:18px;border:1px solid var(--line);padding:12px;background:#fffaf7">${esc(msg)}</textarea><div class="actions"><button class="btn light small" onclick="copyText(statusAutoMessage(db.orders.find(x=>x.id==='${o.id}')))">Copy ຂໍ້ຄວາມ</button><a class="btn sage small" target="_blank" href="${customerStatusWaLink(o)}">ທັກ WhatsApp ລູກຄ້າ</a></div></div>`;
+}
+function adminOrders(){
+  const f=state.adminOrderFilter||'all';
+  let orders=[...db.orders];
+  if(f==='pay') orders=orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ');
+  if(f==='verify') orders=orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ');
+  if(f==='bill') orders=orders.filter(o=>!o.status.includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage);
+  if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage);
+  return `${notificationPanel()}<div class="admin-toolbar"><h2>ຈັດການອໍເດີ້</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option><option value="pay" ${f==='pay'?'selected':''}>ລໍຖ້າໂອນ</option><option value="verify" ${f==='verify'?'selected':''}>ລໍຖ້າກວດການໂອນ</option><option value="bill" ${f==='bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option><option value="done" ${f==='done'?'selected':''}>ມີບິນແລ້ວ</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div></div>${orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} · ${o.customer.name} · ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${o.billNo||''}</div>`:''}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="notice"><b>ຂໍ້ຄວາມສະຖານະ:</b> ${esc(statusAutoMessage(o)).replace(/\n/g,'<br>')}</div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">ເບິ່ງ/ຈັດການ</button><button class="btn sage small" onclick="nextStatus('${o.id}')">ດັນສະຖານະຕໍ່ໄປ</button><a class="btn light small" target="_blank" href="${customerStatusWaLink(o)}">ທັກລູກຄ້າ</a><button class="btn danger small" onclick="deleteOrder('${o.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້ໃນ Filter ນີ້</div>'}`;
+}
+function adminOpenOrder(id){
+  const o=db.orders.find(x=>x.id===id);
+  if(!o) return;
+  showModal(`<div class="modal-head"><b>Admin · ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body">${orderFullHTML(o,true)}${statusMessagePanel(o)}<div class="card" style="padding:16px;margin-top:16px"><h3>ກວດສອບການໂອນ</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">ຍັງບໍ່ມີສະລິບ</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="ເລກອ້າງອີງ"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">ອະນຸມັດການໂອນ</button><button class="btn danger" onclick="invalidSlip('${o.id}')">ສະລິບບໍ່ຖືກຕ້ອງ</button><a class="btn light" target="_blank" href="${customerStatusWaLink(o)}">ທັກລູກຄ້າ</a></div></div><div class="card" style="padding:16px;margin-top:16px"><h3>ແຈ້ງບິນຝາກເຄື່ອງ</h3><div class="form-grid"><div class="field"><label>ເລກບິນ / Tracking No.</label><input id="billNo" value="${esc(o.billNo||'')}" placeholder="ເຊັ່ນ ANS123456"></div><div class="field"><label>ອັບໂຫຼດຮູບບິນ</label><input id="billImage" type="file" accept="image/*"></div></div>${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}<div class="file-mini">ເມື່ອບັນທຶກ ລູກຄ້າຈະເຫັນເລກບິນ/ຮູບບິນໃນໜ້າສະຖານະອໍເດີ້</div><button class="btn rose" onclick="saveShippingBill('${o.id}')">ບັນທຶກ ແລະ ແຈ້ງບິນ</button></div></div>`);
+}
+function approveSlip(id){
+  const o=db.orders.find(x=>x.id===id);
+  if(!o) return;
+  o.refNo=val('refNo');
+  o.status='ກວດສອບການໂອນ';
+  o.approvedAt=Date.now();
+  if(o.role==='agent' && !o.agentTargetCounted){
+    const ag=db.agents.find(a=>a.id===o.userId);
+    if(ag){ ag.weekOrders=(ag.weekOrders||0)+1; if(state.user&&state.user.id===ag.id) state.user.weekOrders=ag.weekOrders; }
+    o.agentTargetCounted=true;
+  }
+  saveDB();
+  toast(o.role==='agent'?'ອະນຸມັດການໂອນແລ້ວ · ເພີ່ມເປົ້າຕົວແທນ 1 ອໍເດີ້ · ກົດທັກລູກຄ້າໄດ້':'ອະນຸມັດການໂອນແລ້ວ · ກົດທັກລູກຄ້າໄດ້');
+  closeModal();
+  render();
+}
+function nextStatus(id){
+  const o=db.orders.find(x=>x.id===id);
+  if(!o) return;
+  const steps=o.type==='ready'?readySteps:preSteps;
+  let idx=stepIndex(o);
+  if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1;
+  if(idx<steps.length-1){
+    const next=steps[idx+1].replace(' ✅','');
+    o.status=next;
+    if(next==='ແຈ້ງບິນ' && !o.billNo && !o.billImage){ toast('ຢ່າລືມໃສ່ເລກບິນ/ຮູບບິນໃຫ້ລູກຄ້າເດີ້'); }
+    else { toast('ອັບເດດສະຖານະແລ້ວ · ກົດທັກລູກຄ້າໄດ້'); }
+  }
+  saveDB();
+  render();
+}
