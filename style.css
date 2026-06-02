@@ -247,3 +247,25 @@ select { max-width: 100%; }
 .password-cell code{background:#fff7f4;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-family:ui-monospace,Menlo,monospace;color:#6d5f45}
 .status-message-panel textarea{font-family:inherit;line-height:1.6;resize:vertical}
 @media(max-width:680px){.password-cell{align-items:flex-start}.password-cell code{max-width:160px;overflow:auto}}
+
+/* === v16: separate admin entrance + compact register === */
+.v16-login .customer-agent-tabs{grid-template-columns:1fr 1fr;margin-bottom:14px}
+.v16-login .customer-agent-tabs button{font-weight:800}
+.v16-login .customer-agent-tabs button:nth-child(1).active{background:linear-gradient(135deg,var(--dusty),#d8abb4);color:#fff}
+.v16-login .customer-agent-tabs button:nth-child(2).active{background:linear-gradient(135deg,var(--sage),#aeb9a2);color:#fff}
+.login-switch{margin:12px 0 4px;text-align:center;color:var(--muted);font-weight:700}
+.login-switch button{border:0;background:transparent;color:var(--rose-dark,#a36f7c);font-weight:900;text-decoration:underline;cursor:pointer;font-size:inherit}
+.register-inline{margin-top:12px;padding:14px;border-radius:22px;background:rgba(255,255,255,.72);border:1px dashed rgba(196,150,161,.55)}
+.register-title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.admin-hidden-entry{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:right}
+.admin-hidden-entry button{border:0;background:transparent;color:#9b8b82;font-size:12px;font-weight:800;cursor:pointer;padding:6px 2px;text-decoration:none}
+.admin-hidden-entry button:hover{color:var(--sage);text-decoration:underline}
+.admin-login-modal .notice{margin-bottom:12px}
+.admin-login-modal .field{margin-bottom:10px}
+@media(max-width:760px){
+  .v16-login .login-card{padding:18px 16px;border-radius:28px}
+  .v16-login .mobile-compact-hero{margin-bottom:10px}
+  .login-switch{font-size:13px;line-height:1.6}
+  .admin-hidden-entry{text-align:center;margin-top:12px}
+  .register-inline .form-grid{grid-template-columns:1fr!important}
+}

@@ -562,3 +562,81 @@ function nextStatus(id){
   saveDB();
   render();
 }
+
+/* === v16: separate admin entrance + compact customer register === */
+function toggleRegister(){
+  state.showRegister = !state.showRegister;
+  renderLogin();
+}
+
+function showAdminLogin(){
+  showModal(`<div class="modal-head"><b>ເຂົ້າຫຼັງບ້ານ Admin</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+  <div class="modal-body admin-login-modal">
+    <div class="notice"><b>ສຳລັບແອັດມິນເທົ່ານັ້ນ</b><br>ປຸ່ມນີ້ແຍກອອກຈາກ Login ລູກຄ້າ/ຕົວແທນ ເພື່ອໃຫ້ໜ້າເວັບດູສະອາດຂຶ້ນ.</div>
+    <div class="field"><label>Username</label><input id="adminLoginId" placeholder="Admin username" autocomplete="username"></div>
+    <div class="field"><label>ລະຫັດຜ່ານ</label><input id="adminLoginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn rose full" onclick="doAdminLoginSeparate()">ເຂົ້າຫຼັງບ້ານ</button>
+  </div>`);
+}
+
+function doAdminLoginSeparate(){
+  const id = (document.getElementById('adminLoginId')||{}).value?.trim() || '';
+  const pass = (document.getElementById('adminLoginPass')||{}).value?.trim() || '';
+  if(id === ADMIN_USER && pass === ADMIN_PASS){
+    state.user = {id:'ADMIN', name:'Bai Boua Admin'};
+    state.role = 'admin';
+    state.adminTab = 'dashboard';
+    if(typeof saveSessionV12 === 'function') saveSessionV12();
+    closeModal();
+    toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
+    render();
+  }else{
+    toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+  }
+}
+
+loginRole = function(role){
+  if(role === 'admin') role = 'customer';
+  state.loginRole = role;
+  state.showRegister = false;
+  renderLogin();
+};
+
+function renderLogin(){
+  if(state.loginRole === 'admin') state.loginRole = 'customer';
+  const isCustomer = state.loginRole === 'customer';
+  const registerHTML = isCustomer && state.showRegister ? `
+    <div class="register-box register-inline">
+      <div class="register-title-row"><b>ສະໝັກລູກຄ້າໃໝ່</b><button class="btn light small" onclick="toggleRegister()">ປິດ</button></div>
+      <div class="form-grid" style="margin-top:10px">
+        <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
+        <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
+        <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
+      </div>
+      <button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+    </div>` : '';
+  document.getElementById('app').innerHTML = `
+  <div class="screen login-wrap mobile-login v16-login">
+    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="hero mobile-compact-hero">
+      <div class="hero-badge">🪷 Bai Boua Shop</div>
+      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
+      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>Tracking</span></div>
+    </div>
+    <div class="login-card customer-login-card">
+      <div class="role-tabs customer-agent-tabs">
+        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+      </div>
+      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+      <div class="login-help-text">${isCustomer?'ລູກຄ້າ Login ຫຼື ສະໝັກໃໝ່ໄດ້ດ້ານລຸ່ມ':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+      <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+      ${isCustomer && !state.showRegister ? `<div class="login-switch">ຍັງບໍ່ມີບັນຊີ? <button onclick="toggleRegister()">ສະໝັກລູກຄ້າໃໝ່</button></div>` : ''}
+      ${registerHTML}
+      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+      <div class="admin-hidden-entry"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+    </div>
+  </div>`;
+}
