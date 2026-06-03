@@ -640,3 +640,240 @@ function renderLogin(){
     </div>
   </div>`;
 }
+
+/* === v17: Cart Persistence + Product Image Gallery + Review/Rating === */
+const CART_STORAGE_PREFIX_V17 = 'bai_boua_cart_v17:';
+let galleryIndexV17 = {};
+
+function normalizeDBV17(){
+  if(!db || typeof db !== 'object') return;
+  if(!Array.isArray(db.reviews)) db.reviews = [];
+  if(!Array.isArray(db.products)) db.products = [];
+  db.products.forEach(p=>{
+    if(!Array.isArray(p.images)) p.images = [];
+    if(!Array.isArray(p.variantImages)) p.variantImages = [];
+    if(!Array.isArray(p.galleryImages)) p.galleryImages = [];
+    if(!Array.isArray(p.colors)) p.colors = ['Default'];
+    if(!Array.isArray(p.sizes)) p.sizes = ['Free size'];
+  });
+}
+
+const oldSaveDBV17 = saveDB;
+saveDB = function(){
+  normalizeDBV17();
+  oldSaveDBV17();
+};
+
+function cartKeyV17(){
+  if(!state.user || state.role === 'admin') return '';
+  return CART_STORAGE_PREFIX_V17 + state.role + ':' + (state.user.id || state.user.phone || 'guest');
+}
+function loadCartV17(){
+  const key = cartKeyV17();
+  if(!key) return;
+  try{
+    const saved = JSON.parse(localStorage.getItem(key) || '[]');
+    if(Array.isArray(saved)) state.cart = saved.filter(i=>i && i.productId && Number(i.qty) > 0);
+  }catch(e){ state.cart = state.cart || []; }
+}
+function saveCartV17(){
+  const key = cartKeyV17();
+  if(!key) return;
+  try{ localStorage.setItem(key, JSON.stringify(state.cart || [])); }catch(e){}
+}
+function ensureCartLoadedV17(){
+  const key = cartKeyV17();
+  if(!key) return;
+  if(state.cartLoadedKeyV17 !== key){
+    state.cartLoadedKeyV17 = key;
+    loadCartV17();
+  }
+}
+function clearCartV17(){
+  state.cart = [];
+  saveCartV17();
+  toast('ລ້າງກະຕ້າແລ້ວ');
+  render();
+}
+function updateCartQtyV17(idx,delta){
+  if(!state.cart[idx]) return;
+  state.cart[idx].qty = Math.max(1, (+state.cart[idx].qty || 1) + delta);
+  saveCartV17();
+  render();
+}
+function removeCartItemV17(idx){
+  state.cart.splice(idx,1);
+  saveCartV17();
+  render();
+}
+
+function productGalleryImagesV17(p){
+  const imgs = [];
+  [...(p.images||[]), ...(p.variantImages||[]), ...(p.galleryImages||[])].forEach(img=>{
+    if(img && !imgs.includes(img)) imgs.push(img);
+  });
+  return imgs.length ? imgs : [productSVG(p.name || 'Product','rose')];
+}
+function productReviewStatsV17(productId){
+  normalizeDBV17();
+  const approved = db.reviews.filter(r=>r.productId===productId && r.approved !== false);
+  const count = approved.length;
+  const avg = count ? approved.reduce((s,r)=>s+(+r.rating||0),0)/count : 0;
+  return {count,avg};
+}
+function starsV17(n){
+  n = Math.round(+n || 0);
+  return '★★★★★'.split('').map((s,i)=>`<span class="${i<n?'on':''}">★</span>`).join('');
+}
+function reviewSummaryV17(productId){
+  const st = productReviewStatsV17(productId);
+  return `<div class="review-summary"><div class="stars">${starsV17(st.avg)}</div><b>${st.count?st.avg.toFixed(1):'0.0'}</b><span class="meta">${st.count} ຣີວິວ</span></div>`;
+}
+function approvedReviewsHTMLV17(productId){
+  const list = db.reviews.filter(r=>r.productId===productId && r.approved !== false).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!list.length) return `<div class="empty mini-empty">ຍັງບໍ່ມີຣີວິວສິນຄ້ານີ້</div>`;
+  return `<div class="review-list">${list.slice(0,6).map(r=>`<div class="review-card"><div class="review-top"><b>${esc(r.name||'ລູກຄ້າ')}</b><span class="stars">${starsV17(r.rating)}</span></div><div>${esc(r.text||'')}</div><div class="meta">${new Date(r.createdAt||Date.now()).toLocaleDateString()}</div></div>`).join('')}</div>`;
+}
+function canReviewProductV17(productId){
+  if(!state.user || state.role === 'admin') return false;
+  return db.orders.some(o=>o.userId===state.user.id && o.role===state.role && !String(o.status||'').includes('ຍົກເລີກ') && (o.status==='ແຈ້ງບິນ' || o.billNo || o.billImage) && (o.items||[]).some(i=>i.productId===productId));
+}
+function alreadyReviewedV17(productId){
+  if(!state.user) return false;
+  return db.reviews.some(r=>r.productId===productId && r.userId===state.user.id && r.role===state.role);
+}
+function reviewFormHTMLV17(productId){
+  if(!state.user || state.role === 'admin') return '';
+  if(alreadyReviewedV17(productId)) return `<div class="notice review-note">ເຈົ້າສົ່ງຣີວິວສິນຄ້ານີ້ແລ້ວ · ລໍຖ້າ Admin ອະນຸມັດ ຫຼື ໂຊว์ໃນໜ້າສິນຄ້າ.</div>`;
+  if(!canReviewProductV17(productId)) return `<div class="notice review-note">ຈະຣີວິວໄດ້ຫຼັງອໍເດີ້ຖືກແຈ້ງບິນແລ້ວ.</div>`;
+  return `<div class="review-form"><h3>ຂຽນຣີວິວ</h3><div class="form-grid"><div class="field"><label>ຄະແນນ</label><select id="reviewRating"><option value="5">5 ດາວ · ດີຫຼາຍ</option><option value="4">4 ດາວ · ດີ</option><option value="3">3 ດາວ · ພໍໃຊ້</option><option value="2">2 ດາວ</option><option value="1">1 ດາວ</option></select></div></div><div class="field"><label>ຄວາມເຫັນ</label><textarea id="reviewText" rows="3" placeholder="ຂຽນຄວາມຮູ້ສຶກຫຼັງໄດ້ຮັບສິນຄ້າ"></textarea></div><button class="btn rose" onclick="submitReviewV17('${productId}')">ສົ່ງຣີວິວ</button></div>`;
+}
+function submitReviewV17(productId){
+  normalizeDBV17();
+  if(!canReviewProductV17(productId)) return toast('ຈະຣີວິວໄດ້ຫຼັງແຈ້ງບິນແລ້ວ','danger');
+  if(alreadyReviewedV17(productId)) return toast('ເຈົ້າສົ່ງຣີວິວແລ້ວ','danger');
+  const p = db.products.find(x=>x.id===productId);
+  const rating = Math.max(1, Math.min(5, +val('reviewRating') || 5));
+  const text = val('reviewText').trim();
+  if(!text) return toast('ກະລຸນາຂຽນຄວາມເຫັນກ່ອນ','danger');
+  const order = db.orders.find(o=>o.userId===state.user.id && o.role===state.role && (o.billNo || o.billImage || o.status==='ແຈ້ງບິນ') && (o.items||[]).some(i=>i.productId===productId));
+  db.reviews.unshift({id:uid('RV'),productId,productName:p?.name||'',orderId:order?.id||'',userId:state.user.id,role:state.role,name:state.user.name||'',rating,text,approved:false,createdAt:Date.now()});
+  saveDB();
+  toast('ສົ່ງຣີວິວແລ້ວ · ລໍຖ້າ Admin ອະນຸມັດ');
+  openProduct(productId);
+}
+function reviewSectionV17(productId){
+  return `<div class="review-section"><div class="section-title mini-title"><h3>ຣີວິວສິນຄ້າ</h3>${reviewSummaryV17(productId)}</div>${approvedReviewsHTMLV17(productId)}${reviewFormHTMLV17(productId)}</div>`;
+}
+
+function setGalleryImageV17(productId, idx){
+  const p = db.products.find(x=>x.id===productId);
+  if(!p) return;
+  const imgs = productGalleryImagesV17(p);
+  const total = imgs.length;
+  if(!total) return;
+  idx = (idx + total) % total;
+  galleryIndexV17[productId] = idx;
+  const main = document.getElementById('mainProductImage');
+  if(main) main.src = imgs[idx];
+  const counter = document.getElementById('galleryCounterV17');
+  if(counter) counter.textContent = `${idx+1}/${total}`;
+  document.querySelectorAll('[data-gallery-thumb]').forEach(el=>el.classList.toggle('selected', +el.dataset.galleryThumb === idx));
+}
+function nextGalleryImageV17(productId, delta){
+  setGalleryImageV17(productId, (galleryIndexV17[productId] || 0) + delta);
+}
+
+function productCard(p){
+  const out=p.type==='ready' && p.stock<=0;
+  const price=state.role==='agent'?`<span class="oldprice">${money(p.price)}</span> ${money(p.agentPrice)}`:money(p.price);
+  const g=productGalleryImagesV17(p);
+  const st=productReviewStatsV17(p.id);
+  return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${g[0]}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><span class="gallery-count">${g.length} ຮູບ</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">♡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${price}</div><div class="review-mini">${st.count?`★ ${st.avg.toFixed(1)} · ${st.count} ຣີວິວ`:'ຍັງບໍ່ມີຣີວິວ'}</div><div class="meta">${p.type==='ready'?`Stock: ${p.stock}`:'ລໍຖ້າ 14-18 ມື້'} · ${(p.colors||[]).join(', ')}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">ເບິ່ງ/ສັ່ງ</button>${out?'<span class="type-badge">ໝົດ</span>':''}</div></div></div>`;
+}
+
+function openProduct(id){
+  normalizeDBV17();
+  const p=db.products.find(x=>x.id===id);
+  if(!p)return;
+  const price=state.role==='agent'?p.agentPrice:p.price;
+  const colorImgs=productImagesByColor(p);
+  const gallery=productGalleryImagesV17(p);
+  galleryIndexV17[id]=0;
+  showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail v17-product-detail"><div><div class="gallery-main-wrap"><button class="gallery-arrow left" onclick="nextGalleryImageV17('${p.id}',-1)">‹</button><img id="mainProductImage" class="big-img" src="${gallery[0]}"><button class="gallery-arrow right" onclick="nextGalleryImageV17('${p.id}',1)">›</button><span id="galleryCounterV17" class="gallery-counter">1/${gallery.length}</span></div><div class="gallery-strip">${gallery.map((img,idx)=>`<img class="preview-img gallery-thumb ${idx===0?'selected':''}" data-gallery-thumb="${idx}" src="${img}" onclick="setGalleryImageV17('${p.id}',${idx})">`).join('')}</div><div class="actions color-choice-row">${colorImgs.map((item,idx)=>`<div><img class="preview-img color-thumb ${idx===0?'selected':''}" data-color-thumb="${esc(item.color)}" src="${item.img}" onclick="pickProductColor('${p.id}','${esc(item.color)}')"><div class="color-caption">${item.color}</div></div>`).join('')}</div><div class="file-mini">ຮູບ Gallery ເລື່ອນເບິ່ງໄດ້ · ເລືອກສີແລ້ວຮູບຫຼັກຈະປ່ຽນຕາມສີ</div></div><div><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div>${reviewSummaryV17(p.id)}<div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div><p>${p.detail||''}</p><div class="form-grid"><div class="field"><label>ໄຊ້</label><select id="selSize">${(p.sizes||['Free size']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ສີ</label><select id="selColor" data-product-id="${p.id}" onchange="changeProductColorImage('${p.id}')">${(p.colors||['Default']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${p.stock} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div><div class="actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div></div><div style="grid-column:1/-1">${reviewSectionV17(p.id)}</div></div>`);
+}
+
+function renderCart(){
+  if(!state.cart.length) return `<div class="empty">ກະຕ້າຍັງວ່າງ <br><button class="btn rose" onclick="state.tab='shop';render()">ໄປຊື້ເຄື່ອງ</button></div>`;
+  const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  return `<div class="section-title"><h2>ກະຕ້າ / ສະຫຼຸບກ່ອນຊຳລະ</h2><button class="btn light" onclick="clearCartV17()">ລ້າງກະຕ້າ</button></div><div class="notice cart-save-notice">ກະຕ້ານີ້ save ໄວ້ໃນເຄື່ອງນີ້ແລ້ວ · refresh ໜ້າກໍບໍ່ຫາຍ</div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="updateCartQtyV17(${idx},-1)">−</button><button class="btn light small" onclick="updateCartQtyV17(${idx},1)">＋</button><button class="btn danger small" onclick="removeCartItemV17(${idx})">ລຶບ</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>ຍອດລວມ</h3><div class="summary-row"><span>ລາຄາສິນຄ້າ</span><b>${money(total)}</b></div><div class="meta">ບໍ່ຂຽນຄ່າຝາກໃນລະບົບ — ລູກຄ້າຈະເຫັນຈາກບິນຝາກເຄື່ອງ.</div><div class="divider"></div><button class="btn rose full" onclick="placeOrder()">ຢືນຢັນອໍເດີ້ / ໄປໜ້າໂອນ</button></aside></div>`;
+}
+
+async function readFilesV17(inputId){
+  const input=document.getElementById(inputId);
+  const out=[];
+  if(!input || !input.files) return out;
+  for(const f of input.files){ out.push(await readFile(f)); }
+  return out.filter(Boolean);
+}
+
+function adminProducts(){
+  normalizeDBV17();
+  const s=(state.adminProductSearch||'').toLowerCase();
+  const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s));
+  return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: ຖ້າບໍ່ແກ້ ລະບົບຈະສ້າງໃຫ້ເອງ</div></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType" onchange="updateAutoCode()"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ສີ (ຄັ່ນດ້ວຍ ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຕາມສີ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກ = ສີທຳອິດ, ຮູບທີ່ 1 = ສີທີ່ 2</div></div><div class="field"><label>Gallery 3-5 ຮູບ</label><input id="pGallery" type="file" accept="image/*" multiple><div class="file-mini">ຮູບມຸມອື່ນໆ ໃຫ້ລູກຄ້າ swipe/ເລື່ອນເບິ່ງ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>ລາຍການສິນຄ້າ</h3><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາສິນຄ້າໃນ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>Gallery</th><th>ຣີວິວ</th><th>Stock</th><th></th></tr>${list.map(p=>{const st=productReviewStatsV17(p.id); return `<tr><td><img src="${productGalleryImagesV17(p)[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${productGalleryImagesV17(p).length} ຮູບ</td><td>${st.count?`${st.avg.toFixed(1)} ★ (${st.count})`:'-'}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">ໃກ້ໝົດ</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`}).join('')}</table></div>`;
+}
+
+async function addProductAdmin(){
+  const name=val('pName');
+  const type=val('pType')||'ready';
+  const code=val('pCode')||nextProductCode(type);
+  if(!name)return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
+  const main=await readFile(document.getElementById('pImage')?.files?.[0]);
+  const variants=await readFilesV17('pVariants');
+  const gallery=await readFilesV17('pGallery');
+  db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,galleryImages:gallery,detail:val('pDetail')});
+  saveDB();
+  toast('ເພີ່ມສິນຄ້າແລ້ວ · Gallery '+(gallery.length+variants.length+1)+' ຮູບ');
+  render();
+}
+
+function approveReviewV17(id){ const r=db.reviews.find(x=>x.id===id); if(!r)return; r.approved=true; r.approvedAt=Date.now(); saveDB(); toast('ອະນຸມັດຣີວິວແລ້ວ'); render(); }
+function hideReviewV17(id){ const r=db.reviews.find(x=>x.id===id); if(!r)return; r.approved=false; saveDB(); toast('ເຊື່ອງຣີວິວແລ້ວ'); render(); }
+function deleteReviewV17(id){ if(!confirm('ລຶບຣີວິວນີ້?')) return; db.reviews=db.reviews.filter(r=>r.id!==id); saveDB(); render(); }
+function adminReviewsV17(){
+  normalizeDBV17();
+  const f=state.reviewFilterV17||'pending';
+  let list=[...db.reviews].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(f==='pending') list=list.filter(r=>r.approved===false);
+  if(f==='approved') list=list.filter(r=>r.approved!==false);
+  return `<div class="section-title"><h2>ຈັດການຣີວິວ / Rating</h2></div><div class="admin-toolbar"><div class="actions"><select onchange="state.reviewFilterV17=this.value;render()"><option value="pending" ${f==='pending'?'selected':''}>ລໍຖ້າອະນຸມັດ</option><option value="approved" ${f==='approved'?'selected':''}>ອະນຸມັດແລ້ວ</option><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option></select></div><span class="soft-chip">Pending: ${db.reviews.filter(r=>r.approved===false).length}</span></div><div class="review-admin-list">${list.map(r=>`<div class="order-card review-admin-card"><div class="order-head"><div><b>${esc(r.productName||r.productId)}</b><div class="meta">${esc(r.name||'')} · ${r.role||''} · ${new Date(r.createdAt||Date.now()).toLocaleString()}</div></div><span class="status-pill ${r.approved===false?'off':''}">${r.approved===false?'ລໍຖ້າ':'ໂຊว์ແລ້ວ'}</span></div><div class="stars">${starsV17(r.rating)}</div><p>${esc(r.text||'')}</p><div class="meta">Order: ${r.orderId||'-'}</div><div class="actions">${r.approved===false?`<button class="btn sage small" onclick="approveReviewV17('${r.id}')">ອະນຸມັດ</button>`:`<button class="btn light small" onclick="hideReviewV17('${r.id}')">ເຊື່ອງ</button>`}<button class="btn danger small" onclick="deleteReviewV17('${r.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີຣີວິວ</div>'}</div>`;
+}
+
+function adminPage(){
+  const t=state.adminTab;
+  if(t==='dashboard')return adminDashboard();
+  if(t==='orders')return adminOrders();
+  if(t==='products')return adminProducts();
+  if(t==='categories')return adminCategories();
+  if(t==='customers')return adminCustomers();
+  if(t==='agents')return adminAgents();
+  if(t==='reports')return adminReports();
+  if(t==='promo')return adminPromo();
+  if(t==='reviews')return adminReviewsV17();
+  return '';
+}
+function renderAdmin(){
+  normalizeDBV17();
+  const pendingReviews=db.reviews.filter(r=>r.approved===false).length;
+  document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ຈັດການຮ້ານ</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reviews',`ຣີວິວ${pendingReviews?` (${pendingReviews})`:''}`)}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
+}
+
+const oldRenderV17 = render;
+render = function(){
+  normalizeDBV17();
+  if(state.user && state.role !== 'admin') ensureCartLoadedV17();
+  oldRenderV17();
+  if(state.user && state.role !== 'admin') saveCartV17();
+  setTimeout(()=>{ try{ if(typeof enhanceMobileTables==='function') enhanceMobileTables(); }catch(e){} },0);
+};

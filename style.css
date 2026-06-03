@@ -269,3 +269,39 @@ select { max-width: 100%; }
   .admin-hidden-entry{text-align:center;margin-top:12px}
   .register-inline .form-grid{grid-template-columns:1fr!important}
 }
+
+/* === v17: cart persistence + image gallery + reviews === */
+.cart-save-notice{border:1px dashed var(--sage);background:rgba(145,157,133,.10);}
+.gallery-main-wrap{position:relative;overflow:hidden;border-radius:28px;background:#fff;box-shadow:0 16px 40px rgba(68,58,50,.08);}
+.gallery-main-wrap .big-img{width:100%;display:block;border-radius:28px;}
+.gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border:0;border-radius:999px;background:rgba(255,255,255,.88);box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:30px;line-height:1;cursor:pointer;color:var(--text);}
+.gallery-arrow.left{left:10px}.gallery-arrow.right{right:10px}
+.gallery-counter{position:absolute;right:14px;bottom:14px;background:rgba(68,58,50,.72);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;}
+.gallery-strip{display:flex;gap:10px;overflow-x:auto;padding:12px 2px 8px;scroll-snap-type:x mandatory;}
+.gallery-thumb{scroll-snap-align:start;opacity:.72;border:2px solid transparent;cursor:pointer;}
+.gallery-thumb.selected,.color-thumb.selected{opacity:1;border-color:var(--rose);box-shadow:0 0 0 4px rgba(196,150,161,.18);}
+.color-choice-row{overflow-x:auto;flex-wrap:nowrap;padding-bottom:6px;}
+.gallery-count{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--text);}
+.review-mini{font-size:12px;color:var(--bronze);font-weight:700;margin-top:4px;}
+.review-section{grid-column:1/-1;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+.mini-title{align-items:center;margin-bottom:10px;}
+.review-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.stars{letter-spacing:1px;color:#d6cec4;font-size:18px;white-space:nowrap;}
+.stars .on{color:#b58a54;}
+.review-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0;}
+.review-card,.review-form{border:1px solid var(--line);background:#fffaf7;border-radius:22px;padding:14px;}
+.review-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:6px;}
+.review-note{margin-top:12px;}
+.mini-empty{padding:18px;margin:8px 0;}
+.review-admin-list{display:grid;gap:14px;margin-top:14px;}
+.review-admin-card p{white-space:pre-wrap;margin:8px 0;}
+.status-pill.off{background:#eee;color:#777;border-color:#ddd;}
+.v17-product-detail{align-items:start;}
+
+@media(max-width:720px){
+  .gallery-arrow{width:36px;height:36px;font-size:26px;}
+  .gallery-counter{font-size:11px;padding:5px 10px;}
+  .review-list{grid-template-columns:1fr;}
+  .review-top{align-items:flex-start;flex-direction:column;}
+  .gallery-strip .preview-img,.color-choice-row .preview-img{width:72px;height:72px;}
+}
