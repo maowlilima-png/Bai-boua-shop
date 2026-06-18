@@ -293,3 +293,14 @@ select { max-width: 100%; }
   .lookup-order-card .order-head{align-items:flex-start}
   .admin-order-lookup-v20{padding:14px;border-radius:22px}
 }
+
+/* === v21: Admin login entry is hidden at the bottom, not a main tab === */
+.v21-login .customer-agent-tabs{grid-template-columns:repeat(2,1fr)!important}
+.v21-login .customer-agent-tabs button:nth-child(n+3){display:none!important}
+/* fallback for older cached login renderer */
+.login-wrap .login-card .role-tabs button:nth-child(3){display:none!important}
+.admin-hidden-entry-v21{margin-top:14px;text-align:center;opacity:.72}
+.admin-hidden-entry-v21 button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer;font-weight:850;padding:8px 10px;font-size:13px}
+.admin-hidden-entry-v21 button:hover{color:var(--dusty)}
+.clean-admin-login-v21{padding-top:16px}
+.clean-admin-login-v21 .notice{display:none!important}
