@@ -274,3 +274,22 @@ select { max-width: 100%; }
 .order-card-v19 .order-head b{display:inline-block;margin-right:8px}.btn.ghost{background:#fff;border:1px solid var(--line);color:#6f6455}.btn.tiny{min-height:28px;padding:5px 8px;border-radius:999px;font-size:11px}
 .order-mini-items{display:grid;gap:8px;margin:10px 0}.order-mini-item{display:grid;grid-template-columns:50px 1fr;gap:10px;align-items:center;background:#fbf7f0;border:1px solid #efe5d9;border-radius:16px;padding:8px}.order-mini-item img{width:50px;height:50px;border-radius:12px;object-fit:cover;background:#eee}.order-mini-item b{display:block;font-size:14px}.order-mini-item small{display:block;color:#786f63;line-height:1.35;font-weight:700}
 @media(max-width:720px){.product-gallery-v19 .big-img{height:300px}.gallery-arrow{width:38px;height:38px;font-size:26px}.gallery-thumb-btn{flex-basis:82px}.gallery-thumb-btn img{height:56px}.color-pick{flex-basis:84px}.color-pick img{height:52px}.order-id-hero{grid-template-columns:1fr}.order-id-hero .btn{width:100%}.order-mini-item{grid-template-columns:46px 1fr}.order-mini-item img{width:46px;height:46px}.agent-download-box .actions{display:grid;grid-template-columns:1fr}.agent-download-box .btn{width:100%}}
+
+/* v20: admin dashboard order lookup + clean admin login */
+.admin-order-lookup-v20{padding:18px;margin-bottom:18px;border:1px solid var(--line);box-shadow:0 18px 45px rgba(129,120,90,.10)}
+.lookup-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.lookup-head h3{margin:0;color:var(--bronze)}
+.big-search{width:100%;min-width:0;margin:8px 0 6px}
+.big-search input{font-size:16px}
+.lookup-count,.lookup-hint{margin-top:8px}
+.lookup-results-v20{display:grid;gap:12px;margin-top:12px}
+.lookup-order-card{border:1px solid var(--line);border-radius:22px;padding:14px;background:rgba(255,255,255,.86)}
+.clean-admin-login-v20{padding-top:16px}
+.clean-admin-login-v20 .notice{display:none!important}
+.admin-hidden-entry{margin-top:14px;text-align:center;opacity:.72}
+.admin-hidden-entry button{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer;font-weight:800;padding:8px 10px}
+.admin-hidden-entry button:hover{color:var(--dusty)}
+@media(max-width:720px){
+  .lookup-order-card .order-head{align-items:flex-start}
+  .admin-order-lookup-v20{padding:14px;border-radius:22px}
+}

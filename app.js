@@ -827,3 +827,128 @@ try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringif
       ${orders.map(o=>`<div class="order-card order-card-v19"><div class="order-head"><div><b>${e19(o.id)}</b><button class="btn ghost tiny" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><div class="meta">${e19(o.role)} · ${e19(o.customer?.name||'')} · ${e19(o.customer?.phone||'')}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${e19(o.billNo||'')}</div>`:''}${orderMiniItems19(o)}<div class="summary-row"><span>${e19(o.status)}</span><b>${money(o.total||0)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${e19(o.id)}')">ເບິ່ງ/ຈັດການ</button>${typeof printOrderPackingV18==='function'?`<button class="btn light small" onclick="printOrderPackingV18('${e19(o.id)}')">ພິມ</button>`:''}<button class="btn sage small" onclick="nextStatus('${e19(o.id)}')">ດັນສະຖານະຕໍ່ໄປ</button><button class="btn danger small" onclick="deleteOrder('${e19(o.id)}')">ລຶບ</button></div></div>`).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ Filter/Search ນີ້</div>'}`;
   };
 })();
+
+/* === v20: Admin dashboard order search + cleaner admin login modal === */
+(function(){
+  function e20(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function orderText20(o){
+    return [
+      o.id, o.status, o.role, o.type,
+      o.customer?.name, o.customer?.phone,
+      o.userName, o.userPhone,
+      o.sender?.name, o.sender?.phone,
+      o.shipping?.carrier, o.shipping?.branch, o.shipping?.city, o.shipping?.province,
+      ...(o.items||[]).flatMap(i=>[i.name,i.code,i.size,i.color,i.type,i.qty])
+    ].join(' ').toLowerCase();
+  }
+  function matchOrder20(o,q){
+    q = String(q||'').trim().toLowerCase();
+    if(!q) return true;
+    return orderText20(o).includes(q);
+  }
+  function miniOrderItems20(o){
+    return `<div class="order-mini-items">${(o.items||[]).map(i=>`<div class="order-mini-item"><img src="${i.image||''}"><div><b>${e20(i.name)}</b><small>${e20(i.code||'')} · ໄຊ້ ${e20(i.size||'-')} · ສີ ${e20(i.color||'-')} · x${e20(i.qty||1)}</small></div></div>`).join('')}</div>`;
+  }
+
+  window.adminDashboardSearchBoxV20 = function(){
+    const q = state.adminDashOrderSearchV20 || '';
+    const orders = (db.orders||[]).filter(o=>matchOrder20(o,q)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const show = String(q||'').trim().length > 0;
+    return `<div class="card admin-order-lookup-v20">
+      <div class="lookup-head"><div><h3>🔎 ຄົ້ນຫາອໍເດີ້ດ່ວນ</h3><div class="meta">ພິມ Order ID ແລ້ວເບິ່ງລາຍລະອຽດໄດ້ທັນທີ</div></div><button class="btn light small" onclick="state.adminTab='orders';state.adminOrderSearchV19=state.adminDashOrderSearchV20||'';render()">ໄປໜ້າອໍເດີ້</button></div>
+      <div class="search big-search"><span>🔎</span><input placeholder="ຄົ້ນຫາ Order ID / ຊື່ລູກຄ້າ / ເບີ / Code ສິນຄ້າ" value="${e20(q)}" oninput="state.adminDashOrderSearchV20=this.value;render()"></div>
+      ${show ? `<div class="meta lookup-count">ພົບ ${orders.length} ອໍເດີ້</div>
+        <div class="lookup-results-v20">${orders.slice(0,5).map(o=>`<div class="lookup-order-card">
+          <div class="order-head"><div><b>${e20(o.id)}</b><div class="meta">${e20(o.customer?.name||'')} · ${e20(o.customer?.phone||'')} · ${new Date(o.createdAt||Date.now()).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>
+          ${miniOrderItems20(o)}
+          <div class="summary-row"><span>${e20(o.status||'')}</span><b>${money(o.total||0)}</b></div>
+          <div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${e20(o.id)}')">ເປີດລາຍລະອຽດ</button><button class="btn light small" onclick="state.adminTab='orders';state.adminOrderSearchV19='${e20(o.id)}';render()">ເບິ່ງໃນໜ້າອໍເດີ້</button></div>
+        </div>`).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ ID/ຄຳຄົ້ນຫານີ້</div>'}</div>` : '<div class="meta lookup-hint">ຕົວຢ່າງ: ORD001, ເບີໂທ, ຊື່ລູກຄ້າ, Code ສິນຄ້າ</div>'}
+    </div>`;
+  };
+
+  try{
+    const oldAdminDashboardV20 = adminDashboard;
+    adminDashboard = function(){
+      return adminDashboardSearchBoxV20() + oldAdminDashboardV20();
+    };
+  }catch(err){ console.warn('v20 dashboard search skipped', err); }
+
+  window.showAdminLogin = showAdminLogin = function(){
+    showModal(`<div class="modal-head"><b>ເຂົ້າຫຼັງບ້ານ Admin</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+    <div class="modal-body admin-login-modal clean-admin-login-v20">
+      <div class="field"><label>Username</label><input id="adminLoginId" placeholder="Admin username" autocomplete="username"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="adminLoginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn rose full" onclick="doAdminLoginSeparate()">ເຂົ້າຫຼັງບ້ານ</button>
+    </div>`);
+  };
+
+  window.doAdminLoginSeparate = doAdminLoginSeparate = function(){
+    const id = (document.getElementById('adminLoginId')||{}).value?.trim() || '';
+    const pass = (document.getElementById('adminLoginPass')||{}).value?.trim() || '';
+    if(id === ADMIN_USER && pass === ADMIN_PASS){
+      state.user = {id:'ADMIN', name:'Bai Boua Admin'};
+      state.role = 'admin';
+      state.adminTab = 'dashboard';
+      try{ if(typeof saveSessionV12 === 'function') saveSessionV12(); }catch(e){}
+      closeModal();
+      toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
+      render();
+    }else{
+      toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+    }
+  };
+
+  window.toggleRegister = toggleRegister = function(){
+    state.showRegister = !state.showRegister;
+    renderLogin();
+  };
+
+  window.loginRole = loginRole = function(role){
+    if(role === 'admin') role = 'customer';
+    state.loginRole = role;
+    state.showRegister = false;
+    renderLogin();
+  };
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    const isCustomer = state.loginRole === 'customer';
+    const registerHTML = isCustomer && state.showRegister ? `
+      <div class="register-box register-inline">
+        <div class="register-title-row"><b>ສະໝັກລູກຄ້າໃໝ່</b><button class="btn light small" onclick="toggleRegister()">ປິດ</button></div>
+        <div class="form-grid" style="margin-top:10px">
+          <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
+          <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
+          <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
+        </div>
+        <button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+      </div>` : '';
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v20-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua</h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>Tracking</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າ Login ຫຼື ສະໝັກໃໝ່ໄດ້ດ້ານລຸ່ມ':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer && !state.showRegister ? `<div class="login-switch">ຍັງບໍ່ມີບັນຊີ? <button onclick="toggleRegister()">ສະໝັກລູກຄ້າໃໝ່</button></div>` : ''}
+        ${registerHTML}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
