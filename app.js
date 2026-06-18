@@ -448,432 +448,382 @@ render = function(){
 
 try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
 
-/* === v15: admin password visibility + customer status message templates === */
-function copyText(text){
-  const value = String(text ?? '');
-  const done = () => toast('Copy ແລ້ວ');
-  if(navigator.clipboard){ navigator.clipboard.writeText(value).then(done).catch(()=>fallbackCopy(value, done)); }
-  else fallbackCopy(value, done);
-}
-function fallbackCopy(text, done){
-  const t=document.createElement('textarea');
-  t.value=text;
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand('copy');
-  t.remove();
-  if(done) done();
-}
-function copyUserPassword(type,id){
-  const arr = type==='agent' ? db.agents : db.users;
-  const u = arr.find(x=>x.id===id);
-  if(!u) return toast('ບໍ່ພົບ ID','danger');
-  copyText(u.password || '');
-}
-function passwordCell(u,type){
-  const pass = u.password || '-';
-  return `<div class="password-cell"><code>${esc(pass)}</code><button class="btn light small" onclick="copyUserPassword('${type}','${u.id}')">Copy</button></div>`;
-}
-function userTable(type){
-  const arr = type==='customer' ? db.users : db.agents;
-  const isAgent = type==='agent';
-  const title = isAgent ? 'ຈັດການຕົວແທນ' : 'ຈັດການລູກຄ້າ';
-  const totalUsers = arr.length;
-  const activeAgents = isAgent ? arr.filter(a=>a.active).length : 0;
-  return `<div class="section-title"><h2>${title}</h2></div>
-  <div class="admin-glow-panel"><h3>${isAgent?'Agent Center':'Customer Center'}</h3><div class="meta">${isAgent?`ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents}`:`ລູກຄ້າທັງໝົດ ${totalUsers} · ແອັດມິນສາມາດເບິ່ງ ID/ລະຫັດ/ອໍເດີ້ ແລະ ລຶບ ID ໄດ້`}</div></div>
-  <div class="notice"><b>ໝາຍເຫດ:</b> ລະຫັດນີ້ໃຫ້ແອັດມິນເຫັນເພື່ອຊ່ວຍລູກຄ້າ/ຕົວແທນເວລາລືມລະຫັດ. ຢ່າສົ່ງໃຫ້ຄົນອື່ນ.</div>
-  <div class="table-wrap elevated-table"><table class="table"><tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ລະຫັດ</th><th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>${arr.map(u=>{ const orders=db.orders.filter(o=>o.userId===u.id&&o.role===type); const total=orders.reduce((sum,o)=>sum+o.total,0); const inactive=isAgent && !u.active; return `<tr class="${inactive?'row-muted':''}"><td><b>${u.id}</b></td><td>${u.name}</td><td>${u.phone}</td><td>${passwordCell(u,type)}</td><td>${orders.length}</td><td><b>${money(total)}</b></td><td>${isAgent?`<span class="status-pill ${u.active?'':'off'}">${u.active?'ເປີດໃຊ້':'ປິດໃຊ້'}</span>`:`<span class="status-pill">ເປີດໃຊ້</span>`}</td><td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${u.id}','${type}')">ເບິ່ງອໍເດີ້</button>${isAgent?`<button class="btn ${u.active?'danger':'sage'} small" onclick="toggleAgent('${u.id}')">${u.active?'ປິດ ID':'ເປີດ ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${u.id}')">ລຶບ ID</button>`}</div></td></tr>` }).join('') || `<tr><td colspan="8"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}</table></div>`;
-}
-function customerWaNumber(phone){
-  let d=String(phone||'').replace(/\D/g,'');
-  if(d.startsWith('020')) d='856'+d.slice(1);
-  else if(d.startsWith('20')) d='856'+d;
-  return d;
-}
-function statusAutoMessage(o){
-  if(!o) return '';
-  const name=o.customer?.name||'ລູກຄ້າ';
-  const id=o.id||'';
-  const status=o.status||'';
-  const total=money(o.total||0);
-  const base=`ສະບາຍດີ ${name} 🪷\nອໍເດີ້ ${id} · ຍອດ ${total}\n`;
-  if(status==='ລໍຖ້າຍອດໂອນ') return base+`ຕອນນີ້ລະບົບຍັງລໍຖ້າຍອດໂອນ. ຫຼັງໂອນແລ້ວກະລຸນາອັບໂຫຼດສະລິບໃນໜ້າອໍເດີ້ເດີ້.`;
-  if(status==='ລໍຖ້າກວດສອບການໂອນ') return base+`ແອັດມິນໄດ້ຮັບສະລິບການໂອນແລ້ວ ກຳລັງກວດສອບຍອດໃຫ້. ຖ້າກວດແລ້ວຈະອັບເດດໄປສະຖານະຕໍ່ໄປເດີ້.`;
-  if(status==='ກວດສອບການໂອນ') return base+`ແອັດມິນກວດການໂອນແລ້ວ ✅ ອໍເດີ້ຂອງເຈົ້າກຳລັງໄປສະຖານະຕໍ່ໄປ.`;
-  if(status==='ກຽມຝາກເຄື່ອງ') return base+`ຮ້ານກຳລັງກຽມຈັດຝາກເຄື່ອງໃຫ້ເຈົ້າ. ຖ້າຝາກແລ້ວຈະແຈ້ງບິນໃຫ້ທັນທີ.`;
-  if(status==='ສັ່ງເຄື່ອງ') return base+`ຮ້ານໄດ້ສັ່ງເຄື່ອງພຣີອໍເດີ້ໃຫ້ແລ້ວ. ຈະອັບເດດໃຫ້ອີກຮອບເມື່ອເຂົ້າສູ່ຊ່ວງລໍຖ້າເຄື່ອງ 14-18 ມື້.`;
-  if(status==='ລໍຖ້າເຄື່ອງ 14-18 ມື້') return base+`ຕອນນີ້ອໍເດີ້ຢູ່ຂັ້ນຕອນລໍຖ້າເຄື່ອງຈາກຈີນ 14-18 ມື້. ຖ້າເຄື່ອງຮອດແລ້ວແອັດມິນຈະແຈ້ງທັນທີ.`;
-  if(status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ') return base+`ເຄື່ອງຮອດແລ້ວ ✅ ຮ້ານກຳລັງກຽມຝາກເຄື່ອງໃຫ້. ຝາກແລ້ວຈະແຈ້ງບິນໃຫ້ເດີ້.`;
-  if(status==='ແຈ້ງບິນ') return base+`ຮ້ານແຈ້ງບິນແລ້ວ ✅ ${o.billNo?`ເລກບິນ: ${o.billNo}`:''} ລູກຄ້າສາມາດເຊັກໃນໜ້າສະຖານະອໍເດີ້ໄດ້ເລີຍ.`;
-  if(status==='ສະລິບບໍ່ຖືກຕ້ອງ') return base+`ສະລິບການໂອນບໍ່ຖືກຕ້ອງ ຫຼື ຂໍ້ມູນຍັງບໍ່ຄົບ. ກະລຸນາອັບໂຫຼດສະລິບໃໝ່ ຫຼື ທັກແອັດມິນເພື່ອກວດສອບເດີ້.`;
-  return base+`ສະຖານະປັດຈຸບັນ: ${status}. ຮ້ານຈະອັບເດດໃຫ້ເປັນລຳດັບເດີ້.`;
-}
-function customerStatusWaLink(o){
-  const d=customerWaNumber(o?.customer?.phone);
-  return d ? `https://wa.me/${d}?text=${encodeURIComponent(statusAutoMessage(o))}` : '#';
-}
-function statusMessagePanel(o){
-  const msg=statusAutoMessage(o);
-  return `<div class="card status-message-panel" style="padding:16px;margin-top:16px"><h3>ຂໍ້ຄວາມແຈ້ງລູກຄ້າຕາມສະຖານະ</h3><div class="meta">ແອັດມິນສາມາດ Copy ຫຼື ກົດທັກ WhatsApp ໄປຫາລູກຄ້າໄດ້ເລີຍ</div><textarea readonly rows="6" style="width:100%;margin-top:10px;border-radius:18px;border:1px solid var(--line);padding:12px;background:#fffaf7">${esc(msg)}</textarea><div class="actions"><button class="btn light small" onclick="copyText(statusAutoMessage(db.orders.find(x=>x.id==='${o.id}')))">Copy ຂໍ້ຄວາມ</button><a class="btn sage small" target="_blank" href="${customerStatusWaLink(o)}">ທັກ WhatsApp ລູກຄ້າ</a></div></div>`;
-}
-function adminOrders(){
-  const f=state.adminOrderFilter||'all';
-  let orders=[...db.orders];
-  if(f==='pay') orders=orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ');
-  if(f==='verify') orders=orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ');
-  if(f==='bill') orders=orders.filter(o=>!o.status.includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage);
-  if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage);
-  return `${notificationPanel()}<div class="admin-toolbar"><h2>ຈັດການອໍເດີ້</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option><option value="pay" ${f==='pay'?'selected':''}>ລໍຖ້າໂອນ</option><option value="verify" ${f==='verify'?'selected':''}>ລໍຖ້າກວດການໂອນ</option><option value="bill" ${f==='bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option><option value="done" ${f==='done'?'selected':''}>ມີບິນແລ້ວ</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div></div>${orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} · ${o.customer.name} · ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${o.billNo||''}</div>`:''}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="notice"><b>ຂໍ້ຄວາມສະຖານະ:</b> ${esc(statusAutoMessage(o)).replace(/\n/g,'<br>')}</div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">ເບິ່ງ/ຈັດການ</button><button class="btn sage small" onclick="nextStatus('${o.id}')">ດັນສະຖານະຕໍ່ໄປ</button><a class="btn light small" target="_blank" href="${customerStatusWaLink(o)}">ທັກລູກຄ້າ</a><button class="btn danger small" onclick="deleteOrder('${o.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້ໃນ Filter ນີ້</div>'}`;
-}
-function adminOpenOrder(id){
-  const o=db.orders.find(x=>x.id===id);
-  if(!o) return;
-  showModal(`<div class="modal-head"><b>Admin · ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body">${orderFullHTML(o,true)}${statusMessagePanel(o)}<div class="card" style="padding:16px;margin-top:16px"><h3>ກວດສອບການໂອນ</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">ຍັງບໍ່ມີສະລິບ</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="ເລກອ້າງອີງ"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">ອະນຸມັດການໂອນ</button><button class="btn danger" onclick="invalidSlip('${o.id}')">ສະລິບບໍ່ຖືກຕ້ອງ</button><a class="btn light" target="_blank" href="${customerStatusWaLink(o)}">ທັກລູກຄ້າ</a></div></div><div class="card" style="padding:16px;margin-top:16px"><h3>ແຈ້ງບິນຝາກເຄື່ອງ</h3><div class="form-grid"><div class="field"><label>ເລກບິນ / Tracking No.</label><input id="billNo" value="${esc(o.billNo||'')}" placeholder="ເຊັ່ນ ANS123456"></div><div class="field"><label>ອັບໂຫຼດຮູບບິນ</label><input id="billImage" type="file" accept="image/*"></div></div>${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}<div class="file-mini">ເມື່ອບັນທຶກ ລູກຄ້າຈະເຫັນເລກບິນ/ຮູບບິນໃນໜ້າສະຖານະອໍເດີ້</div><button class="btn rose" onclick="saveShippingBill('${o.id}')">ບັນທຶກ ແລະ ແຈ້ງບິນ</button></div></div>`);
-}
-function approveSlip(id){
-  const o=db.orders.find(x=>x.id===id);
-  if(!o) return;
-  o.refNo=val('refNo');
-  o.status='ກວດສອບການໂອນ';
-  o.approvedAt=Date.now();
-  if(o.role==='agent' && !o.agentTargetCounted){
-    const ag=db.agents.find(a=>a.id===o.userId);
-    if(ag){ ag.weekOrders=(ag.weekOrders||0)+1; if(state.user&&state.user.id===ag.id) state.user.weekOrders=ag.weekOrders; }
-    o.agentTargetCounted=true;
+/* === v18: Packing List Print + Wishlist admin dashboard === */
+(function(){
+  function e18(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   }
-  saveDB();
-  toast(o.role==='agent'?'ອະນຸມັດການໂອນແລ້ວ · ເພີ່ມເປົ້າຕົວແທນ 1 ອໍເດີ້ · ກົດທັກລູກຄ້າໄດ້':'ອະນຸມັດການໂອນແລ້ວ · ກົດທັກລູກຄ້າໄດ້');
-  closeModal();
-  render();
-}
-function nextStatus(id){
-  const o=db.orders.find(x=>x.id===id);
-  if(!o) return;
-  const steps=o.type==='ready'?readySteps:preSteps;
-  let idx=stepIndex(o);
-  if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1;
-  if(idx<steps.length-1){
-    const next=steps[idx+1].replace(' ✅','');
-    o.status=next;
-    if(next==='ແຈ້ງບິນ' && !o.billNo && !o.billImage){ toast('ຢ່າລືມໃສ່ເລກບິນ/ຮູບບິນໃຫ້ລູກຄ້າເດີ້'); }
-    else { toast('ອັບເດດສະຖານະແລ້ວ · ກົດທັກລູກຄ້າໄດ້'); }
+  function orderDate18(o){ return todayStr(o.createdAt || Date.now()); }
+  function isCanceled18(o){ return String(o.status || '').includes('ຍົກເລີກ'); }
+  function packingOrders18(){
+    const mode = state.packingMode || 'today';
+    const date = state.packingDate || todayStr();
+    let orders = (db.orders || []).filter(o => !isCanceled18(o));
+    if(mode === 'today') orders = orders.filter(o => orderDate18(o) === date);
+    if(mode === 'paid') orders = orders.filter(o => ['ກວດຍອດເງິນເເລ້ວ','ກຽມຝາກເຄື່ອງ','ເຄື່ອງຮອດແລ້ວກຽມຝາກ','ແຈ້ງບິນ'].some(s => String(o.status||'').includes(s)));
+    if(mode === 'need_bill') orders = orders.filter(o => !o.billNo && !o.billImage && ['ກຽມຝາກເຄື່ອງ','ເຄື່ອງຮອດແລ້ວກຽມຝາກ','ແຈ້ງບິນ'].some(s => String(o.status||'').includes(s)));
+    return orders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   }
-  saveDB();
-  render();
-}
-
-/* === v16: separate admin entrance + compact customer register === */
-function toggleRegister(){
-  state.showRegister = !state.showRegister;
-  renderLogin();
-}
-
-function showAdminLogin(){
-  showModal(`<div class="modal-head"><b>ເຂົ້າຫຼັງບ້ານ Admin</b><button class="btn light small" onclick="closeModal()">✕</button></div>
-  <div class="modal-body admin-login-modal">
-    <div class="notice"><b>ສຳລັບແອັດມິນເທົ່ານັ້ນ</b><br>ປຸ່ມນີ້ແຍກອອກຈາກ Login ລູກຄ້າ/ຕົວແທນ ເພື່ອໃຫ້ໜ້າເວັບດູສະອາດຂຶ້ນ.</div>
-    <div class="field"><label>Username</label><input id="adminLoginId" placeholder="Admin username" autocomplete="username"></div>
-    <div class="field"><label>ລະຫັດຜ່ານ</label><input id="adminLoginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-    <button class="btn rose full" onclick="doAdminLoginSeparate()">ເຂົ້າຫຼັງບ້ານ</button>
-  </div>`);
-}
-
-function doAdminLoginSeparate(){
-  const id = (document.getElementById('adminLoginId')||{}).value?.trim() || '';
-  const pass = (document.getElementById('adminLoginPass')||{}).value?.trim() || '';
-  if(id === ADMIN_USER && pass === ADMIN_PASS){
-    state.user = {id:'ADMIN', name:'Bai Boua Admin'};
-    state.role = 'admin';
-    state.adminTab = 'dashboard';
-    if(typeof saveSessionV12 === 'function') saveSessionV12();
-    closeModal();
-    toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
-    render();
-  }else{
-    toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+  function packingItemRows18(order, forPrint=false){
+    return (order.items||[]).map((i,idx)=>`<tr>
+      <td>${idx+1}</td>
+      <td>${forPrint && i.image ? `<img src="${i.image}" class="print-img">` : (i.image?`<img src="${i.image}" class="preview-img">`:'')}</td>
+      <td><b>${e18(i.name)}</b><div class="meta">${e18(i.code || '')}</div></td>
+      <td>${e18(i.size || '-')}</td>
+      <td>${e18(i.color || '-')}</td>
+      <td><b>${e18(i.qty || 1)}</b></td>
+      <td>${money((i.price||0) * (i.qty||1))}</td>
+    </tr>`).join('');
   }
-}
-
-loginRole = function(role){
-  if(role === 'admin') role = 'customer';
-  state.loginRole = role;
-  state.showRegister = false;
-  renderLogin();
-};
-
-function renderLogin(){
-  if(state.loginRole === 'admin') state.loginRole = 'customer';
-  const isCustomer = state.loginRole === 'customer';
-  const registerHTML = isCustomer && state.showRegister ? `
-    <div class="register-box register-inline">
-      <div class="register-title-row"><b>ສະໝັກລູກຄ້າໃໝ່</b><button class="btn light small" onclick="toggleRegister()">ປິດ</button></div>
-      <div class="form-grid" style="margin-top:10px">
-        <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
-        <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
-        <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
+  function packingOrderCard18(o){
+    return `<div class="packing-card">
+      <div class="packing-head">
+        <div><b>${e18(o.id)}</b><div class="meta">${new Date(o.createdAt||Date.now()).toLocaleString()} · ${e18(o.role)}</div></div>
+        <div class="actions"><button class="btn light small" onclick="printOrderPackingV18('${e18(o.id)}')">ພິມອໍເດີ້ນີ້</button><button class="btn sage small" onclick="printShippingLabelV18('${e18(o.id)}')">ພິມໃບແປະກ່ອງ</button></div>
       </div>
-      <button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
-    </div>` : '';
-  document.getElementById('app').innerHTML = `
-  <div class="screen login-wrap mobile-login v16-login">
-    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="hero mobile-compact-hero">
-      <div class="hero-badge">🪷 Bai Boua Shop</div>
-      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
-      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>Tracking</span></div>
-    </div>
-    <div class="login-card customer-login-card">
-      <div class="role-tabs customer-agent-tabs">
-        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
-        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+      <div class="packing-info">
+        <div><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || o.userName || '-')}</b><small>${e18(o.customer?.phone || o.userPhone || '-')}</small></div>
+        <div><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b><small>${e18(o.shipping?.branch || '-')}, ${e18(o.shipping?.city || '-')}, ${e18(o.shipping?.province || '-')}</small></div>
+        <div><span>ສະຖານະ</span><b>${e18(o.status || '-')}</b><small>${o.billNo ? 'Bill: '+e18(o.billNo) : 'ຍັງບໍ່ມີບິນ'}</small></div>
+        <div><span>ຍອດ</span><b>${money(o.total||0)}</b><small>${(o.items||[]).reduce((s,i)=>s+(+i.qty||1),0)} ຊິ້ນ</small></div>
       </div>
-      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
-      <div class="login-help-text">${isCustomer?'ລູກຄ້າ Login ຫຼື ສະໝັກໃໝ່ໄດ້ດ້ານລຸ່ມ':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
-      <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
-      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
-      ${isCustomer && !state.showRegister ? `<div class="login-switch">ຍັງບໍ່ມີບັນຊີ? <button onclick="toggleRegister()">ສະໝັກລູກຄ້າໃໝ່</button></div>` : ''}
-      ${registerHTML}
-      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
-      <div class="admin-hidden-entry"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
-    </div>
-  </div>`;
-}
-
-/* === v17: Cart Persistence + Product Image Gallery + Review/Rating === */
-const CART_STORAGE_PREFIX_V17 = 'bai_boua_cart_v17:';
-let galleryIndexV17 = {};
-
-function normalizeDBV17(){
-  if(!db || typeof db !== 'object') return;
-  if(!Array.isArray(db.reviews)) db.reviews = [];
-  if(!Array.isArray(db.products)) db.products = [];
-  db.products.forEach(p=>{
-    if(!Array.isArray(p.images)) p.images = [];
-    if(!Array.isArray(p.variantImages)) p.variantImages = [];
-    if(!Array.isArray(p.galleryImages)) p.galleryImages = [];
-    if(!Array.isArray(p.colors)) p.colors = ['Default'];
-    if(!Array.isArray(p.sizes)) p.sizes = ['Free size'];
-  });
-}
-
-const oldSaveDBV17 = saveDB;
-saveDB = function(){
-  normalizeDBV17();
-  oldSaveDBV17();
-};
-
-function cartKeyV17(){
-  if(!state.user || state.role === 'admin') return '';
-  return CART_STORAGE_PREFIX_V17 + state.role + ':' + (state.user.id || state.user.phone || 'guest');
-}
-function loadCartV17(){
-  const key = cartKeyV17();
-  if(!key) return;
+      <div class="table-wrap"><table class="table packing-table"><tr><th>#</th><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ໄຊ້</th><th>ສີ</th><th>ຈຳນວນ</th><th>ລາຄາ</th></tr>${packingItemRows18(o)}</table></div>
+      ${o.shipping?.note ? `<div class="notice"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}
+    </div>`;
+  }
+  window.adminPackingPrintPage = function(){
+    const orders = packingOrders18();
+    const pieces = orders.reduce((s,o)=>s+(o.items||[]).reduce((a,i)=>a+(+i.qty||1),0),0);
+    return `<div class="section-title"><h2>📦 Packing List / ພິມລາຍການແພັກເຄື່ອງ</h2></div>
+      <div class="card packing-control">
+        <div class="form-grid">
+          <div class="field"><label>ວັນທີ</label><input type="date" value="${state.packingDate||todayStr()}" onchange="state.packingDate=this.value;render()"></div>
+          <div class="field"><label>Filter</label><select onchange="state.packingMode=this.value;render()">
+            <option value="today" ${(state.packingMode||'today')==='today'?'selected':''}>ຕາມວັນທີ່ເລືອກ</option>
+            <option value="paid" ${state.packingMode==='paid'?'selected':''}>ກວດເງິນແລ້ວ / ກຽມຝາກ</option>
+            <option value="need_bill" ${state.packingMode==='need_bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option>
+            <option value="all" ${state.packingMode==='all'?'selected':''}>ອໍເດີ້ທັງໝົດ</option>
+          </select></div>
+        </div>
+        <div class="stats mini-stats"><div class="stat">ອໍເດີ້<b>${orders.length}</b></div><div class="stat">ຈຳນວນຊິ້ນ<b>${pieces}</b></div><div class="stat">ຍອດລວມ<b>${money(orders.reduce((s,o)=>s+(+o.total||0),0))}</b></div></div>
+        <div class="actions"><button class="btn rose" onclick="printPackingListV18()">ພິມ Packing List</button><button class="btn sage" onclick="printAllLabelsV18()">ພິມໃບແປະກ່ອງທັງໝົດ</button><button class="btn light" onclick="exportPackingV18()">Export CSV</button></div>
+      </div>
+      ${orders.map(packingOrderCard18).join('') || '<div class="empty">ບໍ່ມີອໍເດີ້ຕາມ filter ນີ້</div>'}`;
+  }
+  function printFrame18(title, body){
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${e18(title)}</title><style>
+      *{box-sizing:border-box}body{font-family:Arial,'Noto Sans Lao',sans-serif;margin:18px;color:#2f2a24}h1,h2,h3{margin:0 0 8px}.print-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #81785a;padding-bottom:12px;margin-bottom:14px}.brand{font-size:24px;font-weight:900;color:#81785a}.muted{color:#6f675d;font-size:12px;line-height:1.45}.order-box{break-inside:avoid;border:1px solid #d8d0c2;border-radius:14px;padding:12px;margin:0 0 12px}.print-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 10px}.print-grid div{border:1px solid #eee6da;border-radius:10px;padding:8px}.print-grid span{display:block;color:#7c7267;font-size:11px}.print-grid b{display:block;font-size:14px;margin-top:2px}.print-table{width:100%;border-collapse:collapse;font-size:12px}.print-table th,.print-table td{border:1px solid #ddd4c8;padding:6px;vertical-align:top}.print-table th{background:#f4eee6}.print-img{width:52px;height:52px;object-fit:cover;border-radius:8px}.label{break-inside:avoid;border:2px solid #333;border-radius:12px;padding:14px;margin:0 0 14px;min-height:260px}.label h2{font-size:22px}.label-row{display:grid;grid-template-columns:100px 1fr;gap:8px;border-bottom:1px dashed #bbb;padding:7px 0}.label-row b{font-size:18px}.note{background:#fff8e8;border:1px solid #ead8aa;border-radius:10px;padding:8px;margin-top:8px}@media print{body{margin:10mm}.no-print{display:none}.order-box,.label{page-break-inside:avoid}}
+    </style></head><body>${body}<script>setTimeout(()=>window.print(),350)<\/script></body></html>`;
+    const w = window.open('', '_blank');
+    if(!w){ toast('Browser ບລັອກ popup · ກະລຸນາ allow popup ກ່ອນ','danger'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  function printOrderHTML18(o){
+    return `<div class="order-box"><div class="print-top"><div><div class="brand">🪷 Bai Boua Shop</div><div class="muted">Packing List · ${e18(o.id)}</div></div><div class="muted">${new Date(o.createdAt||Date.now()).toLocaleString()}<br>Status: ${e18(o.status||'')}</div></div>
+      <div class="print-grid"><div><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || '-')}</b><span>${e18(o.customer?.phone || '-')}</span></div><div><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b><span>${e18(o.shipping?.branch || '-')}</span></div><div><span>ເມືອງ / ແຂວງ</span><b>${e18(o.shipping?.city || '-')}</b><span>${e18(o.shipping?.province || '-')}</span></div><div><span>ຍອດ</span><b>${money(o.total||0)}</b><span>${e18(o.type||'')}</span></div></div>
+      <table class="print-table"><tr><th>#</th><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ໄຊ້</th><th>ສີ</th><th>ຈຳນວນ</th><th>ລາຄາ</th></tr>${packingItemRows18(o,true)}</table>
+      ${o.shipping?.note ? `<div class="note"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}</div>`;
+  }
+  function labelHTML18(o){
+    const itemText = (o.items||[]).map(i=>`${e18(i.name)} / ${e18(i.size)} / ${e18(i.color)} x${e18(i.qty||1)}`).join('<br>');
+    return `<div class="label"><h2>🪷 Bai Boua Shop</h2><div class="muted">Order: ${e18(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div><div class="label-row"><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || '-')}</b></div><div class="label-row"><span>ເບີໂທ</span><b>${e18(o.customer?.phone || '-')}</b></div><div class="label-row"><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b></div><div class="label-row"><span>ສາຂາ</span><b>${e18(o.shipping?.branch || '-')}</b></div><div class="label-row"><span>ເມືອງ/ແຂວງ</span><b>${e18(o.shipping?.city || '-')} / ${e18(o.shipping?.province || '-')}</b></div><div class="note"><b>ລາຍການ:</b><br>${itemText}</div>${o.shipping?.note?`<div class="note"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}</div>`;
+  }
+  window.printPackingListV18 = function(){
+    const orders = packingOrders18();
+    if(!orders.length) return toast('ບໍ່ມີອໍເດີ້ໃຫ້ພິມ','danger');
+    printFrame18('Bai Boua Packing List', `<h1>📦 Packing List</h1><div class="muted">${orders.length} orders · ${new Date().toLocaleString()}</div>${orders.map(printOrderHTML18).join('')}`);
+  }
+  window.printOrderPackingV18 = function(id){
+    const o = (db.orders||[]).find(x=>x.id===id); if(!o) return toast('ບໍ່ພົບອໍເດີ້','danger');
+    printFrame18(`Packing ${id}`, printOrderHTML18(o));
+  }
+  window.printShippingLabelV18 = function(id){
+    const o = (db.orders||[]).find(x=>x.id===id); if(!o) return toast('ບໍ່ພົບອໍເດີ້','danger');
+    printFrame18(`Label ${id}`, labelHTML18(o));
+  }
+  window.printAllLabelsV18 = function(){
+    const orders = packingOrders18();
+    if(!orders.length) return toast('ບໍ່ມີອໍເດີ້ໃຫ້ພິມ','danger');
+    printFrame18('Bai Boua Labels', `<h1>ໃບແປະກ່ອງ</h1>${orders.map(labelHTML18).join('')}`);
+  }
+  window.exportPackingV18 = function(){
+    const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No','Note']];
+    packingOrders18().forEach(o=>(o.items||[]).forEach(i=>rows.push([o.id,new Date(o.createdAt||Date.now()).toLocaleString(),o.role,o.customer?.name||'',o.customer?.phone||'',o.shipping?.carrier||'',o.shipping?.branch||'',o.shipping?.city||'',o.shipping?.province||'',i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'',o.shipping?.note||''])));
+    const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_Print_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export Packing CSV ແລ້ວ');
+  }
+  function wishlistCount18(pid){ return Object.values(db.wishlist||{}).filter(arr=>Array.isArray(arr)&&arr.includes(pid)).length; }
+  function wishlistPeople18(pid){
+    const out=[]; Object.entries(db.wishlist||{}).forEach(([key,arr])=>{ if(!Array.isArray(arr)||!arr.includes(pid)) return; const [role,id]=key.split(':'); const u=(role==='agent'?db.agents:db.users).find(x=>x.id===id); out.push(`${role||''}: ${u?u.name:id}`); }); return out;
+  }
+  window.adminWishlistPageV18 = function(){
+    const rows=(db.products||[]).map(p=>({p,count:wishlistCount18(p.id),people:wishlistPeople18(p.id)})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+    const total=rows.reduce((s,r)=>s+r.count,0);
+    return `<div class="section-title"><h2>♡ Wishlist Analytics / ສິນຄ້າທີ່ລູກຄ້າຖືກໃຈ</h2><button class="btn light" onclick="exportWishlistV18()">Export CSV</button></div>
+      <div class="stats mini-stats"><div class="stat">ສິນຄ້າຖືກໃຈ<b>${rows.length}</b></div><div class="stat">ກົດຖືກໃຈລວມ<b>${total}</b></div><div class="stat">Top Product<b>${rows[0]?e18(rows[0].p.name):'-'}</b></div></div>
+      <div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ຈຳນວນຖືກໃຈ</th><th>ຜູ້ກົດຖືກໃຈ</th></tr>${rows.map(r=>`<tr><td><img src="${r.p.images?.[0]||''}" class="preview-img"></td><td><b>${e18(r.p.name)}</b><div class="meta">${e18(r.p.code||'')} · ${e18(r.p.category||'')}</div></td><td><b>${r.count}</b></td><td>${r.people.map(e18).join('<br>')||'-'}</td></tr>`).join('') || '<tr><td colspan="4"><div class="empty">ຍັງບໍ່ມີລູກຄ້າກົດ Wishlist</div></td></tr>'}</table></div>`;
+  }
+  window.exportWishlistV18 = function(){
+    const rows=[['Product','Code','Category','Wishlist Count','Liked By']];
+    (db.products||[]).forEach(p=>{ const people=wishlistPeople18(p.id); if(people.length) rows.push([p.name,p.code,p.category,people.length,people.join(' | ')]); });
+    const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Wishlist_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export Wishlist CSV ແລ້ວ');
+  }
   try{
-    const saved = JSON.parse(localStorage.getItem(key) || '[]');
-    if(Array.isArray(saved)) state.cart = saved.filter(i=>i && i.productId && Number(i.qty) > 0);
-  }catch(e){ state.cart = state.cart || []; }
-}
-function saveCartV17(){
-  const key = cartKeyV17();
-  if(!key) return;
-  try{ localStorage.setItem(key, JSON.stringify(state.cart || [])); }catch(e){}
-}
-function ensureCartLoadedV17(){
-  const key = cartKeyV17();
-  if(!key) return;
-  if(state.cartLoadedKeyV17 !== key){
-    state.cartLoadedKeyV17 = key;
-    loadCartV17();
+    const oldAdminPage18 = adminPage;
+    adminPage = function(){
+      if(state.adminTab === 'packing') return adminPackingPrintPage();
+      if(state.adminTab === 'wishlist') return adminWishlistPageV18();
+      return oldAdminPage18();
+    };
+    const oldAdminOrders18 = adminOrders;
+    adminOrders = function(){
+      let html = oldAdminOrders18();
+      html = html.replace('Export Packing CSV</button>', 'Export Packing CSV</button><button class="btn sage" onclick="state.adminTab=\'packing\';render()">Packing Print</button>');
+      html = html.replace(/<button class="btn rose small" onclick="adminOpenOrder\('([^']+)'\)">ເບິ່ງ\/ຈັດການ<\/button>/g, (m,id)=>`${m}<button class="btn light small" onclick="printOrderPackingV18('${id}')">ພິມ</button>`);
+      return html;
+    };
+    const oldProductCard18 = productCard;
+    productCard = function(p){
+      const count = wishlistCount18(p.id);
+      let html = oldProductCard18(p);
+      if(count>0) html = html.replace('<button class="heart', `<div class="wish-count">♡ ${count}</div><button class="heart`);
+      return html;
+    };
+    renderAdmin = function(){
+      try{ normalizeNewFields(); }catch(e){}
+      document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · Packing Print · Wishlist Analytics</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('packing','ແພັກເຄື່ອງ')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('wishlist','Wishlist')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
+    };
+  }catch(err){ console.warn('v18 admin patch skipped', err); }
+})();
+
+/* === v19: Agent product image download + swipe gallery + order ID search === */
+(function(){
+  function e19(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   }
-}
-function clearCartV17(){
-  state.cart = [];
-  saveCartV17();
-  toast('ລ້າງກະຕ້າແລ້ວ');
-  render();
-}
-function updateCartQtyV17(idx,delta){
-  if(!state.cart[idx]) return;
-  state.cart[idx].qty = Math.max(1, (+state.cart[idx].qty || 1) + delta);
-  saveCartV17();
-  render();
-}
-function removeCartItemV17(idx){
-  state.cart.splice(idx,1);
-  saveCartV17();
-  render();
-}
+  function safeId19(v){ return String(v ?? '').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+  function uniqueImgs19(items){
+    const seen = new Set();
+    return (items||[]).filter(x => x && x.img).filter(x => {
+      const k = String(x.img).slice(0,1200);
+      if(seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+  function gallery19(p){
+    if(!p) return [];
+    const out = [];
+    const colors = (Array.isArray(p.colors) && p.colors.length ? p.colors : ['Default']);
+    (p.images || []).forEach((img,idx)=>out.push({img, label:`ຮູບ ${idx+1}`, color: idx===0 ? colors[0] : ''}));
+    (p.variantImages || []).forEach((img,idx)=>out.push({img, label: colors[idx+1] || `ຮູບສີ ${idx+1}`, color: colors[idx+1] || ''}));
+    (p.gallery || p.galleryImages || []).forEach((img,idx)=>out.push({img, label:`Gallery ${idx+1}`, color:''}));
+    const byColor = (typeof productImagesByColor === 'function') ? productImagesByColor(p) : [];
+    byColor.forEach(x=>out.push({img:x.img, label:x.color || 'ຮູບສິນຄ້າ', color:x.color||''}));
+    const list = uniqueImgs19(out);
+    return list.length ? list : [{img:'', label:'ບໍ່ມີຮູບ', color:''}];
+  }
+  function productFileName19(p,idx,img){
+    let ext = 'png';
+    const m = String(img||'').match(/^data:image\/(png|jpeg|jpg|webp)/i);
+    if(m) ext = m[1].toLowerCase().replace('jpeg','jpg');
+    const code = String(p?.code || p?.id || 'product').replace(/[^a-zA-Z0-9_-]/g,'-');
+    return `BaiBoua_${code}_${idx+1}.${ext}`;
+  }
+  function orderText19(o){
+    return [
+      o.id, o.status, o.role, o.type,
+      o.customer?.name, o.customer?.phone,
+      o.userName, o.userPhone,
+      o.sender?.name, o.sender?.phone,
+      o.shipping?.carrier, o.shipping?.branch, o.shipping?.city, o.shipping?.province,
+      ...(o.items||[]).flatMap(i=>[i.name,i.code,i.size,i.color,i.type,i.qty])
+    ].join(' ').toLowerCase();
+  }
+  function orderMatches19(o,q){
+    q = String(q||'').trim().toLowerCase();
+    if(!q) return true;
+    return orderText19(o).includes(q);
+  }
+  function orderMiniItems19(o){
+    return `<div class="order-mini-items">${(o.items||[]).map(i=>`<div class="order-mini-item"><img src="${i.image||''}"><div><b>${e19(i.name)}</b><small>${e19(i.code||'')} · ໄຊ້ ${e19(i.size||'-')} · ສີ ${e19(i.color||'-')} · x${e19(i.qty||1)}</small></div></div>`).join('')}</div>`;
+  }
 
-function productGalleryImagesV17(p){
-  const imgs = [];
-  [...(p.images||[]), ...(p.variantImages||[]), ...(p.galleryImages||[])].forEach(img=>{
-    if(img && !imgs.includes(img)) imgs.push(img);
-  });
-  return imgs.length ? imgs : [productSVG(p.name || 'Product','rose')];
-}
-function productReviewStatsV17(productId){
-  normalizeDBV17();
-  const approved = db.reviews.filter(r=>r.productId===productId && r.approved !== false);
-  const count = approved.length;
-  const avg = count ? approved.reduce((s,r)=>s+(+r.rating||0),0)/count : 0;
-  return {count,avg};
-}
-function starsV17(n){
-  n = Math.round(+n || 0);
-  return '★★★★★'.split('').map((s,i)=>`<span class="${i<n?'on':''}">★</span>`).join('');
-}
-function reviewSummaryV17(productId){
-  const st = productReviewStatsV17(productId);
-  return `<div class="review-summary"><div class="stars">${starsV17(st.avg)}</div><b>${st.count?st.avg.toFixed(1):'0.0'}</b><span class="meta">${st.count} ຣີວິວ</span></div>`;
-}
-function approvedReviewsHTMLV17(productId){
-  const list = db.reviews.filter(r=>r.productId===productId && r.approved !== false).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  if(!list.length) return `<div class="empty mini-empty">ຍັງບໍ່ມີຣີວິວສິນຄ້ານີ້</div>`;
-  return `<div class="review-list">${list.slice(0,6).map(r=>`<div class="review-card"><div class="review-top"><b>${esc(r.name||'ລູກຄ້າ')}</b><span class="stars">${starsV17(r.rating)}</span></div><div>${esc(r.text||'')}</div><div class="meta">${new Date(r.createdAt||Date.now()).toLocaleDateString()}</div></div>`).join('')}</div>`;
-}
-function canReviewProductV17(productId){
-  if(!state.user || state.role === 'admin') return false;
-  return db.orders.some(o=>o.userId===state.user.id && o.role===state.role && !String(o.status||'').includes('ຍົກເລີກ') && (o.status==='ແຈ້ງບິນ' || o.billNo || o.billImage) && (o.items||[]).some(i=>i.productId===productId));
-}
-function alreadyReviewedV17(productId){
-  if(!state.user) return false;
-  return db.reviews.some(r=>r.productId===productId && r.userId===state.user.id && r.role===state.role);
-}
-function reviewFormHTMLV17(productId){
-  if(!state.user || state.role === 'admin') return '';
-  if(alreadyReviewedV17(productId)) return `<div class="notice review-note">ເຈົ້າສົ່ງຣີວິວສິນຄ້ານີ້ແລ້ວ · ລໍຖ້າ Admin ອະນຸມັດ ຫຼື ໂຊว์ໃນໜ້າສິນຄ້າ.</div>`;
-  if(!canReviewProductV17(productId)) return `<div class="notice review-note">ຈະຣີວິວໄດ້ຫຼັງອໍເດີ້ຖືກແຈ້ງບິນແລ້ວ.</div>`;
-  return `<div class="review-form"><h3>ຂຽນຣີວິວ</h3><div class="form-grid"><div class="field"><label>ຄະແນນ</label><select id="reviewRating"><option value="5">5 ດາວ · ດີຫຼາຍ</option><option value="4">4 ດາວ · ດີ</option><option value="3">3 ດາວ · ພໍໃຊ້</option><option value="2">2 ດາວ</option><option value="1">1 ດາວ</option></select></div></div><div class="field"><label>ຄວາມເຫັນ</label><textarea id="reviewText" rows="3" placeholder="ຂຽນຄວາມຮູ້ສຶກຫຼັງໄດ້ຮັບສິນຄ້າ"></textarea></div><button class="btn rose" onclick="submitReviewV17('${productId}')">ສົ່ງຣີວິວ</button></div>`;
-}
-function submitReviewV17(productId){
-  normalizeDBV17();
-  if(!canReviewProductV17(productId)) return toast('ຈະຣີວິວໄດ້ຫຼັງແຈ້ງບິນແລ້ວ','danger');
-  if(alreadyReviewedV17(productId)) return toast('ເຈົ້າສົ່ງຣີວິວແລ້ວ','danger');
-  const p = db.products.find(x=>x.id===productId);
-  const rating = Math.max(1, Math.min(5, +val('reviewRating') || 5));
-  const text = val('reviewText').trim();
-  if(!text) return toast('ກະລຸນາຂຽນຄວາມເຫັນກ່ອນ','danger');
-  const order = db.orders.find(o=>o.userId===state.user.id && o.role===state.role && (o.billNo || o.billImage || o.status==='ແຈ້ງບິນ') && (o.items||[]).some(i=>i.productId===productId));
-  db.reviews.unshift({id:uid('RV'),productId,productName:p?.name||'',orderId:order?.id||'',userId:state.user.id,role:state.role,name:state.user.name||'',rating,text,approved:false,createdAt:Date.now()});
-  saveDB();
-  toast('ສົ່ງຣີວິວແລ້ວ · ລໍຖ້າ Admin ອະນຸມັດ');
-  openProduct(productId);
-}
-function reviewSectionV17(productId){
-  return `<div class="review-section"><div class="section-title mini-title"><h3>ຣີວິວສິນຄ້າ</h3>${reviewSummaryV17(productId)}</div>${approvedReviewsHTMLV17(productId)}${reviewFormHTMLV17(productId)}</div>`;
-}
+  window.downloadProductImageV19 = function(id, idx){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    const g = gallery19(p);
+    const item = g[Number(idx)||0];
+    if(!item || !item.img) return toast('ບໍ່ພົບຮູບ','danger');
+    const a = document.createElement('a');
+    a.href = item.img;
+    a.download = productFileName19(p, Number(idx)||0, item.img);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast('ບັນທຶກຮູບແລ້ວ');
+  };
+  window.downloadAllProductImagesV19 = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    gallery19(p).forEach((_,idx)=>setTimeout(()=>downloadProductImageV19(id,idx), idx*220));
+  };
+  window.copyOrderIdV19 = function(id){
+    const txt = String(id||'');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(()=>toast('Copy Order ID ແລ້ວ')).catch(()=>{});
+    }else{
+      const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); toast('Copy Order ID ແລ້ວ');
+    }
+  };
+  window.setProductGalleryImageV19 = function(id, idx){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const g = gallery19(p); if(!g.length) return;
+    idx = ((Number(idx)||0) + g.length) % g.length;
+    state.productGalleryIndexV19 = state.productGalleryIndexV19 || {};
+    state.productGalleryIndexV19[id] = idx;
+    const sid = safeId19(id);
+    const img = document.getElementById(`mainProductImage_${sid}`) || document.getElementById('mainProductImage');
+    if(img && g[idx].img) img.src = g[idx].img;
+    const counter = document.getElementById(`galleryCounter_${sid}`);
+    if(counter) counter.textContent = `${idx+1}/${g.length}`;
+    const label = document.getElementById(`galleryLabel_${sid}`);
+    if(label) label.textContent = g[idx].label || '';
+    document.querySelectorAll(`[data-v19-thumb="${sid}"]`).forEach(el=>el.classList.remove('selected'));
+    const th = document.querySelector(`[data-v19-thumb="${sid}"][data-idx="${idx}"]`);
+    if(th) th.classList.add('selected');
+    if(g[idx].color){
+      const sel = document.getElementById('selColor');
+      if(sel){ sel.value = g[idx].color; }
+      document.querySelectorAll('[data-color-thumb]').forEach(el=>el.classList.toggle('selected', el.getAttribute('data-color-thumb') === g[idx].color));
+    }
+  };
+  window.slideProductGalleryV19 = function(id, step){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const cur = (state.productGalleryIndexV19 && state.productGalleryIndexV19[id]) || 0;
+    setProductGalleryImageV19(id, cur + (Number(step)||0));
+  };
+  window.bindGallerySwipeV19 = function(id){
+    const el = document.getElementById(`gallerySwipe_${safeId19(id)}`);
+    if(!el || el.dataset.boundV19) return;
+    el.dataset.boundV19 = '1';
+    let sx=0, sy=0;
+    el.addEventListener('touchstart', ev=>{ const t=ev.touches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+    el.addEventListener('touchend', ev=>{ const t=ev.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){ slideProductGalleryV19(id, dx<0?1:-1); } }, {passive:true});
+  };
+  window.changeProductColorImage = function(id){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const color = val('selColor');
+    const img = (typeof productColorImage === 'function') ? productColorImage(p,color) : '';
+    const g = gallery19(p);
+    const idx = Math.max(0, g.findIndex(x => x.img === img || x.color === color));
+    setProductGalleryImageV19(id, idx);
+  };
+  window.pickProductColor = function(id,color){
+    const sel = document.getElementById('selColor');
+    if(sel) sel.value = color;
+    changeProductColorImage(id);
+  };
 
-function setGalleryImageV17(productId, idx){
-  const p = db.products.find(x=>x.id===productId);
-  if(!p) return;
-  const imgs = productGalleryImagesV17(p);
-  const total = imgs.length;
-  if(!total) return;
-  idx = (idx + total) % total;
-  galleryIndexV17[productId] = idx;
-  const main = document.getElementById('mainProductImage');
-  if(main) main.src = imgs[idx];
-  const counter = document.getElementById('galleryCounterV17');
-  if(counter) counter.textContent = `${idx+1}/${total}`;
-  document.querySelectorAll('[data-gallery-thumb]').forEach(el=>el.classList.toggle('selected', +el.dataset.galleryThumb === idx));
-}
-function nextGalleryImageV17(productId, delta){
-  setGalleryImageV17(productId, (galleryIndexV17[productId] || 0) + delta);
-}
+  const oldOpenProduct19 = window.openProduct || openProduct;
+  window.openProduct = openProduct = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return;
+    const price = state.role==='agent' ? p.agentPrice : p.price;
+    const colors = (Array.isArray(p.colors) && p.colors.length ? p.colors : ['Default']);
+    const sizes = (Array.isArray(p.sizes) && p.sizes.length ? p.sizes : ['Free size']);
+    const g = gallery19(p);
+    const sid = safeId19(id);
+    state.productGalleryIndexV19 = state.productGalleryIndexV19 || {};
+    state.productGalleryIndexV19[id] = 0;
+    const colorImgs = (typeof productImagesByColor === 'function') ? productImagesByColor(p) : colors.map(c=>({color:c,img:g[0]?.img||''}));
+    const agentDownload = state.role === 'agent' ? `<div class="agent-download-box"><b>ສຳລັບຕົວແທນ</b><div class="meta">ກົດບັນທຶກຮູບໄປໂພສຂາຍໄດ້ເລີຍ</div><div class="actions"><button class="btn sage small" onclick="downloadProductImageV19('${e19(id)}',(state.productGalleryIndexV19&&state.productGalleryIndexV19['${e19(id)}'])||0)">ບັນທຶກຮູບນີ້</button><button class="btn light small" onclick="downloadAllProductImagesV19('${e19(id)}')">ບັນທຶກທຸກຮູບ</button></div></div>` : '';
+    showModal(`<div class="modal-head"><b>${e19(p.name)}</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body product-detail product-detail-v19">
+        <div>
+          <div class="product-gallery-v19" id="gallerySwipe_${sid}">
+            <button class="gallery-arrow left" onclick="slideProductGalleryV19('${e19(id)}',-1)">‹</button>
+            <img id="mainProductImage_${sid}" class="big-img" src="${g[0]?.img || ''}" alt="${e19(p.name)}">
+            <button class="gallery-arrow right" onclick="slideProductGalleryV19('${e19(id)}',1)">›</button>
+            <div class="gallery-badge"><span id="galleryCounter_${sid}">1/${g.length}</span> · <span id="galleryLabel_${sid}">${e19(g[0]?.label||'')}</span></div>
+          </div>
+          <div class="gallery-thumbs-v19">${g.map((it,idx)=>`<button class="gallery-thumb-btn ${idx===0?'selected':''}" data-v19-thumb="${sid}" data-idx="${idx}" onclick="setProductGalleryImageV19('${e19(id)}',${idx})"><img src="${it.img}" alt="${e19(it.label)}"><span>${e19(it.label||('ຮູບ '+(idx+1)))}</span></button>`).join('')}</div>
+          ${agentDownload}
+        </div>
+        <div>
+          <span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span>
+          <h2>${e19(p.name)}</h2>
+          <div class="order-id-box"><span>Product ID / Code</span><b>${e19(p.code || p.id)}</b></div>
+          <div class="meta">${e19(p.category||'')} · ${g.length} ຮູບ · ${colors.length} ສີ</div>
+          <div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div>
+          <p>${e19(p.detail||'')}</p>
+          <div class="form-grid">
+            <div class="field"><label>ໄຊ້</label><select id="selSize">${sizes.map(s=>`<option>${e19(s)}</option>`).join('')}</select></div>
+            <div class="field"><label>ສີ</label><select id="selColor" data-product-id="${e19(id)}" onchange="changeProductColorImage('${e19(id)}')">${colors.map(s=>`<option>${e19(s)}</option>`).join('')}</select></div>
+            <div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div>
+          </div>
+          <div class="color-pick-row">${colorImgs.map((item,idx)=>`<button class="color-pick ${idx===0?'selected':''}" data-color-thumb="${e19(item.color)}" onclick="pickProductColor('${e19(id)}','${e19(item.color)}')"><img src="${item.img}"><span>${e19(item.color)}</span></button>`).join('')}</div>
+          <div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${e19(p.stock)} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div>
+          <div class="actions"><button class="btn rose" onclick="addToCart('${e19(id)}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${e19(id)}')">♡ ຖືກໃຈ</button></div>
+        </div>
+      </div>`);
+    setTimeout(()=>bindGallerySwipeV19(id),80);
+  };
 
-function productCard(p){
-  const out=p.type==='ready' && p.stock<=0;
-  const price=state.role==='agent'?`<span class="oldprice">${money(p.price)}</span> ${money(p.agentPrice)}`:money(p.price);
-  const g=productGalleryImagesV17(p);
-  const st=productReviewStatsV17(p.id);
-  return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${g[0]}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><span class="gallery-count">${g.length} ຮູບ</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">♡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${price}</div><div class="review-mini">${st.count?`★ ${st.avg.toFixed(1)} · ${st.count} ຣີວິວ`:'ຍັງບໍ່ມີຣີວິວ'}</div><div class="meta">${p.type==='ready'?`Stock: ${p.stock}`:'ລໍຖ້າ 14-18 ມື້'} · ${(p.colors||[]).join(', ')}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">ເບິ່ງ/ສັ່ງ</button>${out?'<span class="type-badge">ໝົດ</span>':''}</div></div></div>`;
-}
+  window.addToCart = addToCart = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    const qty = Math.max(1, parseInt(val('selQty') || '1'));
+    if(p.type==='ready' && (+p.stock||0)<qty) return toast('ສະຕັອກບໍ່ພໍ','danger');
+    const size = val('selSize') || '-';
+    const color = val('selColor') || '-';
+    const price = state.role==='agent' ? p.agentPrice : p.price;
+    const main = document.querySelector('.product-detail-v19 img.big-img');
+    const selectedImage = (main && main.src) ? main.src : ((typeof productColorImage === 'function') ? productColorImage(p,color) : (p.images||[])[0]);
+    const existing = state.cart.find(i=>i.productId===id && i.size===size && i.color===color);
+    if(existing) existing.qty += qty;
+    else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage});
+    closeModal();
+    toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ');
+    state.tab='cart';
+    try{ if(typeof saveCartV17 === 'function') saveCartV17(); }catch(e){}
+    render();
+  };
 
-function openProduct(id){
-  normalizeDBV17();
-  const p=db.products.find(x=>x.id===id);
-  if(!p)return;
-  const price=state.role==='agent'?p.agentPrice:p.price;
-  const colorImgs=productImagesByColor(p);
-  const gallery=productGalleryImagesV17(p);
-  galleryIndexV17[id]=0;
-  showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail v17-product-detail"><div><div class="gallery-main-wrap"><button class="gallery-arrow left" onclick="nextGalleryImageV17('${p.id}',-1)">‹</button><img id="mainProductImage" class="big-img" src="${gallery[0]}"><button class="gallery-arrow right" onclick="nextGalleryImageV17('${p.id}',1)">›</button><span id="galleryCounterV17" class="gallery-counter">1/${gallery.length}</span></div><div class="gallery-strip">${gallery.map((img,idx)=>`<img class="preview-img gallery-thumb ${idx===0?'selected':''}" data-gallery-thumb="${idx}" src="${img}" onclick="setGalleryImageV17('${p.id}',${idx})">`).join('')}</div><div class="actions color-choice-row">${colorImgs.map((item,idx)=>`<div><img class="preview-img color-thumb ${idx===0?'selected':''}" data-color-thumb="${esc(item.color)}" src="${item.img}" onclick="pickProductColor('${p.id}','${esc(item.color)}')"><div class="color-caption">${item.color}</div></div>`).join('')}</div><div class="file-mini">ຮູບ Gallery ເລື່ອນເບິ່ງໄດ້ · ເລືອກສີແລ້ວຮູບຫຼັກຈະປ່ຽນຕາມສີ</div></div><div><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div>${reviewSummaryV17(p.id)}<div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div><p>${p.detail||''}</p><div class="form-grid"><div class="field"><label>ໄຊ້</label><select id="selSize">${(p.sizes||['Free size']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ສີ</label><select id="selColor" data-product-id="${p.id}" onchange="changeProductColorImage('${p.id}')">${(p.colors||['Default']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${p.stock} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div><div class="actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div></div><div style="grid-column:1/-1">${reviewSectionV17(p.id)}</div></div>`);
-}
+  window.orderCard = orderCard = function(o){
+    const canCancel = o.status==='ລໍຖ້າຍອດໂອນ' && !o.slip;
+    return `<div class="order-card order-card-v19"><div class="order-head"><div><b>${e19(o.id)}</b><button class="btn ghost tiny" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><div class="meta">${new Date(o.createdAt||Date.now()).toLocaleString()} · ${(o.items||[]).length} ລາຍການ</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${orderMiniItems19(o)}<div class="summary-row"><span>${e19(o.status)}</span><b>${money(o.total||0)}</b></div><div class="actions"><button class="btn rose small" onclick="openOrderDetail('${e19(o.id)}')">ເບິ່ງລາຍລະອຽດ</button>${o.status==='ລໍຖ້າຍອດໂອນ'?`<button class="btn sage small" onclick="openPayment('${e19(o.id)}')">ໄປໜ້າໂອນ</button>`:''}${canCancel?`<button class="btn danger small" onclick="cancelOrder('${e19(o.id)}')">ຍົກເລີກອໍເດີ້</button>`:''}<a class="btn light small" target="_blank" href="${waLink(`ສະບາຍດີແອັດມິນ ຂ້ອຍຕ້ອງການສອບຖາມອໍເດີ້ ${o.id} ຊື່ ${o.customer?.name||''} ເບີ ${o.customer?.phone||''} ສະຖານະ ${o.status} ຕອນນີ້ຮອດໃສແລ້ວ?`)}">ທັກແອັດມິນ</a></div></div>`;
+  };
 
-function renderCart(){
-  if(!state.cart.length) return `<div class="empty">ກະຕ້າຍັງວ່າງ <br><button class="btn rose" onclick="state.tab='shop';render()">ໄປຊື້ເຄື່ອງ</button></div>`;
-  const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0);
-  return `<div class="section-title"><h2>ກະຕ້າ / ສະຫຼຸບກ່ອນຊຳລະ</h2><button class="btn light" onclick="clearCartV17()">ລ້າງກະຕ້າ</button></div><div class="notice cart-save-notice">ກະຕ້ານີ້ save ໄວ້ໃນເຄື່ອງນີ້ແລ້ວ · refresh ໜ້າກໍບໍ່ຫາຍ</div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="updateCartQtyV17(${idx},-1)">−</button><button class="btn light small" onclick="updateCartQtyV17(${idx},1)">＋</button><button class="btn danger small" onclick="removeCartItemV17(${idx})">ລຶບ</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>ຍອດລວມ</h3><div class="summary-row"><span>ລາຄາສິນຄ້າ</span><b>${money(total)}</b></div><div class="meta">ບໍ່ຂຽນຄ່າຝາກໃນລະບົບ — ລູກຄ້າຈະເຫັນຈາກບິນຝາກເຄື່ອງ.</div><div class="divider"></div><button class="btn rose full" onclick="placeOrder()">ຢືນຢັນອໍເດີ້ / ໄປໜ້າໂອນ</button></aside></div>`;
-}
+  const oldRenderOrders19 = window.renderOrders || renderOrders;
+  window.renderOrders = renderOrders = function(){
+    const all = userOrders();
+    const q = state.orderSearchV19 || '';
+    if(!all.length) return `<div class="empty">ຍັງບໍ່ມີອໍເດີ້<br><button class="btn rose" onclick="state.tab='shop';render()">ກັບໄປຊື້ເຄື່ອງ</button></div>`;
+    const orders = all.filter(o=>orderMatches19(o,q));
+    return `<div class="section-title"><h2>ປະຫວັດອໍເດີ້</h2><button class="btn light" onclick="state.tab='shop';render()">← ກັບໄປໜ້າຊື້ເຄື່ອງ</button></div>
+      <div class="order-search-panel"><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາ Order ID / Code ສິນຄ້າ / ຊື່ສິນຄ້າ" value="${e19(q)}" oninput="state.orderSearchV19=this.value;render()"></div><div class="meta">ຕົວຢ່າງ: ORD001, BB-001, ຊື່ສິນຄ້າ, ສີ</div></div>
+      ${orders.map(orderCard).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ ID/ຄຳຄົ້ນຫານີ້</div>'}`;
+  };
 
-async function readFilesV17(inputId){
-  const input=document.getElementById(inputId);
-  const out=[];
-  if(!input || !input.files) return out;
-  for(const f of input.files){ out.push(await readFile(f)); }
-  return out.filter(Boolean);
-}
+  const oldOrderFullHTML19 = window.orderFullHTML || orderFullHTML;
+  window.orderFullHTML = orderFullHTML = function(o,admin=false){
+    return `<div class="order-id-hero"><span>Order ID</span><b>${e19(o.id)}</b><button class="btn light small" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><small>ໃຊ້ ID ນີ້ຄົ້ນຫາ / ສອບຖາມກັບແອັດມິນໄດ້</small></div>` + oldOrderFullHTML19(o,admin);
+  };
 
-function adminProducts(){
-  normalizeDBV17();
-  const s=(state.adminProductSearch||'').toLowerCase();
-  const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s));
-  return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: ຖ້າບໍ່ແກ້ ລະບົບຈະສ້າງໃຫ້ເອງ</div></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType" onchange="updateAutoCode()"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ສີ (ຄັ່ນດ້ວຍ ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຕາມສີ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກ = ສີທຳອິດ, ຮູບທີ່ 1 = ສີທີ່ 2</div></div><div class="field"><label>Gallery 3-5 ຮູບ</label><input id="pGallery" type="file" accept="image/*" multiple><div class="file-mini">ຮູບມຸມອື່ນໆ ໃຫ້ລູກຄ້າ swipe/ເລື່ອນເບິ່ງ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>ລາຍການສິນຄ້າ</h3><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາສິນຄ້າໃນ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>Gallery</th><th>ຣີວິວ</th><th>Stock</th><th></th></tr>${list.map(p=>{const st=productReviewStatsV17(p.id); return `<tr><td><img src="${productGalleryImagesV17(p)[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${productGalleryImagesV17(p).length} ຮູບ</td><td>${st.count?`${st.avg.toFixed(1)} ★ (${st.count})`:'-'}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">ໃກ້ໝົດ</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`}).join('')}</table></div>`;
-}
-
-async function addProductAdmin(){
-  const name=val('pName');
-  const type=val('pType')||'ready';
-  const code=val('pCode')||nextProductCode(type);
-  if(!name)return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
-  const main=await readFile(document.getElementById('pImage')?.files?.[0]);
-  const variants=await readFilesV17('pVariants');
-  const gallery=await readFilesV17('pGallery');
-  db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,galleryImages:gallery,detail:val('pDetail')});
-  saveDB();
-  toast('ເພີ່ມສິນຄ້າແລ້ວ · Gallery '+(gallery.length+variants.length+1)+' ຮູບ');
-  render();
-}
-
-function approveReviewV17(id){ const r=db.reviews.find(x=>x.id===id); if(!r)return; r.approved=true; r.approvedAt=Date.now(); saveDB(); toast('ອະນຸມັດຣີວິວແລ້ວ'); render(); }
-function hideReviewV17(id){ const r=db.reviews.find(x=>x.id===id); if(!r)return; r.approved=false; saveDB(); toast('ເຊື່ອງຣີວິວແລ້ວ'); render(); }
-function deleteReviewV17(id){ if(!confirm('ລຶບຣີວິວນີ້?')) return; db.reviews=db.reviews.filter(r=>r.id!==id); saveDB(); render(); }
-function adminReviewsV17(){
-  normalizeDBV17();
-  const f=state.reviewFilterV17||'pending';
-  let list=[...db.reviews].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  if(f==='pending') list=list.filter(r=>r.approved===false);
-  if(f==='approved') list=list.filter(r=>r.approved!==false);
-  return `<div class="section-title"><h2>ຈັດການຣີວິວ / Rating</h2></div><div class="admin-toolbar"><div class="actions"><select onchange="state.reviewFilterV17=this.value;render()"><option value="pending" ${f==='pending'?'selected':''}>ລໍຖ້າອະນຸມັດ</option><option value="approved" ${f==='approved'?'selected':''}>ອະນຸມັດແລ້ວ</option><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option></select></div><span class="soft-chip">Pending: ${db.reviews.filter(r=>r.approved===false).length}</span></div><div class="review-admin-list">${list.map(r=>`<div class="order-card review-admin-card"><div class="order-head"><div><b>${esc(r.productName||r.productId)}</b><div class="meta">${esc(r.name||'')} · ${r.role||''} · ${new Date(r.createdAt||Date.now()).toLocaleString()}</div></div><span class="status-pill ${r.approved===false?'off':''}">${r.approved===false?'ລໍຖ້າ':'ໂຊว์ແລ້ວ'}</span></div><div class="stars">${starsV17(r.rating)}</div><p>${esc(r.text||'')}</p><div class="meta">Order: ${r.orderId||'-'}</div><div class="actions">${r.approved===false?`<button class="btn sage small" onclick="approveReviewV17('${r.id}')">ອະນຸມັດ</button>`:`<button class="btn light small" onclick="hideReviewV17('${r.id}')">ເຊື່ອງ</button>`}<button class="btn danger small" onclick="deleteReviewV17('${r.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີຣີວິວ</div>'}</div>`;
-}
-
-function adminPage(){
-  const t=state.adminTab;
-  if(t==='dashboard')return adminDashboard();
-  if(t==='orders')return adminOrders();
-  if(t==='products')return adminProducts();
-  if(t==='categories')return adminCategories();
-  if(t==='customers')return adminCustomers();
-  if(t==='agents')return adminAgents();
-  if(t==='reports')return adminReports();
-  if(t==='promo')return adminPromo();
-  if(t==='reviews')return adminReviewsV17();
-  return '';
-}
-function renderAdmin(){
-  normalizeDBV17();
-  const pendingReviews=db.reviews.filter(r=>r.approved===false).length;
-  document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ຈັດການຮ້ານ</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reviews',`ຣີວິວ${pendingReviews?` (${pendingReviews})`:''}`)}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
-}
-
-const oldRenderV17 = render;
-render = function(){
-  normalizeDBV17();
-  if(state.user && state.role !== 'admin') ensureCartLoadedV17();
-  oldRenderV17();
-  if(state.user && state.role !== 'admin') saveCartV17();
-  setTimeout(()=>{ try{ if(typeof enhanceMobileTables==='function') enhanceMobileTables(); }catch(e){} },0);
-};
+  const oldAdminOrders19 = window.adminOrders || adminOrders;
+  window.adminOrders = adminOrders = function(){
+    const f = state.adminOrderFilter || 'all';
+    const q = state.adminOrderSearchV19 || '';
+    let orders = [...(db.orders||[])];
+    if(f==='pay') orders=orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ');
+    if(f==='verify') orders=orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ');
+    if(f==='bill') orders=orders.filter(o=>!String(o.status||'').includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage);
+    if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage);
+    orders = orders.filter(o=>orderMatches19(o,q)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    return `${typeof notificationPanel==='function'?notificationPanel():''}<div class="admin-toolbar"><h2>ຈັດການອໍເດີ້</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option><option value="pay" ${f==='pay'?'selected':''}>ລໍຖ້າໂອນ</option><option value="verify" ${f==='verify'?'selected':''}>ລໍຖ້າກວດການໂອນ</option><option value="bill" ${f==='bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option><option value="done" ${f==='done'?'selected':''}>ມີບິນແລ້ວ</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button>${typeof printPackingListV18==='function'?`<button class="btn sage" onclick="state.adminTab='packing';render()">Packing Print</button>`:''}</div></div>
+      <div class="order-search-panel"><div class="search"><span>🔎</span><input placeholder="Admin search: Order ID / ຊື່ / ເບີ / Code ສິນຄ້າ" value="${e19(q)}" oninput="state.adminOrderSearchV19=this.value;render()"></div><div class="meta">ພົບ ${orders.length} ອໍເດີ້</div></div>
+      ${orders.map(o=>`<div class="order-card order-card-v19"><div class="order-head"><div><b>${e19(o.id)}</b><button class="btn ghost tiny" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><div class="meta">${e19(o.role)} · ${e19(o.customer?.name||'')} · ${e19(o.customer?.phone||'')}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${e19(o.billNo||'')}</div>`:''}${orderMiniItems19(o)}<div class="summary-row"><span>${e19(o.status)}</span><b>${money(o.total||0)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${e19(o.id)}')">ເບິ່ງ/ຈັດການ</button>${typeof printOrderPackingV18==='function'?`<button class="btn light small" onclick="printOrderPackingV18('${e19(o.id)}')">ພິມ</button>`:''}<button class="btn sage small" onclick="nextStatus('${e19(o.id)}')">ດັນສະຖານະຕໍ່ໄປ</button><button class="btn danger small" onclick="deleteOrder('${e19(o.id)}')">ລຶບ</button></div></div>`).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ Filter/Search ນີ້</div>'}`;
+  };
+})();
