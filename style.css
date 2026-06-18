@@ -304,3 +304,15 @@ select { max-width: 100%; }
 .admin-hidden-entry-v21 button:hover{color:var(--dusty)}
 .clean-admin-login-v21{padding-top:16px}
 .clean-admin-login-v21 .notice{display:none!important}
+
+/* === v22: Signup is a separate modal/page, not inline under login === */
+.v22-login .customer-agent-tabs{grid-template-columns:repeat(2,1fr)!important}
+.signup-open-v22{margin-top:10px;border-style:dashed!important;background:rgba(255,255,255,.92)!important;color:#6d6255!important;box-shadow:none!important}
+.signup-open-v22:hover{background:#fff7f4!important;color:var(--dusty)!important}
+.customer-register-modal-v22{padding-top:16px;display:grid;gap:14px}
+.customer-register-modal-v22 .field{margin:0}
+.register-welcome-v22{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;background:linear-gradient(135deg,#fff7f4,#f4efe5);border:1px solid #eaded4;border-radius:20px;padding:12px;margin-bottom:4px}
+.register-welcome-v22 .lotus{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,var(--dusty),#d8b1ba);color:white;box-shadow:0 10px 22px rgba(196,150,161,.20);font-size:24px}
+.register-welcome-v22 b{font-size:18px;color:var(--bronze)}
+.register-welcome-v22 span{font-size:13px;color:#776c5f;line-height:1.5;font-weight:750}
+@media(max-width:720px){.customer-register-modal-v22{gap:12px}.register-welcome-v22{grid-template-columns:44px 1fr;border-radius:18px}.register-welcome-v22 .lotus{width:44px;height:44px;border-radius:16px}.signup-open-v22{min-height:50px}}

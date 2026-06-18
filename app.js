@@ -1039,3 +1039,92 @@ try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringif
     </div>`;
   };
 })();
+
+/* === v22: Signup opens as a separate modal/page, not inline under login === */
+(function(){
+  function safePhoneTextV22(){
+    try{ return (typeof ADMIN_PHONE_TEXT !== 'undefined' && ADMIN_PHONE_TEXT) ? ADMIN_PHONE_TEXT : '+856 20 9980 9749'; }
+    catch(e){ return '+856 20 9980 9749'; }
+  }
+  function e22(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  window.loginRole = loginRole = function(role){
+    if(role === 'admin') role = 'customer';
+    state.loginRole = role;
+    state.showRegister = false;
+    renderLogin();
+  };
+
+  window.openCustomerRegister = openCustomerRegister = function(){
+    state.showRegister = false;
+    showModal(`<div class="modal-head"><b>ສະໝັກບັນຊີໃໝ່</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body customer-register-modal-v22">
+        <div class="register-welcome-v22">
+          <div class="lotus">🪷</div>
+          <div><b>Bai Boua</b><br><span>ກອກຂໍ້ມູນແລ້ວກົດຢືນຢັນ ລະບົບຈະເຂົ້າໜ້າເວັບໃຫ້ເລີຍ</span></div>
+        </div>
+        <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ" autocomplete="name"></div>
+        <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..." autocomplete="tel"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ" autocomplete="new-password"></div>
+        <button class="btn rose full" onclick="registerCustomer()">ຢືນຢັນສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+      </div>`);
+    setTimeout(()=>{ try{ document.getElementById('regName')?.focus(); }catch(e){} },80);
+  };
+
+  window.toggleRegister = toggleRegister = function(){
+    openCustomerRegister();
+  };
+
+  window.registerCustomer = registerCustomer = function(){
+    const name = val('regName');
+    const phone = val('regPhone');
+    const pass = val('regPass');
+    if(!name || !phone || !pass) return toast('ກະລຸນາກອກຊື່ ເບີໂທ ແລະ ລະຫັດ','danger');
+    if(db.users.some(u => String(u.phone) === String(phone))) return toast('ເບີນີ້ມີບັນຊີແລ້ວ','danger');
+    const u = {id:uid('C'), role:'customer', name, phone, password:pass, createdAt:Date.now()};
+    db.users.push(u);
+    saveDB();
+    state.user = u;
+    state.role = 'customer';
+    state.loginRole = 'customer';
+    state.tab = 'shop';
+    state.showRegister = false;
+    try{ if(typeof saveSessionV12 === 'function') saveSessionV12(); }catch(e){}
+    try{ closeModal(); }catch(e){}
+    toast('ສະໝັກສຳເລັດ ເຂົ້າໜ້າເວັບແລ້ວ');
+    render();
+    try{ showWelcome(); }catch(e){}
+  };
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    state.showRegister = false;
+    const isCustomer = state.loginRole === 'customer';
+    const phoneText = safePhoneTextV22();
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v22-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua<br><span>Shop</span></h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າລັອກອິນ ຫຼື ກົດສະໝັກບັນຊີໃໝ່':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer ? `<button class="btn light full signup-open-v22" onclick="openCustomerRegister()">ສະໝັກບັນຊີໃໝ່</button>` : ''}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${e22(phoneText)}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry admin-hidden-entry-v21"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
