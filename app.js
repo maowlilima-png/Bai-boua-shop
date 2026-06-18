@@ -5,9 +5,9 @@ const ADMIN_PASS = "Maliluv_277";
 const WA_NUMBER = "8562099809749";
 const ADMIN_PHONE_TEXT = "+856 20 9980 9749";
 const STORAGE_KEY = "bai_boua_shop_live_v7";
-const provinces = ["àº™àº°àº„àº­àº™àº«àº¼àº§àº‡àº§àº½àº‡àºˆàº±àº™","àº§àº½àº‡àºˆàº±àº™","àº«àº¼àº§àº‡àºžàº°àºšàº²àº‡","àºˆàº³àº›àº²àºªàº±àº","àºªàº°àº«àº§àº±àº™àº™àº°à»€àº‚àº”","àº„àº³àº¡à»ˆàº§àº™","àºšà»àº¥àº´àº„àº³à»„àºŠ","àº«àº¼àº§àº‡àº™à»‰àº³àº—àº²","àº­àº¸àº”àº»àº¡à»„àºŠ","àºŠàº½àº‡àº‚àº§àº²àº‡","àº«àº»àº§àºžàº±àº™","à»„àºŠàºàº°àºšàº¹àº¥àºµ","àºªàº²àº¥àº°àº§àº±àº™","à»€àºŠàºàº­àº‡","àº­àº±àº”àº•àº°àº›àº·","àºšà»à»ˆà»àºà»‰àº§","à»„àºŠàºªàº»àº¡àºšàº¹àº™","àºœàº»à»‰àº‡àºªàº²àº¥àºµ"];
-const readySteps = ["àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™","àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™","àºàº½àº¡àºàº²àºà»€àº„àº·à»ˆàº­àº‡","à»àºˆà»‰àº‡àºšàº´àº™ âœ…"];
-const preSteps = ["àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™","àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™","àºªàº±à»ˆàº‡à»€àº„àº·à»ˆàº­àº‡","àº¥à»àº–à»‰àº²à»€àº„àº·à»ˆàº­àº‡ 14-18 àº¡àº·à»‰","à»€àº„àº·à»ˆàº­àº‡àº®àº­àº”à»àº¥à»‰àº§àºàº½àº¡àºàº²àº","à»àºˆà»‰àº‡àºšàº´àº™ âœ…"];
+const provinces = ["ນະຄອນຫຼວງວຽງຈັນ","ວຽງຈັນ","ຫຼວງພະບາງ","ຈຳປາສັກ","ສະຫວັນນະເຂດ","ຄຳມ່ວນ","ບໍລິຄຳໄຊ","ຫຼວງນ້ຳທາ","ອຸດົມໄຊ","ຊຽງຂວາງ","ຫົວພັນ","ໄຊຍະບູລີ","ສາລະວັນ","ເຊກອງ","ອັດຕະປື","ບໍ່ແກ້ວ","ໄຊສົມບູນ","ຜົ້ງສາລີ"];
+const readySteps = ["ລໍຖ້າຍອດໂອນ","ກວດສອບການໂອນ","ກຽມຝາກເຄື່ອງ","ແຈ້ງບິນ ✅"];
+const preSteps = ["ລໍຖ້າຍອດໂອນ","ກວດສອບການໂອນ","ສັ່ງເຄື່ອງ","ລໍຖ້າເຄື່ອງ 14-18 ມື້","ເຄື່ອງຮອດແລ້ວກຽມຝາກ","ແຈ້ງບິນ ✅"];
 let state = { user:null, role:"customer", loginRole:"customer", tab:"shop", adminTab:"dashboard", category:"all", search:"", cart:[], paymentOrderId:null, detailOrderId:null };
 function productSVG(name, hue="rose"){
   const palettes = {rose:["%23c496a1","%23f4dce3","%2381785a"], sage:["%23919d85","%23e7edde","%2381785a"], lav:["%238e8aa3","%23eceafd","%2381785a"], cream:["%23ebe1c6","%23fffaf0","%2381785a"]};
@@ -16,18 +16,18 @@ function productSVG(name, hue="rose"){
 }
 function defaultData(){
   return {
-    categories:["à»€àºªàº·à»‰àº­","à»‚àºªà»‰àº‡","àºàº°à»‚àº›àº‡","àºàº³à»„àº¥","àºàº°à»€àº›àº»àº²","àºžà»‰àº­àº¡àºªàº»à»ˆàº‡","àºžàº£àºµàº­à»à»€àº”àºµà»‰"],
+    categories:["ເສື້ອ","ໂສ້ງ","ກະໂປງ","ກຳໄລ","ກະເປົາ","ພ້ອມສົ່ງ","ພຣີອໍເດີ້"],
     users:[],
     agents:[],
     products:[
-      {id:uid("P"),name:"Vintage Rose Dress",code:"DR-001",category:"àºàº°à»‚àº›àº‡",type:"ready",price:185000,agentPrice:155000,cost:110000,stock:8,sizes:["S","M","L"],colors:["Dusty Rose","Vintage Cream"],images:[productSVG("Dress","rose")],variantImages:[productSVG("Rose","rose"),productSVG("Cream","cream")],detail:"àºŠàº¸àº”àºªàºµàº«àº§àº²àº™ à»‚àº—àº™ vintage garden àºžà»‰àº­àº¡àºªàº»à»ˆàº‡"},
-      {id:uid("P"),name:"Muted Sage Shirt",code:"SH-002",category:"à»€àºªàº·à»‰àº­",type:"ready",price:129000,agentPrice:109000,cost:79000,stock:12,sizes:["M","L","XL"],colors:["Muted Sage","Antique Bronze"],images:[productSVG("Shirt","sage")],variantImages:[productSVG("Sage","sage")],detail:"à»€àºªàº·à»‰àº­àºªàºµ sage à»ƒàºªà»ˆàº‡à»ˆàº²àº àº–à»ˆàº²àºàº®àº¹àºšàº‡àº²àº¡"},
-      {id:uid("P"),name:"Lavender Charm Bracelet",code:"BR-003",category:"àºàº³à»„àº¥",type:"preorder",price:99000,agentPrice:82000,cost:55000,stock:null,sizes:["15cm","16cm","17cm","18cm"],colors:["Lavender Purple","Dusty Rose"],images:[productSVG("Bracelet","lav")],variantImages:[productSVG("Lavender","lav")],detail:"àºªàº´àº™àº„à»‰àº²àºžàº£àºµàº­à»à»€àº”àºµà»‰ àº¥à»àº–à»‰àº² 14-18 àº¡àº·à»‰ àº«àº¼àº±àº‡àºˆàº²àºà»àº­àº±àº”àº¡àº´àº™àº¢àº·àº™àº¢àº±àº™"},
-      {id:uid("P"),name:"Cream Tote Bag",code:"BG-004",category:"àºàº°à»€àº›àº»àº²",type:"ready",price:159000,agentPrice:135000,cost:97000,stock:0,sizes:["Free size"],colors:["Vintage Cream"],images:[productSVG("Tote","cream")],variantImages:[],detail:"àºªàº´àº™àº„à»‰àº²à»àº»àº”àºŠàº»à»ˆàº§àº„àº²àº§"}
+      {id:uid("P"),name:"Vintage Rose Dress",code:"DR-001",category:"ກະໂປງ",type:"ready",price:185000,agentPrice:155000,cost:110000,stock:8,sizes:["S","M","L"],colors:["Dusty Rose","Vintage Cream"],images:[productSVG("Dress","rose")],variantImages:[productSVG("Rose","rose"),productSVG("Cream","cream")],detail:"ຊຸດສີຫວານ ໂທນ vintage garden ພ້ອມສົ່ງ"},
+      {id:uid("P"),name:"Muted Sage Shirt",code:"SH-002",category:"ເສື້ອ",type:"ready",price:129000,agentPrice:109000,cost:79000,stock:12,sizes:["M","L","XL"],colors:["Muted Sage","Antique Bronze"],images:[productSVG("Shirt","sage")],variantImages:[productSVG("Sage","sage")],detail:"ເສື້ອສີ sage ໃສ່ງ່າຍ ຖ່າຍຮູບງາມ"},
+      {id:uid("P"),name:"Lavender Charm Bracelet",code:"BR-003",category:"ກຳໄລ",type:"preorder",price:99000,agentPrice:82000,cost:55000,stock:null,sizes:["15cm","16cm","17cm","18cm"],colors:["Lavender Purple","Dusty Rose"],images:[productSVG("Bracelet","lav")],variantImages:[productSVG("Lavender","lav")],detail:"ສິນຄ້າພຣີອໍເດີ້ ລໍຖ້າ 14-18 ມື້ ຫຼັງຈາກແອັດມິນຢືນຢັນ"},
+      {id:uid("P"),name:"Cream Tote Bag",code:"BG-004",category:"ກະເປົາ",type:"ready",price:159000,agentPrice:135000,cost:97000,stock:0,sizes:["Free size"],colors:["Vintage Cream"],images:[productSVG("Tote","cream")],variantImages:[],detail:"ສິນຄ້າໝົດຊົ່ວຄາວ"}
     ],
     orders:[],
     wishlist:{},
-    promo:{show:true,title:"à»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™àº¡àº·à»‰àº™àºµà»‰",text:"àºªàº´àº™àº„à»‰àº²à»ƒà»à»ˆà»‚àº—àº™ Vintage Garden à»€àº‚àº»à»‰àº²à»àº¥à»‰àº§ àºàº»àº”à»€àºšàº´à»ˆàº‡à»„àº”à»‰à»€àº¥àºµàº",image:""}
+    promo:{show:true,title:"ໂປຣໂມຊັ່ນມື້ນີ້",text:"ສິນຄ້າໃໝ່ໂທນ Vintage Garden ເຂົ້າແລ້ວ ກົດເບິ່ງໄດ້ເລີຍ",image:""}
   }
 }
 function uid(prefix="ID"){ return prefix + Math.random().toString(36).slice(2,8).toUpperCase() }
@@ -72,7 +72,7 @@ async function initCloudDB(){
   }catch(e){
     cloudReady=false;
     console.warn("Supabase sync off, using localStorage only:", e.message||e);
-    setTimeout(()=>{try{toast('àºàº±àº‡à»€àºŠàº·à»ˆàº­àº¡ Supabase àºšà»à»ˆà»„àº”à»‰: àºàº§àº”àº•àº²àº•àº°àº¥àº²àº‡ app_state à»ƒàº™àº–àº²àº™àº‚à»à»‰àº¡àº¹àº™','danger')}catch(_){}},700);
+    setTimeout(()=>{try{toast('ຍັງເຊື່ອມ Supabase ບໍ່ໄດ້: ກວດຕາຕະລາງ app_state ໃນຖານຂໍ້ມູນ','danger')}catch(_){}},700);
   }
 }
 async function saveDBToCloud(force=false){
@@ -88,7 +88,7 @@ async function saveDBToCloud(force=false){
     cloudReady=true;
   }catch(e){
     console.warn("Supabase save failed:", e.message||e);
-    if(force) setTimeout(()=>{try{toast('àºšàº±àº™àº—àº¶àºàº‚àº¶à»‰àº™ Supabase àºšà»à»ˆàºªàº³à»€àº¥àº±àº”','danger')}catch(_){}},300);
+    if(force) setTimeout(()=>{try{toast('ບັນທຶກຂຶ້ນ Supabase ບໍ່ສຳເລັດ','danger')}catch(_){}},300);
   }finally{
     cloudSaving=false;
     if(pendingCloudSave){ pendingCloudSave=false; saveDBToCloud(); }
@@ -99,15 +99,15 @@ function saveDB(){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
   saveDBToCloud();
 }
-function money(n){ return Number(n||0).toLocaleString('en-US') + " â‚­" }
+function money(n){ return Number(n||0).toLocaleString('en-US') + " ₭" }
 function todayStr(ts=Date.now()){ return new Date(ts).toISOString().slice(0,10) }
-function toast(msg,type="ok"){ const el=document.getElementById('toast'); const div=document.createElement('div'); div.className='toast-item'; if(type==='danger')div.style.borderLeftColor='var(--danger)'; div.innerHTML=`<b>ðŸŒ· Bai Boua</b><br>${msg}`; el.appendChild(div); setTimeout(()=>div.remove(),3400); trySound(type==='danger'?220:520) }
+function toast(msg,type="ok"){ const el=document.getElementById('toast'); const div=document.createElement('div'); div.className='toast-item'; if(type==='danger')div.style.borderLeftColor='var(--danger)'; div.innerHTML=`<b>🌷 Bai Boua</b><br>${msg}`; el.appendChild(div); setTimeout(()=>div.remove(),3400); trySound(type==='danger'?220:520) }
 function trySound(freq=520){ try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.setValueAtTime(.05,ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.12); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+.13)}catch(e){} }
 function waLink(text){ return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}` }
 function currentUserKey(){ return state.user ? `${state.role}:${state.user.id}` : "guest" }
 function isWish(pid){ return !!(db.wishlist[currentUserKey()]||[]).includes(pid) }
-function toggleWish(pid){ const k=currentUserKey(); db.wishlist[k]=db.wishlist[k]||[]; const i=db.wishlist[k].indexOf(pid); if(i>=0){db.wishlist[k].splice(i,1)}else{db.wishlist[k].push(pid)} saveDB(); toast(i>=0?'àº¥àº¶àºšàº­àº­àºàºˆàº²àºàº¥àº²àºàºàº²àº™àº–àº·àºà»ƒàºˆ':'à»€àºžàºµà»ˆàº¡à»€àº‚àº»à»‰àº²àº¥àº²àºàºàº²àº™àº–àº·àºà»ƒàºˆ'); render() }
-function productsFiltered(){ return db.products.filter(p=>{ const matchCat = state.category==='all' || p.category===state.category || (state.category==='àºžà»‰àº­àº¡àºªàº»à»ˆàº‡'&&p.type==='ready') || (state.category==='àºžàº£àºµàº­à»à»€àº”àºµà»‰'&&p.type==='preorder'); const s=(state.search||'').toLowerCase(); const matchSearch=!s || [p.name,p.code,p.category,p.detail].join(' ').toLowerCase().includes(s); return matchCat && matchSearch }) }
+function toggleWish(pid){ const k=currentUserKey(); db.wishlist[k]=db.wishlist[k]||[]; const i=db.wishlist[k].indexOf(pid); if(i>=0){db.wishlist[k].splice(i,1)}else{db.wishlist[k].push(pid)} saveDB(); toast(i>=0?'ລຶບອອກຈາກລາຍການຖືກໃຈ':'ເພີ່ມເຂົ້າລາຍການຖືກໃຈ'); render() }
+function productsFiltered(){ return db.products.filter(p=>{ const matchCat = state.category==='all' || p.category===state.category || (state.category==='ພ້ອມສົ່ງ'&&p.type==='ready') || (state.category==='ພຣີອໍເດີ້'&&p.type==='preorder'); const s=(state.search||'').toLowerCase(); const matchSearch=!s || [p.name,p.code,p.category,p.detail].join(' ').toLowerCase().includes(s); return matchCat && matchSearch }) }
 function loginRole(role){ state.loginRole=role; renderLogin() }
 function render(){ if(!state.user) return renderLogin(); clearExpiredOrders(); if(state.role==='admin') return renderAdmin(); return renderShop() }
 function renderLogin(){
@@ -115,127 +115,127 @@ function renderLogin(){
   <div class="screen login-wrap">
     <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="hero">
-      <div class="hero-badge">ðŸª· Bai Boua Shop Â· Vintage Garden</div>
+      <div class="hero-badge">🪷 Bai Boua Shop · Vintage Garden</div>
       <h1 class="brand-title">Bai Boua <span>Online Shop</span></h1>
-      <p>à»€àº§àº±àºšàº‚àº²àºà»€àº„àº·à»ˆàº­àº‡àº­àº­àº™àº¥àº²àº àº¡àºµàºªàº´àº™àº„à»‰àº²àºžà»‰àº­àº¡àºªàº»à»ˆàº‡ + àºžàº£àºµàº­à»à»€àº”àºµà»‰, àºàº°àº•à»‰àº², àº•àº´àº”àº•àº²àº¡àº­à»à»€àº”àºµà»‰, QR Payment, àº¥àº°àºšàº»àºšàº•àº»àº§à»àº—àº™ à»àº¥àº° à»àº­àº±àº”àº¡àº´àº™àº«àº¼àº±àº‡àºšà»‰àº²àº™.</p>
+      <p>ເວັບຂາຍເຄື່ອງອອນລາຍ ມີສິນຄ້າພ້ອມສົ່ງ + ພຣີອໍເດີ້, ກະຕ້າ, ຕິດຕາມອໍເດີ້, QR Payment, ລະບົບຕົວແທນ ແລະ ແອັດມິນຫຼັງບ້ານ.</p>
       <div class="floating-card">
         <div class="flower-dots"><i></i><i></i><i></i></div>
-        <b>à»‚àº—àº™àºªàºµ:</b> Dusty Rose Â· Muted Sage Â· Lavender Purple Â· Vintage Cream Â· Antique Bronze<br>
-        <span class="meta">Login à»œà»‰àº²àº™àºµà»‰àº¡àºµàºàº»àº™àº”àº²àº§àº•àº»àºà»€àºšàº»àº²à»† àºšà»à»ˆà»ƒàºŠà»‰ emoji àº¥àº­àºà»€àºàº°àºàº°.</span>
+        <b>ໂທນສີ:</b> Dusty Rose · Muted Sage · Lavender Purple · Vintage Cream · Antique Bronze<br>
+        <span class="meta">Login ໜ້ານີ້ມີຝົນດາວຕົກເບົາໆ ບໍ່ໃຊ້ emoji ລອຍເກະກະ.</span>
       </div>
     </div>
     <div class="login-card">
       <div class="role-tabs">
-        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">àº¥àº¹àºàº„à»‰àº²</button>
-        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">àº•àº»àº§à»àº—àº™</button>
-        <button class="${state.loginRole==='admin'?'active':''}" onclick="loginRole('admin')">à»àº­àº±àº”àº¡àº´àº™</button>
+        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        <button class="${state.loginRole==='admin'?'active':''}" onclick="loginRole('admin')">ແອັດມິນ</button>
       </div>
-      <h2 style="margin:0 0 4px">à»€àº‚àº»à»‰àº²àºªàº¹à»ˆàº¥àº°àºšàº»àºš</h2>
-      <div class="meta">${state.loginRole==='customer'?'àº¥àº¹àºàº„à»‰àº²àºªàº²àº¡àº²àº”àºªàº°à»àº±àºà»€àº­àº‡à»„àº”à»‰':'àº•àº»àº§à»àº—àº™/à»àº­àº±àº”àº¡àº´àº™ à»ƒàºŠà»‰ ID àº—àºµà»ˆàº®à»‰àº²àº™àºàº³àº™àº»àº”'}</div>
-      <div class="field"><label>${state.loginRole==='admin'?'Username':'à»€àºšàºµà»‚àº— / ID'}</label><input id="loginId" placeholder="àº›à»‰àº­àº™àº‚à»à»‰àº¡àº¹àº™"></div>
-      <div class="field"><label>àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™</label><input id="loginPass" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"></div>
-      <button class="btn rose full" onclick="doLogin()">à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºš</button>
-      ${state.loginRole==='customer'?`<div class="register-box"><b>àºªàº°à»àº±àºàº¥àº¹àºàº„à»‰àº²à»ƒà»à»ˆ</b><div class="form-grid" style="margin-top:10px"><div class="field"><label>àºŠàº·à»ˆ</label><input id="regName" placeholder="àºŠàº·à»ˆàº‚àº­àº‡àº¥àº¹àºàº„à»‰àº²"></div><div class="field"><label>à»€àºšàºµà»‚àº—</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div><div class="field" style="grid-column:1/-1"><label>àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™</label><input id="regPass" type="password" placeholder="àº•àº±à»‰àº‡àº¥àº°àº«àº±àº”"></div></div><button class="btn light full" onclick="registerCustomer()">àºªàº°à»àº±àº à»àº¥àº° à»€àº‚àº»à»‰àº²à»ƒàºŠà»‰</button></div>`:''}
-      <div class="contact-line"><span>àº¥àº·àº¡àº¥àº°àº«àº±àº” / àº•àº´àº”àº•à»à»ˆàº®à»‰àº²àº™<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('àºªàº°àºšàº²àºàº”àºµà»àº­àº±àº”àº¡àº´àº™ àº‚à»‰àº­àºàº¥àº·àº¡àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™ / àº•à»‰àº­àº‡àºàº²àº™àº•àº´àº”àº•à»à»ˆàº®à»‰àº²àº™ Bai Boua')}">WhatsApp</a></div>
+      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+      <div class="meta">${state.loginRole==='customer'?'ລູກຄ້າສາມາດສະໝັກເອງໄດ້':'ຕົວແທນ/ແອັດມິນ ໃຊ້ ID ທີ່ຮ້ານກຳນົດ'}</div>
+      <div class="field"><label>${state.loginRole==='admin'?'Username':'ເບີໂທ / ID'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+      ${state.loginRole==='customer'?`<div class="register-box"><b>ສະໝັກລູກຄ້າໃໝ່</b><div class="form-grid" style="margin-top:10px"><div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div><div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div><div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div></div><button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button></div>`:''}
+      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
     </div>
   </div>`
 }
-function doLogin(){ const id=document.getElementById('loginId').value.trim(); const pass=document.getElementById('loginPass').value.trim(); const r=state.loginRole; if(r==='admin'){ if(id===ADMIN_USER && pass===ADMIN_PASS){state.user={id:'ADMIN',name:'Bai Boua Admin'}; state.role='admin'; toast('à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºšà»àº­àº±àº”àº¡àº´àº™à»àº¥à»‰àº§'); render()} else toast('Username àº«àº¼àº· password àºšà»à»ˆàº–àº·àº','danger'); return} if(r==='customer'){ const u=db.users.find(x=>(x.phone===id||x.id===id)&&x.password===pass); if(!u) return toast('àºšà»à»ˆàºžàº»àºšàºšàº±àº™àºŠàºµàº¥àº¹àºàº„à»‰àº²','danger'); state.user=u; state.role='customer'; toast('àºàº´àº™àº”àºµàº•à»‰àº­àº™àº®àº±àºš'); render(); showWelcome(); return} if(r==='agent'){ const u=db.agents.find(x=>(x.phone===id||x.id===id)&&x.password===pass); if(!u) return toast('àºšà»à»ˆàºžàº»àºšàºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™','danger'); if(!u.active) return toast('àºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™àº–àº·àºàº›àº´àº” àºàº°àº¥àº¸àº™àº²àº•àº´àº”àº•à»à»ˆà»àº­àº±àº”àº¡àº´àº™','danger'); state.user=u; state.role='agent'; toast('à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºšàº•àº»àº§à»àº—àº™à»àº¥à»‰àº§'); render(); showWelcome(); }}
-function registerCustomer(){ const name=val('regName'), phone=val('regPhone'), pass=val('regPass'); if(!name||!phone||!pass) return toast('àºàº°àº¥àº¸àº™àº²àºàº­àºàºŠàº·à»ˆ à»€àºšàºµà»‚àº— à»àº¥àº° àº¥àº°àº«àº±àº”','danger'); if(db.users.some(u=>u.phone===phone)) return toast('à»€àºšàºµàº™àºµà»‰àº¡àºµàºšàº±àº™àºŠàºµà»àº¥à»‰àº§','danger'); const u={id:uid('C'),role:'customer',name,phone,password:pass,createdAt:Date.now()}; db.users.push(u); saveDB(); state.user=u; state.role='customer'; toast('àºªàº°à»àº±àºàºªàº³à»€àº¥àº±àº”'); render(); showWelcome(); }
+function doLogin(){ const id=document.getElementById('loginId').value.trim(); const pass=document.getElementById('loginPass').value.trim(); const r=state.loginRole; if(r==='admin'){ if(id===ADMIN_USER && pass===ADMIN_PASS){state.user={id:'ADMIN',name:'Bai Boua Admin'}; state.role='admin'; toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ'); render()} else toast('Username ຫຼື password ບໍ່ຖືກ','danger'); return} if(r==='customer'){ const u=db.users.find(x=>(x.phone===id||x.id===id)&&x.password===pass); if(!u) return toast('ບໍ່ພົບບັນຊີລູກຄ້າ','danger'); state.user=u; state.role='customer'; toast('ຍິນດີຕ້ອນຮັບ'); render(); showWelcome(); return} if(r==='agent'){ const u=db.agents.find(x=>(x.phone===id||x.id===id)&&x.password===pass); if(!u) return toast('ບໍ່ພົບບັນຊີຕົວແທນ','danger'); if(!u.active) return toast('ບັນຊີຕົວແທນຖືກປິດ ກະລຸນາຕິດຕໍ່ແອັດມິນ','danger'); state.user=u; state.role='agent'; toast('ເຂົ້າລະບົບຕົວແທນແລ້ວ'); render(); showWelcome(); }}
+function registerCustomer(){ const name=val('regName'), phone=val('regPhone'), pass=val('regPass'); if(!name||!phone||!pass) return toast('ກະລຸນາກອກຊື່ ເບີໂທ ແລະ ລະຫັດ','danger'); if(db.users.some(u=>u.phone===phone)) return toast('ເບີນີ້ມີບັນຊີແລ້ວ','danger'); const u={id:uid('C'),role:'customer',name,phone,password:pass,createdAt:Date.now()}; db.users.push(u); saveDB(); state.user=u; state.role='customer'; toast('ສະໝັກສຳເລັດ'); render(); showWelcome(); }
 function val(id){ const el=document.getElementById(id); return el?el.value.trim():'' }
 function onlyDigits(el){ el.value=String(el.value||'').replace(/\D/g,'') }
 function numAttrs(max=''){ return `type="text" inputmode="numeric" pattern="[0-9]*" ${max?`maxlength="${max}"`:''} oninput="onlyDigits(this)"` }
 function logout(){ state={...state,user:null,role:'customer',tab:'shop',cart:[],paymentOrderId:null}; render() }
-function showWelcome(){ if(!db.promo.show) return; setTimeout(()=>{ const w=document.createElement('div'); w.className='welcome'; w.innerHTML=`<button class="btn light small close-x" onclick="this.parentElement.remove()">âœ•</button>${db.promo.image?`<img src="${db.promo.image}" style="width:100%;max-height:170px;object-fit:cover;border-radius:22px;margin-bottom:10px">`:'<div style="font-size:42px">ðŸª·</div>'}<h3>${db.promo.title}</h3><p>${db.promo.text}</p><button class="btn rose full" onclick="this.closest('.welcome').remove(); state.tab='shop'; render()">à»€àºšàº´à»ˆàº‡àºªàº´àº™àº„à»‰àº²</button>`; document.body.appendChild(w)},250) }
-function clearExpiredOrders(){ const now=Date.now(); let changed=false; for(const o of db.orders){ if(o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™' && !o.slip && o.expiresAt && now>o.expiresAt){ o.status='àºàº»àºà»€àº¥àºµàºàº­àº±àº”àº•àº°à»‚àº™àº¡àº±àº”'; restockOrder(o); changed=true } } if(changed) saveDB() }
+function showWelcome(){ if(!db.promo.show) return; setTimeout(()=>{ const w=document.createElement('div'); w.className='welcome'; w.innerHTML=`<button class="btn light small close-x" onclick="this.parentElement.remove()">✕</button>${db.promo.image?`<img src="${db.promo.image}" style="width:100%;max-height:170px;object-fit:cover;border-radius:22px;margin-bottom:10px">`:'<div style="font-size:42px">🪷</div>'}<h3>${db.promo.title}</h3><p>${db.promo.text}</p><button class="btn rose full" onclick="this.closest('.welcome').remove(); state.tab='shop'; render()">ເບິ່ງສິນຄ້າ</button>`; document.body.appendChild(w)},250) }
+function clearExpiredOrders(){ const now=Date.now(); let changed=false; for(const o of db.orders){ if(o.status==='ລໍຖ້າຍອດໂອນ' && !o.slip && o.expiresAt && now>o.expiresAt){ o.status='ຍົກເລີກອັດຕະໂນມັດ'; restockOrder(o); changed=true } } if(changed) saveDB() }
 function restockOrder(order){ for(const item of order.items){ const p=db.products.find(x=>x.id===item.productId); if(p && p.type==='ready' && typeof p.stock==='number') p.stock += item.qty } }
 function renderShop(){ const cartQty=state.cart.reduce((s,i)=>s+i.qty,0); const wishQty=(db.wishlist[currentUserKey()]||[]).length; document.getElementById('app').innerHTML=`
   <div class="screen">
-    <div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">ðŸª·</div><div><b>Bai Boua Shop</b><div class="meta">${state.role==='agent'?'àºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™':'àºšàº±àº™àºŠàºµàº¥àº¹àºàº„à»‰àº²'} Â· ${state.user.name}</div></div></div><div class="nav">
-      ${navBtn('shop','àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡')}${navBtn('cart',`àºàº°àº•à»‰àº² ${cartQty?`(${cartQty})`:''}`)}${navBtn('orders','àº­à»à»€àº”àºµà»‰')}${state.role==='agent'?navBtn('agentReport','àºªàº°àº«àº¼àº¸àºšàºàº­àº”'):''}${navBtn('wish',`àº–àº·àºà»ƒàºˆ ${wishQty?`(${wishQty})`:''}`)}${navBtn('profile','àºšàº±àº™àºŠàºµ')}
-      <button onclick="logout()">àº­àº­àº</button></div></div></div>
+    <div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Shop</b><div class="meta">${state.role==='agent'?'ບັນຊີຕົວແທນ':'ບັນຊີລູກຄ້າ'} · ${state.user.name}</div></div></div><div class="nav">
+      ${navBtn('shop','ຊື້ເຄື່ອງ')}${navBtn('cart',`ກະຕ້າ ${cartQty?`(${cartQty})`:''}`)}${navBtn('orders','ອໍເດີ້')}${state.role==='agent'?navBtn('agentReport','ສະຫຼຸບຍອດ'):''}${navBtn('wish',`ຖືກໃຈ ${wishQty?`(${wishQty})`:''}`)}${navBtn('profile','ບັນຊີ')}
+      <button onclick="logout()">ອອກ</button></div></div></div>
     <main class="main">${state.role==='agent'?agentNotice():''}${pageContent()}</main>
   </div>` }
 function navBtn(tab,label){ return `<button class="${state.tab===tab?'active':''}" onclick="state.tab='${tab}'; render()">${label}</button>` }
 function pageContent(){ if(state.tab==='shop') return renderProducts(); if(state.tab==='cart') return renderCart(); if(state.tab==='orders') return renderOrders(); if(state.tab==='agentReport') return renderAgentReport(); if(state.tab==='wish') return renderWish(); if(state.tab==='profile') return renderProfile(); return '' }
-function agentNotice(){ const a=state.user; const left=Math.max(0,(a.weekTarget||7)-(a.weekOrders||0)); return `<div class="notice"><b>àºªàº°àº–àº²àº™àº°àº•àº»àº§à»àº—àº™:</b> àº­àº²àº—àº´àº”àº™àºµà»‰à»€àº®àº±àº”à»„àº”à»‰à»àº¥à»‰àº§ <b>${a.weekOrders||0}/${a.weekTarget||7}</b> àº­à»à»€àº”àºµà»‰ ${left?`Â· à»€àº«àº¼àº·àº­ ${left} àº­à»à»€àº”àºµà»‰ àºà»ˆàº­àº™àº®àº­àº”àºàº³àº™àº»àº” 7 àº§àº±àº™`:''} Â· <span class="meta">àº™àº±àºšà»€àº›àº»à»‰àº²àº«àº¼àº±àº‡à»àº­àº±àº”àº¡àº´àº™àº­àº°àº™àº¸àº¡àº±àº”àºàº²àº™à»‚àº­àº™à»€àº—àº»à»ˆàº²àº™àº±à»‰àº™</span> <a target="_blank" href="${waLink('àºªàº°àºšàº²àºàº”àºµà»àº­àº±àº”àº¡àº´àº™ àº‚à»‰àº­àºà»€àº›àº±àº™àº•àº»àº§à»àº—àº™ ID '+a.id+' àº•à»‰àº­àº‡àºàº²àº™àºªàº­àºšàº–àº²àº¡à»€àº¥àº·à»ˆàº­àº‡àºªàº°àº–àº²àº™àº°àºšàº±àº™àºŠàºµ')}">àº—àº±àºà»àº­àº±àº”àº¡àº´àº™</a></div>` }
-function renderProducts(){ return `<section class="banner"><div><h1>à»€àº¥àº·àº­àºàºªàº´àº™àº„à»‰àº²à»„àº”à»‰à»€àº¥àºµàº</h1><p class="meta">àºªàº´àº™àº„à»‰àº²àºžà»‰àº­àº¡àºªàº»à»ˆàº‡àºˆàº°àº•àº±àº”àºªàº°àº•àº±àº­àºàº—àº±àº™àº—àºµ à»àº¥àº°àº„àº·àº™àºªàº°àº•àº±àº­àºàº–à»‰àº²àºšà»à»ˆà»‚àº­àº™à»ƒàº™ 25 àº™àº²àº—àºµ. àºžàº£àºµàº­à»à»€àº”àºµà»‰àº¥à»àº–à»‰àº² 14-18 àº¡àº·à»‰.</p><div class="pill-row"><span class="pill">ðŸª· QR BCEL + LDB</span><span class="pill">â™¡ Wishlist</span><span class="pill">ðŸ“¦ àº•àº´àº”àº•àº²àº¡àºªàº°àº–àº²àº™àº°</span></div></div><div class="card" style="padding:18px"><b>àºªàº´àº™àº„à»‰àº²à»àº™àº°àº™àº³</b><div class="meta">Product Carousel</div><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
-  <div class="toolbar"><div class="cat-tabs"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">àº—àº±àº‡à»àº»àº”</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="search">ðŸ”Ž <input placeholder="àº„àº»à»‰àº™àº«àº²àºŠàº·à»ˆ/àº¥àº°àº«àº±àº”àºªàº´àº™àº„à»‰àº²" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div>
-  <div class="grid">${productsFiltered().map(productCard).join('') || `<div class="empty">àºšà»à»ˆàºžàº»àºšàºªàº´àº™àº„à»‰àº²</div>`}</div>` }
-function productCard(p){ const out=p.type==='ready' && p.stock<=0; const price=state.role==='agent'?`<span class="oldprice">${money(p.price)}</span> ${money(p.agentPrice)}`:money(p.price); return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${p.images[0]}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">â™¡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} Â· ${p.category}</div><div class="price">${price}</div><div class="meta">${p.type==='ready'?`Stock: ${p.stock}`:'àº¥à»àº–à»‰àº² 14-18 àº¡àº·à»‰'} Â· ${p.colors.join(', ')}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">à»€àºšàº´à»ˆàº‡/àºªàº±à»ˆàº‡</button>${out?'<span class="type-badge">à»àº»àº”</span>':''}</div></div></div>` }
+function agentNotice(){ const a=state.user; const left=Math.max(0,(a.weekTarget||7)-(a.weekOrders||0)); return `<div class="notice"><b>ສະຖານະຕົວແທນ:</b> ອາທິດນີ້ເຮັດໄດ້ແລ້ວ <b>${a.weekOrders||0}/${a.weekTarget||7}</b> ອໍເດີ້ ${left?`· ເຫຼືອ ${left} ອໍເດີ້ ກ່ອນຮອດກຳນົດ 7 ວັນ`:''} · <span class="meta">ນັບເປົ້າຫຼັງແອັດມິນອະນຸມັດການໂອນເທົ່ານັ້ນ</span> <a target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍເປັນຕົວແທນ ID '+a.id+' ຕ້ອງການສອບຖາມເລື່ອງສະຖານະບັນຊີ')}">ທັກແອັດມິນ</a></div>` }
+function renderProducts(){ return `<section class="banner"><div><h1>ເລືອກສິນຄ້າໄດ້ເລີຍ</h1><p class="meta">ສິນຄ້າພ້ອມສົ່ງຈະຕັດສະຕັອກທັນທີ ແລະຄືນສະຕັອກຖ້າບໍ່ໂອນໃນ 25 ນາທີ. ພຣີອໍເດີ້ລໍຖ້າ 14-18 ມື້.</p><div class="pill-row"><span class="pill">🪷 QR BCEL + LDB</span><span class="pill">♡ Wishlist</span><span class="pill">📦 ຕິດຕາມສະຖານະ</span></div></div><div class="card" style="padding:18px"><b>ສິນຄ້າແນະນຳ</b><div class="meta">Product Carousel</div><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
+  <div class="toolbar"><div class="cat-tabs"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">ທັງໝົດ</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="search">🔎 <input placeholder="ຄົ້ນຫາຊື່/ລະຫັດສິນຄ້າ" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div>
+  <div class="grid">${productsFiltered().map(productCard).join('') || `<div class="empty">ບໍ່ພົບສິນຄ້າ</div>`}</div>` }
+function productCard(p){ const out=p.type==='ready' && p.stock<=0; const price=state.role==='agent'?`<span class="oldprice">${money(p.price)}</span> ${money(p.agentPrice)}`:money(p.price); return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${p.images[0]}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">♡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${price}</div><div class="meta">${p.type==='ready'?`Stock: ${p.stock}`:'ລໍຖ້າ 14-18 ມື້'} · ${p.colors.join(', ')}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">ເບິ່ງ/ສັ່ງ</button>${out?'<span class="type-badge">ໝົດ</span>':''}</div></div></div>` }
 function esc(s){ return String(s??'').replace(/[&<>'"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])) }
 function productImagesByColor(p){ const colors=(p.colors&&p.colors.length?p.colors:['Default']); return colors.map((color,idx)=>({color,img:idx===0?(p.images&&p.images[0]):((p.variantImages||[])[idx-1]||(p.images&&p.images[0]))})) }
 function productColorImage(p,color){ const list=productImagesByColor(p); const found=list.find(x=>x.color===color); return (found&&found.img)||(p.images&&p.images[0])||'' }
 function changeProductColorImage(id){ const p=db.products.find(x=>x.id===id); if(!p)return; const color=val('selColor'); const img=productColorImage(p,color); const main=document.getElementById('mainProductImage'); if(main&&img) main.src=img; document.querySelectorAll('[data-color-thumb]').forEach(el=>el.classList.toggle('selected',el.dataset.colorThumb===color)) }
 function pickProductColor(id,color){ const sel=document.getElementById('selColor'); if(sel){ sel.value=color; changeProductColorImage(id) } }
-function openProduct(id){ const p=db.products.find(x=>x.id===id); if(!p)return; const price=state.role==='agent'?p.agentPrice:p.price; const colorImgs=productImagesByColor(p); showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body product-detail"><div><img id="mainProductImage" class="big-img" src="${productColorImage(p,(p.colors||[])[0])}"><div class="actions">${colorImgs.map((item,idx)=>`<div><img class="preview-img color-thumb ${idx===0?'selected':''}" data-color-thumb="${esc(item.color)}" src="${item.img}" onclick="pickProductColor('${p.id}','${esc(item.color)}')"><div class="color-caption">${item.color}</div></div>`).join('')}</div><div class="file-mini">à»€àº¥àº·àº­àºàºªàºµà»àº¥à»‰àº§àº®àº¹àºšà»ƒàº«àºà»ˆàºˆàº°àº›à»ˆàº½àº™àº•àº²àº¡àºªàºµàº™àº±à»‰àº™</div></div><div><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} Â· ${p.category}</div><div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div><p>${p.detail}</p><div class="form-grid"><div class="field"><label>à»„àºŠà»‰</label><select id="selSize">${p.sizes.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>àºªàºµ</label><select id="selColor" data-product-id="${p.id}" onchange="changeProductColorImage('${p.id}')">${(p.colors||['Default']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>àºˆàº³àº™àº§àº™</label><input id="selQty" ${numAttrs()} value="1"></div></div><div class="notice">${p.type==='ready'?`àºªàº°àº•àº±àº­àºàº„àº»àº‡à»€àº«àº¼àº·àº­ ${p.stock} àºŠàº´à»‰àº™`:'àºžàº£àºµàº­à»à»€àº”àºµà»‰: àº¥à»àº–à»‰àº²à»€àº„àº·à»ˆàº­àº‡ 14-18 àº¡àº·à»‰ àº«àº¼àº±àº‡à»àº­àº±àº”àº¡àº´àº™àº¢àº·àº™àº¢àº±àº™'}</div><div class="actions"><button class="btn rose" onclick="addToCart('${p.id}')">à»€àºžàºµà»ˆàº¡à»€àº‚àº»à»‰àº²àºàº°àº•à»‰àº²</button><button class="btn light" onclick="toggleWish('${p.id}')">â™¡ àº–àº·àºà»ƒàºˆ</button></div></div></div>`) }
-function addToCart(id){ const p=db.products.find(x=>x.id===id); const qty=Math.max(1,parseInt(val('selQty')||'1')); if(p.type==='ready' && p.stock<qty) return toast('àºªàº°àº•àº±àº­àºàºšà»à»ˆàºžà»','danger'); const size=val('selSize'), color=val('selColor'); const price=state.role==='agent'?p.agentPrice:p.price; const selectedImage=productColorImage(p,color); const existing=state.cart.find(i=>i.productId===id&&i.size===size&&i.color===color); if(existing) existing.qty+=qty; else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage}); closeModal(); toast('à»€àºžàºµà»ˆàº¡à»€àº‚àº»à»‰àº²àºàº°àº•à»‰àº²à»àº¥à»‰àº§'); state.tab='cart'; render() }
-function renderCart(){ if(!state.cart.length) return `<div class="empty">àºàº°àº•à»‰àº²àºàº±àº‡àº§à»ˆàº²àº‡ <br><button class="btn rose" onclick="state.tab='shop';render()">à»„àº›àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡</button></div>`; const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); return `<div class="section-title"><h2>àºàº°àº•à»‰àº² / àºªàº°àº«àº¼àº¸àºšàºà»ˆàº­àº™àºŠàº³àº¥àº°</h2><button class="btn light" onclick="state.cart=[];render()">àº¥à»‰àº²àº‡àºàº°àº•à»‰àº²</button></div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} Â· ${i.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'} Â· à»„àºŠà»‰ ${i.size} Â· àºªàºµ ${i.color}</div><div>${money(i.price)} Ã— ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="state.cart[${idx}].qty=Math.max(1,state.cart[${idx}].qty-1);render()">âˆ’</button><button class="btn light small" onclick="state.cart[${idx}].qty++;render()">ï¼‹</button><button class="btn danger small" onclick="state.cart.splice(${idx},1);render()">àº¥àº¶àºš</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>àºàº­àº”àº¥àº§àº¡</h3><div class="summary-row"><span>àº¥àº²àº„àº²àºªàº´àº™àº„à»‰àº²</span><b>${money(total)}</b></div><div class="meta">àºšà»à»ˆàº‚àº½àº™àº„à»ˆàº²àºàº²àºà»ƒàº™àº¥àº°àºšàº»àºš â€” àº¥àº¹àºàº„à»‰àº²àºˆàº°à»€àº«àº±àº™àºˆàº²àºàºšàº´àº™àºàº²àºà»€àº„àº·à»ˆàº­àº‡.</div><div class="divider"></div><button class="btn rose full" onclick="placeOrder()">àº¢àº·àº™àº¢àº±àº™àº­à»à»€àº”àºµà»‰ / à»„àº›à»œà»‰àº²à»‚àº­àº™</button></aside></div>` }
-function checkoutForm(){ const options=provinces.map(p=>`<option>${p}</option>`).join(''); if(state.role==='agent') return `<div class="card" style="padding:16px;margin-top:16px"><h3>àº‚à»à»‰àº¡àº¹àº™àº•àº»àº§à»àº—àº™ à»àº¥àº° àºœàº¹à»‰àº®àº±àºš</h3><div class="form-grid"><div class="field"><label>àºŠàº·à»ˆàº•àº»àº§à»àº—àº™ (àºœàº¹à»‰àºªàº»à»ˆàº‡)</label><input id="senderName" value="${state.user.name}"></div><div class="field"><label>à»€àºšàºµàº•àº»àº§à»àº—àº™</label><input id="senderPhone" ${numAttrs()} value="${state.user.phone}"></div><div class="field"><label>àºŠàº·à»ˆàº¥àº¹àºàº„à»‰àº² (àºœàº¹à»‰àº®àº±àºš)</label><input id="customerName"></div><div class="field"><label>à»€àºšàºµà»‚àº—àºœàº¹à»‰àº®àº±àºš</label><input id="customerPhone" ${numAttrs()}></div>${shippingFields(options)}</div></div>`; return `<div class="card" style="padding:16px;margin-top:16px"><h3>àº‚à»à»‰àº¡àº¹àº™àºœàº¹à»‰àº®àº±àºš</h3><div class="form-grid"><div class="field"><label>àºŠàº·à»ˆ</label><input id="customerName" value="${state.user.name}"></div><div class="field"><label>à»€àºšàºµà»‚àº—</label><input id="customerPhone" ${numAttrs()} value="${state.user.phone}"></div>${shippingFields(options)}</div></div>` }
-function shippingFields(options){ return `<div class="field"><label>àº‚àº»àº™àºªàº»à»ˆàº‡</label><select id="carrier"><option>Anousith / ANS</option><option>HAL</option></select></div><div class="field"><label>àºªàº²àº‚àº²</label><input id="branch" placeholder="àºŠàº·à»ˆàºªàº²àº‚àº²àº®àº±àºšà»€àº„àº·à»ˆàº­àº‡"></div><div class="field"><label>à»€àº¡àº·àº­àº‡</label><input id="city" placeholder="à»€àº¡àº·àº­àº‡"></div><div class="field"><label>à»àº‚àº§àº‡</label><select id="province">${options}</select></div><div class="field" style="grid-column:1/-1"><label>à»àº²àºà»€àº«àº”</label><textarea id="note" rows="3" placeholder="à»àº²àºà»€àº«àº”à»€àºžàºµà»ˆàº¡à»€àº•àºµàº¡"></textarea></div>` }
-function validateCheckout(){ const ids=['customerName','customerPhone','carrier','branch','city','province']; if(state.role==='agent') ids.push('senderName','senderPhone'); let bad=[]; ids.forEach(id=>{const el=document.getElementById(id); if(el && !el.value.trim()){ el.style.borderColor='var(--danger)'; bad.push(id)} else if(el) el.style.borderColor=''}); if(bad.length){toast('àºàº°àº¥àº¸àº™àº²àºàº­àºàº‚à»à»‰àº¡àº¹àº™àº—àºµà»ˆàº‚àº²àº”','danger'); return false} return true}
-function placeOrder(){ if(!validateCheckout()) return; for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready' && p.stock<item.qty) return toast(`${p.name} àºªàº°àº•àº±àº­àºàºšà»à»ˆàºžà»`,'danger') } for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready') p.stock-=item.qty } const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); const cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0); const hasPre=state.cart.some(i=>i.type==='preorder'); const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™',agentTargetCounted:false,createdAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')}}; db.orders.unshift(order); saveDB(); state.cart=[]; state.paymentOrderId=order.id; state.tab='orders'; toast('àºªà»‰àº²àº‡àº­à»à»€àº”àºµà»‰à»àº¥à»‰àº§ àºàº°àº¥àº¸àº™àº²à»‚àº­àº™à»ƒàº™ 25 àº™àº²àº—àºµ'); render(); openPayment(order.id) }
+function openProduct(id){ const p=db.products.find(x=>x.id===id); if(!p)return; const price=state.role==='agent'?p.agentPrice:p.price; const colorImgs=productImagesByColor(p); showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail"><div><img id="mainProductImage" class="big-img" src="${productColorImage(p,(p.colors||[])[0])}"><div class="actions">${colorImgs.map((item,idx)=>`<div><img class="preview-img color-thumb ${idx===0?'selected':''}" data-color-thumb="${esc(item.color)}" src="${item.img}" onclick="pickProductColor('${p.id}','${esc(item.color)}')"><div class="color-caption">${item.color}</div></div>`).join('')}</div><div class="file-mini">ເລືອກສີແລ້ວຮູບໃຫຍ່ຈະປ່ຽນຕາມສີນັ້ນ</div></div><div><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div><p>${p.detail}</p><div class="form-grid"><div class="field"><label>ໄຊ້</label><select id="selSize">${p.sizes.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ສີ</label><select id="selColor" data-product-id="${p.id}" onchange="changeProductColorImage('${p.id}')">${(p.colors||['Default']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${p.stock} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div><div class="actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div></div></div>`) }
+function addToCart(id){ const p=db.products.find(x=>x.id===id); const qty=Math.max(1,parseInt(val('selQty')||'1')); if(p.type==='ready' && p.stock<qty) return toast('ສະຕັອກບໍ່ພໍ','danger'); const size=val('selSize'), color=val('selColor'); const price=state.role==='agent'?p.agentPrice:p.price; const selectedImage=productColorImage(p,color); const existing=state.cart.find(i=>i.productId===id&&i.size===size&&i.color===color); if(existing) existing.qty+=qty; else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage}); closeModal(); toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ'); state.tab='cart'; render() }
+function renderCart(){ if(!state.cart.length) return `<div class="empty">ກະຕ້າຍັງວ່າງ <br><button class="btn rose" onclick="state.tab='shop';render()">ໄປຊື້ເຄື່ອງ</button></div>`; const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); return `<div class="section-title"><h2>ກະຕ້າ / ສະຫຼຸບກ່ອນຊຳລະ</h2><button class="btn light" onclick="state.cart=[];render()">ລ້າງກະຕ້າ</button></div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="state.cart[${idx}].qty=Math.max(1,state.cart[${idx}].qty-1);render()">−</button><button class="btn light small" onclick="state.cart[${idx}].qty++;render()">＋</button><button class="btn danger small" onclick="state.cart.splice(${idx},1);render()">ລຶບ</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>ຍອດລວມ</h3><div class="summary-row"><span>ລາຄາສິນຄ້າ</span><b>${money(total)}</b></div><div class="meta">ບໍ່ຂຽນຄ່າຝາກໃນລະບົບ — ລູກຄ້າຈະເຫັນຈາກບິນຝາກເຄື່ອງ.</div><div class="divider"></div><button class="btn rose full" onclick="placeOrder()">ຢືນຢັນອໍເດີ້ / ໄປໜ້າໂອນ</button></aside></div>` }
+function checkoutForm(){ const options=provinces.map(p=>`<option>${p}</option>`).join(''); if(state.role==='agent') return `<div class="card" style="padding:16px;margin-top:16px"><h3>ຂໍ້ມູນຕົວແທນ ແລະ ຜູ້ຮັບ</h3><div class="form-grid"><div class="field"><label>ຊື່ຕົວແທນ (ຜູ້ສົ່ງ)</label><input id="senderName" value="${state.user.name}"></div><div class="field"><label>ເບີຕົວແທນ</label><input id="senderPhone" ${numAttrs()} value="${state.user.phone}"></div><div class="field"><label>ຊື່ລູກຄ້າ (ຜູ້ຮັບ)</label><input id="customerName"></div><div class="field"><label>ເບີໂທຜູ້ຮັບ</label><input id="customerPhone" ${numAttrs()}></div>${shippingFields(options)}</div></div>`; return `<div class="card" style="padding:16px;margin-top:16px"><h3>ຂໍ້ມູນຜູ້ຮັບ</h3><div class="form-grid"><div class="field"><label>ຊື່</label><input id="customerName" value="${state.user.name}"></div><div class="field"><label>ເບີໂທ</label><input id="customerPhone" ${numAttrs()} value="${state.user.phone}"></div>${shippingFields(options)}</div></div>` }
+function shippingFields(options){ return `<div class="field"><label>ຂົນສົ່ງ</label><select id="carrier"><option>Anousith / ANS</option><option>HAL</option></select></div><div class="field"><label>ສາຂາ</label><input id="branch" placeholder="ຊື່ສາຂາຮັບເຄື່ອງ"></div><div class="field"><label>ເມືອງ</label><input id="city" placeholder="ເມືອງ"></div><div class="field"><label>ແຂວງ</label><select id="province">${options}</select></div><div class="field" style="grid-column:1/-1"><label>ໝາຍເຫດ</label><textarea id="note" rows="3" placeholder="ໝາຍເຫດເພີ່ມເຕີມ"></textarea></div>` }
+function validateCheckout(){ const ids=['customerName','customerPhone','carrier','branch','city','province']; if(state.role==='agent') ids.push('senderName','senderPhone'); let bad=[]; ids.forEach(id=>{const el=document.getElementById(id); if(el && !el.value.trim()){ el.style.borderColor='var(--danger)'; bad.push(id)} else if(el) el.style.borderColor=''}); if(bad.length){toast('ກະລຸນາກອກຂໍ້ມູນທີ່ຂາດ','danger'); return false} return true}
+function placeOrder(){ if(!validateCheckout()) return; for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready' && p.stock<item.qty) return toast(`${p.name} ສະຕັອກບໍ່ພໍ`,'danger') } for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready') p.stock-=item.qty } const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); const cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0); const hasPre=state.cart.some(i=>i.type==='preorder'); const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'ລໍຖ້າຍອດໂອນ',agentTargetCounted:false,createdAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')}}; db.orders.unshift(order); saveDB(); state.cart=[]; state.paymentOrderId=order.id; state.tab='orders'; toast('ສ້າງອໍເດີ້ແລ້ວ ກະລຸນາໂອນໃນ 25 ນາທີ'); render(); openPayment(order.id) }
 function userOrders(){ return db.orders.filter(o=>o.userId===state.user.id && o.role===state.role) }
-function renderOrders(){ const orders=userOrders(); if(!orders.length) return `<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰<br><button class="btn rose" onclick="state.tab='shop';render()">àºàº±àºšà»„àº›àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡</button></div>`; return `<div class="section-title"><h2>àº›àº°àº«àº§àº±àº”àº­à»à»€àº”àºµà»‰</h2><button class="btn light" onclick="state.tab='shop';render()">â† àºàº±àºšà»„àº›à»œà»‰àº²àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡</button></div>${orders.map(orderCard).join('')}` }
-function orderCard(o){ const canCancel=o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™'&&!o.slip; return `<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${new Date(o.createdAt).toLocaleString()} Â· ${o.items.length} àº¥àº²àºàºàº²àº™</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span></div>${progressHTML(o)}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="openOrderDetail('${o.id}')">à»€àºšàº´à»ˆàº‡àº¥àº²àºàº¥àº°àº­àº½àº”</button>${o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™'?`<button class="btn sage small" onclick="openPayment('${o.id}')">à»„àº›à»œà»‰àº²à»‚àº­àº™</button>`:''}${canCancel?`<button class="btn danger small" onclick="cancelOrder('${o.id}')">àºàº»àºà»€àº¥àºµàºàº­à»à»€àº”àºµà»‰</button>`:''}<a class="btn light small" target="_blank" href="${waLink(`àºªàº°àºšàº²àºàº”àºµà»àº­àº±àº”àº¡àº´àº™ àº‚à»‰àº­àºàº•à»‰àº­àº‡àºàº²àº™àºªàº­àºšàº–àº²àº¡àº­à»à»€àº”àºµà»‰ ${o.id} àºŠàº·à»ˆ ${o.customer.name} à»€àºšàºµ ${o.customer.phone} àºªàº°àº–àº²àº™àº° ${o.status} àº•àº­àº™àº™àºµà»‰àº®àº­àº”à»ƒàºªà»àº¥à»‰àº§?`)}">àº—àº±àºà»àº­àº±àº”àº¡àº´àº™</a></div></div>` }
-function stepIndex(o){ if(o.status.includes('àºàº»àºà»€àº¥àºµàº')) return -1; if(o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™') return 0; if(o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™') return 1; const steps=o.type==='ready'?readySteps:preSteps; const idx=steps.findIndex(s=>o.status.includes(s.replace(' âœ…',''))); return idx>=0?idx:1 }
+function renderOrders(){ const orders=userOrders(); if(!orders.length) return `<div class="empty">ຍັງບໍ່ມີອໍເດີ້<br><button class="btn rose" onclick="state.tab='shop';render()">ກັບໄປຊື້ເຄື່ອງ</button></div>`; return `<div class="section-title"><h2>ປະຫວັດອໍເດີ້</h2><button class="btn light" onclick="state.tab='shop';render()">← ກັບໄປໜ້າຊື້ເຄື່ອງ</button></div>${orders.map(orderCard).join('')}` }
+function orderCard(o){ const canCancel=o.status==='ລໍຖ້າຍອດໂອນ'&&!o.slip; return `<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${new Date(o.createdAt).toLocaleString()} · ${o.items.length} ລາຍການ</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="openOrderDetail('${o.id}')">ເບິ່ງລາຍລະອຽດ</button>${o.status==='ລໍຖ້າຍອດໂອນ'?`<button class="btn sage small" onclick="openPayment('${o.id}')">ໄປໜ້າໂອນ</button>`:''}${canCancel?`<button class="btn danger small" onclick="cancelOrder('${o.id}')">ຍົກເລີກອໍເດີ້</button>`:''}<a class="btn light small" target="_blank" href="${waLink(`ສະບາຍດີແອັດມິນ ຂ້ອຍຕ້ອງການສອບຖາມອໍເດີ້ ${o.id} ຊື່ ${o.customer.name} ເບີ ${o.customer.phone} ສະຖານະ ${o.status} ຕອນນີ້ຮອດໃສແລ້ວ?`)}">ທັກແອັດມິນ</a></div></div>` }
+function stepIndex(o){ if(o.status.includes('ຍົກເລີກ')) return -1; if(o.status==='ລໍຖ້າຍອດໂອນ') return 0; if(o.status==='ລໍຖ້າກວດສອບການໂອນ') return 1; const steps=o.type==='ready'?readySteps:preSteps; const idx=steps.findIndex(s=>o.status.includes(s.replace(' ✅',''))); return idx>=0?idx:1 }
 function progressHTML(o){ const steps=o.type==='ready'?readySteps:preSteps; const idx=stepIndex(o); if(idx<0) return `<div class="danger-box">${o.status}</div>`; return `<div class="progress">${steps.map((s,i)=>`<div class="step ${i<idx?'done':i===idx?'active':''}">${i+1}. ${s}</div>`).join('')}</div>` }
-function openOrderDetail(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; showModal(`<div class="modal-head"><b>àº¥àº²àºàº¥àº°àº­àº½àº”àº­à»à»€àº”àºµà»‰ ${o.id}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body"><button class="btn light small" onclick="closeModal(); state.tab='shop'; render()">â† àºàº±àºšà»„àº›à»œà»‰àº²àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡</button>${orderFullHTML(o,false)}</div>`) }
-function orderFullHTML(o,admin=false){ return `<div class="order-card"><div class="order-head"><div><b>àºªàº°àº–àº²àº™àº°: ${o.status}</b><div class="meta">àº§àº±àº™àº—àºµ ${new Date(o.createdAt).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span></div>${progressHTML(o)}<div class="divider"></div><h3>àºªàº´àº™àº„à»‰àº²</h3>${o.items.map(i=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} Â· ${i.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'} Â· à»„àºŠà»‰ ${i.size} Â· àºªàºµ ${i.color}</div><div>${money(i.price)} Ã— ${i.qty}</div></div><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="divider"></div><div class="summary-row"><span>àº¥àº§àº¡</span><b>${money(o.total)}</b></div>${admin?`<div class="summary-row"><span>àº•àº»à»‰àº™àº—àº¶àº™</span><b>${money(o.cost)}</b></div><div class="summary-row"><span>àºàº³à»„àº¥</span><b>${money(o.profit)}</b></div>`:''}<div class="divider"></div><h3>àº‚à»à»‰àº¡àº¹àº™àº®àº±àºšà»€àº„àº·à»ˆàº­àº‡</h3><div class="form-grid"><div><b>àºŠàº·à»ˆàº¥àº¹àºàº„à»‰àº²</b><br>${o.customer.name}</div><div><b>à»€àºšàºµ</b><br>${o.customer.phone}</div>${o.sender?`<div><b>àºœàº¹à»‰àºªàº»à»ˆàº‡/àº•àº»àº§à»àº—àº™</b><br>${o.sender.name} Â· ${o.sender.phone}</div>`:''}<div><b>àº‚àº»àº™àºªàº»à»ˆàº‡</b><br>${o.shipping.carrier}</div><div><b>àºªàº²àº‚àº²</b><br>${o.shipping.branch}</div><div><b>à»€àº¡àº·àº­àº‡/à»àº‚àº§àº‡</b><br>${o.shipping.city}, ${o.shipping.province}</div><div style="grid-column:1/-1"><b>à»àº²àºà»€àº«àº”</b><br>${o.shipping.note||'-'}</div></div>${o.slip?`<div class="divider"></div><h3>àºªàº°àº¥àº´àºšà»‚àº­àº™à»€àº‡àº´àº™</h3><img src="${o.slip}" style="width:100%;max-width:360px;border-radius:22px;border:1px solid var(--line)">${o.refNo?`<p><b>Ref No.</b> ${o.refNo}</p>`:''}`:''}</div>` }
-function cancelOrder(id){ const o=db.orders.find(x=>x.id===id); if(!o || o.slip) return toast('àºàº»àºà»€àº¥àºµàºàºšà»à»ˆà»„àº”à»‰à»àº¥à»‰àº§','danger'); if(!confirm('àº¢àº·àº™àº¢àº±àº™àºàº»àºà»€àº¥àºµàºàº­à»à»€àº”àºµà»‰?')) return; o.status='àºàº»àºà»€àº¥àºµàºà»‚àº”àºàº¥àº¹àºàº„à»‰àº²'; restockOrder(o); saveDB(); toast('àºàº»àºà»€àº¥àºµàº à»àº¥àº° àº„àº·àº™àºªàº°àº•àº±àº­àºà»àº¥à»‰àº§'); render() }
-function openPayment(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; const remain=Math.max(0,o.expiresAt-Date.now()); showModal(`<div class="modal-head"><b>àºŠàº³àº¥àº°à»€àº‡àº´àº™ ${o.id}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body"><div class="notice"><b>àº™àº±àºšàº–àº­àºàº«àº¼àº±àº‡:</b> <span id="countdown">${Math.floor(remain/60000)}:${String(Math.floor((remain%60000)/1000)).padStart(2,'0')}</span> Â· àº–à»‰àº²àºšà»à»ˆà»‚àº­àº™à»ƒàº™ 25 àº™àº²àº—àºµ àº¥àº°àºšàº»àºšàºˆàº°àºàº»àºà»€àº¥àºµàº/àº„àº·àº™àºªàº°àº•àº±àº­àº</div><h3>àºªàº°àº«àº¼àº¸àºšàºàº²àº™à»‚àº­àº™</h3>${orderFullHTML(o,false)}<h3>à»€àº¥àº·àº­àº QR àºŠàº³àº¥àº°à»€àº‡àº´àº™</h3><div class="qr-grid"><div class="qr-card"><b>BCEL One</b><img src="${QR_BCEL}" onclick="openQR('BCEL')"><button class="btn light full" onclick="openQR('BCEL')">àºàº»àº”àº‚àº°àº«àºàº²àº QR</button></div><div class="qr-card"><b>LDB Bank</b><img src="${QR_LDB}" onclick="openQR('LDB')"><button class="btn light full" onclick="openQR('LDB')">àºàº»àº”àº‚àº°àº«àºàº²àº QR</button></div></div><div class="field"><label>àº­àº±àºšà»‚àº«àº¼àº”àºªàº°àº¥àº´àºšà»‚àº­àº™à»€àº‡àº´àº™</label><input type="file" accept="image/*" onchange="uploadSlip('${o.id}',event)"><div class="file-mini">àº«àº¼àº±àº‡àº­àº±àºšà»‚àº«àº¼àº” àºªàº°àº–àº²àº™àº°àºˆàº°à»€àº›àº±àº™ â€œàº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™â€ à»àº¥àº°àº›àº¸à»ˆàº¡àºàº»àºà»€àº¥àºµàºàºˆàº°àº«àº²àºà»„àº›</div></div></div>`); startCountdown(o.id) }
-let countdownTimer=null; function startCountdown(id){ clearInterval(countdownTimer); countdownTimer=setInterval(()=>{const o=db.orders.find(x=>x.id===id); const el=document.getElementById('countdown'); if(!o||!el){clearInterval(countdownTimer);return} const remain=Math.max(0,o.expiresAt-Date.now()); el.textContent=`${Math.floor(remain/60000)}:${String(Math.floor((remain%60000)/1000)).padStart(2,'0')}`; if(remain<=0){clearInterval(countdownTimer); clearExpiredOrders(); closeModal(); render(); toast('àº­à»à»€àº”àºµà»‰à»€àºàºµàº™à»€àº§àº¥àº² àº¥àº°àºšàº»àºšàºàº»àºà»€àº¥àºµàºà»àº¥à»‰àº§','danger')}} ,1000)}
-function openQR(bank){ const img=bank==='BCEL'?QR_BCEL:QR_LDB; showModal(`<div class="modal-card qr-large"><div class="modal-head"><b>${bank==='BCEL'?'BCEL One':'LDB Bank'} QR</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body" style="text-align:center"><img src="${img}"></div></div>`,true) }
-function uploadSlip(id,event){ const file=event.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ const o=db.orders.find(x=>x.id===id); if(!o)return; o.slip=reader.result; o.status='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™'; saveDB(); toast('àº­àº±àºšà»‚àº«àº¼àº”àºªàº°àº¥àº´àºšà»àº¥à»‰àº§ àº¥à»àº–à»‰àº²à»àº­àº±àº”àº¡àº´àº™àºàº§àº”'); closeModal(); render() }; reader.readAsDataURL(file) }
+function openOrderDetail(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; showModal(`<div class="modal-head"><b>ລາຍລະອຽດອໍເດີ້ ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><button class="btn light small" onclick="closeModal(); state.tab='shop'; render()">← ກັບໄປໜ້າຊື້ເຄື່ອງ</button>${orderFullHTML(o,false)}</div>`) }
+function orderFullHTML(o,admin=false){ return `<div class="order-card"><div class="order-head"><div><b>ສະຖານະ: ${o.status}</b><div class="meta">ວັນທີ ${new Date(o.createdAt).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}<div class="divider"></div><h3>ສິນຄ້າ</h3>${o.items.map(i=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="divider"></div><div class="summary-row"><span>ລວມ</span><b>${money(o.total)}</b></div>${admin?`<div class="summary-row"><span>ຕົ້ນທຶນ</span><b>${money(o.cost)}</b></div><div class="summary-row"><span>ກຳໄລ</span><b>${money(o.profit)}</b></div>`:''}<div class="divider"></div><h3>ຂໍ້ມູນຮັບເຄື່ອງ</h3><div class="form-grid"><div><b>ຊື່ລູກຄ້າ</b><br>${o.customer.name}</div><div><b>ເບີ</b><br>${o.customer.phone}</div>${o.sender?`<div><b>ຜູ້ສົ່ງ/ຕົວແທນ</b><br>${o.sender.name} · ${o.sender.phone}</div>`:''}<div><b>ຂົນສົ່ງ</b><br>${o.shipping.carrier}</div><div><b>ສາຂາ</b><br>${o.shipping.branch}</div><div><b>ເມືອງ/ແຂວງ</b><br>${o.shipping.city}, ${o.shipping.province}</div><div style="grid-column:1/-1"><b>ໝາຍເຫດ</b><br>${o.shipping.note||'-'}</div></div>${o.slip?`<div class="divider"></div><h3>ສະລິບໂອນເງິນ</h3><img src="${o.slip}" style="width:100%;max-width:360px;border-radius:22px;border:1px solid var(--line)">${o.refNo?`<p><b>Ref No.</b> ${o.refNo}</p>`:''}`:''}</div>` }
+function cancelOrder(id){ const o=db.orders.find(x=>x.id===id); if(!o || o.slip) return toast('ຍົກເລີກບໍ່ໄດ້ແລ້ວ','danger'); if(!confirm('ຢືນຢັນຍົກເລີກອໍເດີ້?')) return; o.status='ຍົກເລີກໂດຍລູກຄ້າ'; restockOrder(o); saveDB(); toast('ຍົກເລີກ ແລະ ຄືນສະຕັອກແລ້ວ'); render() }
+function openPayment(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; const remain=Math.max(0,o.expiresAt-Date.now()); showModal(`<div class="modal-head"><b>ຊຳລະເງິນ ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="notice"><b>ນັບຖອຍຫຼັງ:</b> <span id="countdown">${Math.floor(remain/60000)}:${String(Math.floor((remain%60000)/1000)).padStart(2,'0')}</span> · ຖ້າບໍ່ໂອນໃນ 25 ນາທີ ລະບົບຈະຍົກເລີກ/ຄືນສະຕັອກ</div><h3>ສະຫຼຸບການໂອນ</h3>${orderFullHTML(o,false)}<h3>ເລືອກ QR ຊຳລະເງິນ</h3><div class="qr-grid"><div class="qr-card"><b>BCEL One</b><img src="${QR_BCEL}" onclick="openQR('BCEL')"><button class="btn light full" onclick="openQR('BCEL')">ກົດຂະຫຍາຍ QR</button></div><div class="qr-card"><b>LDB Bank</b><img src="${QR_LDB}" onclick="openQR('LDB')"><button class="btn light full" onclick="openQR('LDB')">ກົດຂະຫຍາຍ QR</button></div></div><div class="field"><label>ອັບໂຫຼດສະລິບໂອນເງິນ</label><input type="file" accept="image/*" onchange="uploadSlip('${o.id}',event)"><div class="file-mini">ຫຼັງອັບໂຫຼດ ສະຖານະຈະເປັນ “ລໍຖ້າກວດສອບການໂອນ” ແລະປຸ່ມຍົກເລີກຈະຫາຍໄປ</div></div></div>`); startCountdown(o.id) }
+let countdownTimer=null; function startCountdown(id){ clearInterval(countdownTimer); countdownTimer=setInterval(()=>{const o=db.orders.find(x=>x.id===id); const el=document.getElementById('countdown'); if(!o||!el){clearInterval(countdownTimer);return} const remain=Math.max(0,o.expiresAt-Date.now()); el.textContent=`${Math.floor(remain/60000)}:${String(Math.floor((remain%60000)/1000)).padStart(2,'0')}`; if(remain<=0){clearInterval(countdownTimer); clearExpiredOrders(); closeModal(); render(); toast('ອໍເດີ້ເກີນເວລາ ລະບົບຍົກເລີກແລ້ວ','danger')}} ,1000)}
+function openQR(bank){ const img=bank==='BCEL'?QR_BCEL:QR_LDB; showModal(`<div class="modal-card qr-large"><div class="modal-head"><b>${bank==='BCEL'?'BCEL One':'LDB Bank'} QR</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body" style="text-align:center"><img src="${img}"></div></div>`,true) }
+function uploadSlip(id,event){ const file=event.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ const o=db.orders.find(x=>x.id===id); if(!o)return; o.slip=reader.result; o.status='ລໍຖ້າກວດສອບການໂອນ'; saveDB(); toast('ອັບໂຫຼດສະລິບແລ້ວ ລໍຖ້າແອັດມິນກວດ'); closeModal(); render() }; reader.readAsDataURL(file) }
 
-function agentConfirmed(o){ return o.role==='agent' && o.userId===state.user.id && !!o.agentTargetCounted && !o.status.includes('àºàº»àºà»€àº¥àºµàº') && o.status!=='àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡' }
+function agentConfirmed(o){ return o.role==='agent' && o.userId===state.user.id && !!o.agentTargetCounted && !o.status.includes('ຍົກເລີກ') && o.status!=='ສະລິບບໍ່ຖືກຕ້ອງ' }
 function agentOrdersAll(){ return db.orders.filter(o=>o.role==='agent' && o.userId===state.user.id) }
 function samePeriod(ts,period,dateStr){ const d=new Date(ts||Date.now()), now=new Date(); if(period==='date') return todayStr(ts)===dateStr; if(period==='today') return todayStr(ts)===todayStr(); if(period==='month') return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); if(period==='year') return d.getFullYear()===now.getFullYear(); return true }
 function agentConfirmedBy(period,dateStr){ return agentOrdersAll().filter(o=>agentConfirmed(o) && samePeriod(o.approvedAt||o.createdAt,period,dateStr)) }
 function agentOrdersByCreatedDate(dateStr){ return agentOrdersAll().filter(o=>todayStr(o.createdAt)===dateStr) }
 function agentSum(orders){ return {count:orders.length,total:orders.reduce((s,o)=>s+(+o.total||0),0),profit:orders.reduce((s,o)=>s+(+o.profit||0),0),items:orders.reduce((s,o)=>s+o.items.reduce((a,i)=>a+(+i.qty||0),0),0)} }
-function agentPendingCounts(orders){ return {pay:orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™').length,verify:orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™').length,invalid:orders.filter(o=>o.status==='àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡').length,cancel:orders.filter(o=>o.status.includes('àºàº»àºà»€àº¥àºµàº')).length} }
+function agentPendingCounts(orders){ return {pay:orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ').length,verify:orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ').length,invalid:orders.filter(o=>o.status==='ສະລິບບໍ່ຖືກຕ້ອງ').length,cancel:orders.filter(o=>o.status.includes('ຍົກເລີກ')).length} }
 function agentProductSummary(orders){ const m={}; orders.forEach(o=>o.items.forEach(i=>{ const key=i.code+'|'+i.name; if(!m[key]) m[key]={name:i.name,code:i.code,qty:0,total:0}; m[key].qty+=(+i.qty||0); m[key].total+=(+i.price||0)*(+i.qty||0) })); return Object.values(m).sort((a,b)=>b.qty-a.qty) }
-function renderAgentReport(){ if(state.role!=='agent') return `<div class="empty">àº«àº™à»‰àº²àº™àºµà»‰àºªàº³àº¥àº±àºšàº•àº»àº§à»àº—àº™à»€àº—àº»à»ˆàº²àº™àº±à»‰àº™</div>`; const date=state.agentReportDate||todayStr(); const created=agentOrdersByCreatedDate(date); const confirmedDay=agentConfirmedBy('date',date); const today=agentConfirmedBy('today'); const month=agentConfirmedBy('month'); const year=agentConfirmedBy('year'); const d=agentSum(confirmedDay), td=agentSum(today), m=agentSum(month), y=agentSum(year); const pending=agentPendingCounts(created); const products=agentProductSummary(confirmedDay); const target=state.user.weekTarget||7; const done=state.user.weekOrders||0; const percent=Math.min(100,Math.round(done/target*100)); return `<div class="section-title"><h2>àºªàº°àº«àº¼àº¸àºšàº­à»à»€àº”àºµà»‰ / àºàº­àº”àº‚àº²àºàº•àº»àº§à»àº—àº™</h2><button class="btn light" onclick="exportAgentReport()">Export CSV</button></div><div class="notice"><b>àºàº»àº”àºˆàº³à»„àº§à»‰:</b> àºàº­àº”àº‚àº²àº à»àº¥àº° à»€àº›àº»à»‰àº² 7 àº­à»à»€àº”àºµà»‰ àºˆàº°àº™àº±àºšàºªàº°à»€àºžàº²àº°àº­à»à»€àº”àºµà»‰àº—àºµà»ˆà»àº­àº±àº”àº¡àº´àº™àºàº»àº” â€œàº­àº°àº™àº¸àº¡àº±àº”àºàº²àº™à»‚àº­àº™â€ à»àº¥à»‰àº§à»€àº—àº»à»ˆàº²àº™àº±à»‰àº™.</div><div class="stats"><div class="stat">àºàº­àº”àº¡àº·à»‰àº™àºµà»‰àº—àºµà»ˆàº¢àº·àº™àº¢àº±àº™à»àº¥à»‰àº§<b>${money(td.total)}</b><div class="meta">${td.count} àº­à»à»€àº”àºµà»‰ Â· ${td.items} àºŠàº´à»‰àº™</div></div><div class="stat">àºàº­àº”àº§àº±àº™àº—àºµà»ˆà»€àº¥àº·àº­àº<b>${money(d.total)}</b><div class="meta">${d.count} àº­à»à»€àº”àºµà»‰àº¢àº·àº™àº¢àº±àº™</div></div><div class="stat">àºàº­àº”à»€àº”àº·àº­àº™àº™àºµà»‰<b>${money(m.total)}</b><div class="meta">${m.count} àº­à»à»€àº”àºµà»‰</div></div><div class="stat">àºàº­àº”àº›àºµàº™àºµà»‰<b>${money(y.total)}</b><div class="meta">${y.count} àº­à»à»€àº”àºµà»‰</div></div></div><div class="card" style="padding:18px;margin-bottom:16px"><div class="summary-row"><span><b>à»€àº›àº»à»‰àº²àº­àº²àº—àº´àº”àº™àºµà»‰</b></span><b>${done}/${target} àº­à»à»€àº”àºµà»‰</b></div><div style="height:12px;background:#f3ece3;border-radius:999px;overflow:hidden"><div style="width:${percent}%;height:100%;background:linear-gradient(90deg,var(--dusty),var(--sage));border-radius:999px"></div></div><div class="meta" style="margin-top:8px">àº™àº±àºšà»€àº›àº»à»‰àº²àºˆàº²àºàº­à»à»€àº”àºµà»‰àº—àºµà»ˆà»‚àº­àº™à»àº¥à»‰àº§ + à»àº­àº±àº”àº¡àº´àº™àº­àº°àº™àº¸àº¡àº±àº”à»àº¥à»‰àº§.</div></div><div class="card" style="padding:18px;margin-bottom:16px"><div class="form-grid"><div class="field"><label>à»€àº¥àº·àº­àºàº§àº±àº™àº—àºµàºªàº°àº«àº¼àº¸àºš</label><input type="date" value="${date}" onchange="state.agentReportDate=this.value;render()"></div><div class="field"><label>àºªàº°àº–àº²àº™àº°à»ƒàº™àº§àº±àº™àº—àºµà»ˆà»€àº¥àº·àº­àº</label><div class="pill-row"><span class="pill">àº¥à»àº–à»‰àº²à»‚àº­àº™ ${pending.pay}</span><span class="pill">àº¥à»àº–à»‰àº²àºàº§àº”àºªàº°àº¥àº´àºš ${pending.verify}</span><span class="pill">àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àº ${pending.invalid}</span><span class="pill">àºàº»àºà»€àº¥àºµàº ${pending.cancel}</span></div></div></div></div><div class="two-col"><div class="table-wrap"><table class="table"><tr><th>Order</th><th>àº¥àº¹àºàº„à»‰àº²</th><th>àºªàº´àº™àº„à»‰àº²</th><th>àºàº­àº”</th><th>àºªàº°àº–àº²àº™àº°/àº™àº±àºšàºàº­àº”</th></tr>${created.map(o=>`<tr><td><b>${o.id}</b><br><span class="meta">${new Date(o.createdAt).toLocaleTimeString()}</span></td><td>${o.customer.name}<br><span class="meta">${o.customer.phone}</span></td><td>${o.items.map(i=>`${i.name} Â· ${i.color||'-'} Â· x${i.qty}`).join('<br>')}</td><td>${money(o.total)}</td><td>${o.status}<br><span class="type-badge ${agentConfirmed(o)?'ready':''}">${agentConfirmed(o)?'àº™àº±àºšàºàº­àº”à»àº¥à»‰àº§':'àºàº±àº‡àºšà»à»ˆàº™àº±àºšàºàº­àº”'}</span></td></tr>`).join('')||`<tr><td colspan="5"><div class="empty">àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰à»ƒàº™àº§àº±àº™àº™àºµà»‰</div></td></tr>`}</table></div><aside class="summary"><h3>àºªàº´àº™àº„à»‰àº²àº—àºµà»ˆàº‚àº²àºà»„àº”à»‰ (${date})</h3>${products.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code} Â· ${p.qty} àºŠàº´à»‰àº™</span></span><b>${money(p.total)}</b></div>`).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàºàº­àº”àº—àºµà»ˆàº¢àº·àº™àº¢àº±àº™</div>'}<div class="divider"></div><div class="summary-row"><span>àºàº­àº”àº¢àº·àº™àº¢àº±àº™àº§àº±àº™àº™àºµà»‰</span><b>${money(d.total)}</b></div></aside></div>` }
-function exportAgentReport(){ if(state.role!=='agent') return; const date=state.agentReportDate||todayStr(); const orders=agentOrdersByCreatedDate(date); const rows=[['Date','Agent ID','Agent Name','Order','Customer','Phone','Product','Code','Size','Color','Qty','Order Total','Status','Counted In Sales']]; orders.forEach(o=>o.items.forEach(i=>rows.push([todayStr(o.createdAt),state.user.id,state.user.name,o.id,o.customer.name,o.customer.phone,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,agentConfirmed(o)?'YES':'NO']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Agent_Report_${state.user.id}_${date}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export àºªàº°àº«àº¼àº¸àºšàº•àº»àº§à»àº—àº™à»àº¥à»‰àº§') }
+function renderAgentReport(){ if(state.role!=='agent') return `<div class="empty">ຫນ້ານີ້ສຳລັບຕົວແທນເທົ່ານັ້ນ</div>`; const date=state.agentReportDate||todayStr(); const created=agentOrdersByCreatedDate(date); const confirmedDay=agentConfirmedBy('date',date); const today=agentConfirmedBy('today'); const month=agentConfirmedBy('month'); const year=agentConfirmedBy('year'); const d=agentSum(confirmedDay), td=agentSum(today), m=agentSum(month), y=agentSum(year); const pending=agentPendingCounts(created); const products=agentProductSummary(confirmedDay); const target=state.user.weekTarget||7; const done=state.user.weekOrders||0; const percent=Math.min(100,Math.round(done/target*100)); return `<div class="section-title"><h2>ສະຫຼຸບອໍເດີ້ / ຍອດຂາຍຕົວແທນ</h2><button class="btn light" onclick="exportAgentReport()">Export CSV</button></div><div class="notice"><b>ກົດຈຳໄວ້:</b> ຍອດຂາຍ ແລະ ເປົ້າ 7 ອໍເດີ້ ຈະນັບສະເພາະອໍເດີ້ທີ່ແອັດມິນກົດ “ອະນຸມັດການໂອນ” ແລ້ວເທົ່ານັ້ນ.</div><div class="stats"><div class="stat">ຍອດມື້ນີ້ທີ່ຢືນຢັນແລ້ວ<b>${money(td.total)}</b><div class="meta">${td.count} ອໍເດີ້ · ${td.items} ຊິ້ນ</div></div><div class="stat">ຍອດວັນທີ່ເລືອກ<b>${money(d.total)}</b><div class="meta">${d.count} ອໍເດີ້ຢືນຢັນ</div></div><div class="stat">ຍອດເດືອນນີ້<b>${money(m.total)}</b><div class="meta">${m.count} ອໍເດີ້</div></div><div class="stat">ຍອດປີນີ້<b>${money(y.total)}</b><div class="meta">${y.count} ອໍເດີ້</div></div></div><div class="card" style="padding:18px;margin-bottom:16px"><div class="summary-row"><span><b>ເປົ້າອາທິດນີ້</b></span><b>${done}/${target} ອໍເດີ້</b></div><div style="height:12px;background:#f3ece3;border-radius:999px;overflow:hidden"><div style="width:${percent}%;height:100%;background:linear-gradient(90deg,var(--dusty),var(--sage));border-radius:999px"></div></div><div class="meta" style="margin-top:8px">ນັບເປົ້າຈາກອໍເດີ້ທີ່ໂອນແລ້ວ + ແອັດມິນອະນຸມັດແລ້ວ.</div></div><div class="card" style="padding:18px;margin-bottom:16px"><div class="form-grid"><div class="field"><label>ເລືອກວັນທີສະຫຼຸບ</label><input type="date" value="${date}" onchange="state.agentReportDate=this.value;render()"></div><div class="field"><label>ສະຖານະໃນວັນທີ່ເລືອກ</label><div class="pill-row"><span class="pill">ລໍຖ້າໂອນ ${pending.pay}</span><span class="pill">ລໍຖ້າກວດສະລິບ ${pending.verify}</span><span class="pill">ສະລິບບໍ່ຖືກ ${pending.invalid}</span><span class="pill">ຍົກເລີກ ${pending.cancel}</span></div></div></div></div><div class="two-col"><div class="table-wrap"><table class="table"><tr><th>Order</th><th>ລູກຄ້າ</th><th>ສິນຄ້າ</th><th>ຍອດ</th><th>ສະຖານະ/ນັບຍອດ</th></tr>${created.map(o=>`<tr><td><b>${o.id}</b><br><span class="meta">${new Date(o.createdAt).toLocaleTimeString()}</span></td><td>${o.customer.name}<br><span class="meta">${o.customer.phone}</span></td><td>${o.items.map(i=>`${i.name} · ${i.color||'-'} · x${i.qty}`).join('<br>')}</td><td>${money(o.total)}</td><td>${o.status}<br><span class="type-badge ${agentConfirmed(o)?'ready':''}">${agentConfirmed(o)?'ນັບຍອດແລ້ວ':'ຍັງບໍ່ນັບຍອດ'}</span></td></tr>`).join('')||`<tr><td colspan="5"><div class="empty">ບໍ່ມີອໍເດີ້ໃນວັນນີ້</div></td></tr>`}</table></div><aside class="summary"><h3>ສິນຄ້າທີ່ຂາຍໄດ້ (${date})</h3>${products.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code} · ${p.qty} ຊິ້ນ</span></span><b>${money(p.total)}</b></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີຍອດທີ່ຢືນຢັນ</div>'}<div class="divider"></div><div class="summary-row"><span>ຍອດຢືນຢັນວັນນີ້</span><b>${money(d.total)}</b></div></aside></div>` }
+function exportAgentReport(){ if(state.role!=='agent') return; const date=state.agentReportDate||todayStr(); const orders=agentOrdersByCreatedDate(date); const rows=[['Date','Agent ID','Agent Name','Order','Customer','Phone','Product','Code','Size','Color','Qty','Order Total','Status','Counted In Sales']]; orders.forEach(o=>o.items.forEach(i=>rows.push([todayStr(o.createdAt),state.user.id,state.user.name,o.id,o.customer.name,o.customer.phone,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,agentConfirmed(o)?'YES':'NO']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Agent_Report_${state.user.id}_${date}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export ສະຫຼຸບຕົວແທນແລ້ວ') }
 
-function renderWish(){ const ids=db.wishlist[currentUserKey()]||[]; const items=db.products.filter(p=>ids.includes(p.id)); return `<div class="section-title"><h2>àº¥àº²àºàºàº²àº™àº–àº·àºà»ƒàºˆ</h2><button class="btn light" onclick="state.tab='shop';render()">à»„àº›àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡</button></div><div class="grid">${items.map(productCard).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàºªàº´àº™àº„à»‰àº²àº–àº·àºà»ƒàºˆ</div>'}</div>` }
-function renderProfile(){ const orders=userOrders(); const total=orders.reduce((s,o)=>s+o.total,0); return `<div class="two-col"><div class="card" style="padding:18px"><h2>àºšàº±àº™àºŠàºµàº‚àº­àº‡àº‚à»‰àº­àº</h2><div class="field"><label>àºŠàº·à»ˆàº—àºµà»ˆàºªàº°à»àº”àº‡</label><input id="profileName" value="${state.user.name}"></div><div class="field"><label>à»€àºšàºµà»‚àº—</label><input id="profilePhone" ${numAttrs()} value="${state.user.phone}"></div><button class="btn rose" onclick="saveProfile()">àºšàº±àº™àº—àº¶àº</button><a class="btn light" target="_blank" href="${waLink('àºªàº°àºšàº²àºàº”àºµà»àº­àº±àº”àº¡àº´àº™ àº‚à»‰àº­àºàº•à»‰àº­àº‡àºàº²àº™àº•àº´àº”àº•à»à»ˆàº®à»‰àº²àº™ Bai Boua')}">àº•àº´àº”àº•à»à»ˆ WhatsApp</a></div><div class="summary"><h3>àºªàº°àº«àº¼àº¸àºš</h3><div class="summary-row"><span>àº­à»à»€àº”àºµà»‰àº—àº±àº‡à»àº»àº”</span><b>${orders.length}</b></div><div class="summary-row"><span>àºàº­àº”àº—àºµà»ˆà»€àº„àºµàºàºªàº±à»ˆàº‡</span><b>${money(total)}</b></div>${state.role==='agent'?`<div class="summary-row"><span>àº­àº²àº—àº´àº”àº™àºµà»‰</span><b>${state.user.weekOrders||0}/7</b></div>`:''}</div></div>` }
-function saveProfile(){ state.user.name=val('profileName'); state.user.phone=val('profilePhone'); const arr=state.role==='customer'?db.users:db.agents; const idx=arr.findIndex(x=>x.id===state.user.id); if(idx>=0) arr[idx]=state.user; saveDB(); toast('àºšàº±àº™àº—àº¶àºàºšàº±àº™àºŠàºµà»àº¥à»‰àº§'); render() }
+function renderWish(){ const ids=db.wishlist[currentUserKey()]||[]; const items=db.products.filter(p=>ids.includes(p.id)); return `<div class="section-title"><h2>ລາຍການຖືກໃຈ</h2><button class="btn light" onclick="state.tab='shop';render()">ໄປຊື້ເຄື່ອງ</button></div><div class="grid">${items.map(productCard).join('')||'<div class="empty">ຍັງບໍ່ມີສິນຄ້າຖືກໃຈ</div>'}</div>` }
+function renderProfile(){ const orders=userOrders(); const total=orders.reduce((s,o)=>s+o.total,0); return `<div class="two-col"><div class="card" style="padding:18px"><h2>ບັນຊີຂອງຂ້ອຍ</h2><div class="field"><label>ຊື່ທີ່ສະແດງ</label><input id="profileName" value="${state.user.name}"></div><div class="field"><label>ເບີໂທ</label><input id="profilePhone" ${numAttrs()} value="${state.user.phone}"></div><button class="btn rose" onclick="saveProfile()">ບັນທຶກ</button><a class="btn light" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">ຕິດຕໍ່ WhatsApp</a></div><div class="summary"><h3>ສະຫຼຸບ</h3><div class="summary-row"><span>ອໍເດີ້ທັງໝົດ</span><b>${orders.length}</b></div><div class="summary-row"><span>ຍອດທີ່ເຄີຍສັ່ງ</span><b>${money(total)}</b></div>${state.role==='agent'?`<div class="summary-row"><span>ອາທິດນີ້</span><b>${state.user.weekOrders||0}/7</b></div>`:''}</div></div>` }
+function saveProfile(){ state.user.name=val('profileName'); state.user.phone=val('profilePhone'); const arr=state.role==='customer'?db.users:db.agents; const idx=arr.findIndex(x=>x.id===state.user.id); if(idx>=0) arr[idx]=state.user; saveDB(); toast('ບັນທຶກບັນຊີແລ້ວ'); render() }
 function showModal(content,raw=false){ const m=document.getElementById('modal'); m.innerHTML=raw?content:`<div class="modal-card">${content}</div>`; m.classList.add('show') }
 function closeModal(){ clearInterval(countdownTimer); const m=document.getElementById('modal'); m.classList.remove('show'); m.innerHTML='' }
 window.addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
-function renderAdmin(){ document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">ðŸª·</div><div><b>Bai Boua Admin</b><div class="meta">àº«àº¼àº±àº‡àºšà»‰àº²àº™ Â· àºšà»à»ˆà»‚àºŠà¸§à¹Œàº¥àº°àº«àº±àº”à»ƒàº™à»œà»‰àº²à»€àº§àº±àºš</div></div></div><div class="nav"><button onclick="logout()">àº­àº­àºàºˆàº²àºàº¥àº°àºšàº»àºš</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','àº­à»à»€àº”àºµà»‰')}${adminMenuBtn('products','àºªàº´àº™àº„à»‰àº²')}${adminMenuBtn('categories','à»àº§àº”')}${adminMenuBtn('customers','àº¥àº¹àºàº„à»‰àº²')}${adminMenuBtn('agents','àº•àº»àº§à»àº—àº™')}${adminMenuBtn('reports','àº¥àº²àºàº‡àº²àº™')}${adminMenuBtn('promo','à»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™')}</aside><section>${adminPage()}</section></main></div>` }
+function renderAdmin(){ document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ບໍ່ໂຊว์ລະຫັດໃນໜ້າເວັບ</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>` }
 function adminMenuBtn(tab,label){ return `<button class="${state.adminTab===tab?'active':''}" onclick="state.adminTab='${tab}'; render()">${label}</button>` }
 function ordersByDate(filter='all'){ const now=new Date(); return db.orders.filter(o=>{ if(filter==='all')return true; const d=new Date(o.createdAt); if(filter==='today')return todayStr(o.createdAt)===todayStr(); if(filter==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); if(filter==='year')return d.getFullYear()===now.getFullYear(); return true }) }
-function adminStats(filter='all'){ const orders=ordersByDate(filter).filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº')); return {orders,revenue:orders.reduce((s,o)=>s+o.total,0),profit:orders.reduce((s,o)=>s+(o.profit||0),0),customer:orders.filter(o=>o.role==='customer').reduce((s,o)=>s+o.total,0),agent:orders.filter(o=>o.role==='agent').reduce((s,o)=>s+o.total,0)} }
+function adminStats(filter='all'){ const orders=ordersByDate(filter).filter(o=>!o.status.includes('ຍົກເລີກ')); return {orders,revenue:orders.reduce((s,o)=>s+o.total,0),profit:orders.reduce((s,o)=>s+(o.profit||0),0),customer:orders.filter(o=>o.role==='customer').reduce((s,o)=>s+o.total,0),agent:orders.filter(o=>o.role==='agent').reduce((s,o)=>s+o.total,0)} }
 function adminPage(){ const t=state.adminTab; if(t==='dashboard')return adminDashboard(); if(t==='orders')return adminOrders(); if(t==='products')return adminProducts(); if(t==='categories')return adminCategories(); if(t==='customers')return adminCustomers(); if(t==='agents')return adminAgents(); if(t==='reports')return adminReports(); if(t==='promo')return adminPromo(); return '' }
-function adminDashboard(){ const d=adminStats('today'), m=adminStats('month'), y=adminStats('year'); const topAgent=[...db.agents].sort((a,b)=>(b.weekOrders||0)-(a.weekOrders||0))[0]; return `<div class="section-title"><h2>Dashboard</h2></div><div class="stats"><div class="stat">àºàº­àº”àº¡àº·à»‰àº™àºµà»‰<b>${money(d.revenue)}</b></div><div class="stat">àºàº³à»„àº¥àº¡àº·à»‰àº™àºµà»‰<b>${money(d.profit)}</b></div><div class="stat">àºàº­àº”à»€àº”àº·àº­àº™àº™àºµà»‰<b>${money(m.revenue)}</b></div><div class="stat">àºàº­àº”àº›àºµàº™àºµà»‰<b>${money(y.revenue)}</b></div></div><div class="stats"><div class="stat">àºˆàº²àºàº¥àº¹àºàº„à»‰àº²<b>${money(m.customer)}</b></div><div class="stat">àºˆàº²àºàº•àº»àº§à»àº—àº™<b>${money(m.agent)}</b></div><div class="stat">Top Agent<b>${topAgent?topAgent.name:'-'}</b></div><div class="stat">àº­à»à»€àº”àºµà»‰àº—àº±àº‡à»àº»àº”<b>${db.orders.length}</b></div></div><div class="card" style="padding:18px"><h3>àº­à»à»€àº”àºµà»‰àº¥à»ˆàº²àºªàº¸àº”</h3>${db.orders.slice(0,5).map(o=>`<div class="summary-row"><span>${o.id} Â· ${o.customer.name}</span><b>${money(o.total)}</b></div>`).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰</div>'}</div>` }
-function adminOrders(){ return `<div class="section-title"><h2>àºˆàº±àº”àºàº²àº™àº­à»à»€àº”àºµà»‰</h2><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div>${db.orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} Â· ${o.customer.name} Â· ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span></div>${progressHTML(o)}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">à»€àºšàº´à»ˆàº‡/àºàº§àº”àºªàº°àº¥àº´àºš</button><button class="btn sage small" onclick="nextStatus('${o.id}')">àº”àº±àº™àºªàº°àº–àº²àº™àº°àº•à»à»ˆà»„àº›</button><button class="btn danger small" onclick="deleteOrder('${o.id}')">àº¥àº¶àºš</button></div></div>`).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰</div>'}` }
-function adminOpenOrder(id){ const o=db.orders.find(x=>x.id===id); showModal(`<div class="modal-head"><b>Admin Â· ${o.id}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body">${orderFullHTML(o,true)}<div class="card" style="padding:16px"><h3>àºàº§àº”àºªàº­àºšàºªàº°àº¥àº´àºš</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàºªàº°àº¥àº´àºš</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="à»€àº¥àºàº­à»‰àº²àº‡àº­àºµàº‡"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">àº­àº°àº™àº¸àº¡àº±àº”</button><button class="btn danger" onclick="invalidSlip('${o.id}')">àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡</button></div></div></div>`) }
-function approveSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('refNo'); o.status='àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™'; o.approvedAt=Date.now(); if(o.role==='agent' && !o.agentTargetCounted){ const ag=db.agents.find(a=>a.id===o.userId); if(ag){ ag.weekOrders=(ag.weekOrders||0)+1; if(state.user&&state.user.id===ag.id) state.user.weekOrders=ag.weekOrders } o.agentTargetCounted=true } saveDB(); toast(o.role==='agent'?'àº­àº°àº™àº¸àº¡àº±àº”àºàº²àº™à»‚àº­àº™à»àº¥à»‰àº§ Â· à»€àºžàºµà»ˆàº¡à»€àº›àº»à»‰àº²àº•àº»àº§à»àº—àº™ 1 àº­à»à»€àº”àºµà»‰':'àº­àº°àº™àº¸àº¡àº±àº”àºàº²àº™à»‚àº­àº™à»àº¥à»‰àº§'); closeModal(); render() }
-function invalidSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('refNo'); o.status='àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡'; saveDB(); toast('à»àºˆà»‰àº‡àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡','danger'); closeModal(); render() }
-function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™') idx=1; if(idx<steps.length-1){ o.status=steps[idx+1].replace(' âœ…','') } saveDB(); toast('àº­àº±àºšà»€àº”àº”àºªàº°àº–àº²àº™àº°à»àº¥à»‰àº§'); render() }
-function deleteOrder(id){ if(!confirm('àº¥àº¶àºšàº­à»à»€àº”àºµà»‰àº™àºµà»‰?'))return; db.orders=db.orders.filter(o=>o.id!==id); saveDB(); render() }
-function adminProducts(){ return `<div class="section-title"><h2>à»€àºžàºµà»ˆàº¡/àºˆàº±àº”àºàº²àº™àºªàº´àº™àº„à»‰àº²</h2></div><div class="card" style="padding:18px"><h3>à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²à»ƒà»à»ˆ</h3><div class="form-grid"><div class="field"><label>àºŠàº·à»ˆàºªàº´àº™àº„à»‰àº²</label><input id="pName"></div><div class="field"><label>Code/à»€àº¥àºàºªàº´àº™àº„à»‰àº²</label><input id="pCode"></div><div class="field"><label>à»àº§àº”</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>àº›àº°à»€àºžàº”</label><select id="pType"><option value="ready">àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</option><option value="preorder">àºžàº£àºµàº­à»à»€àº”àºµà»‰</option></select></div><div class="field"><label>àº¥àº²àº„àº²àº¥àº¹àºàº„à»‰àº²</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>àº¥àº²àº„àº²àº•àº»àº§à»àº—àº™</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>àº•àº»à»‰àº™àº—àº¶àº™ (à»àº­àº±àº”àº¡àº´àº™à»€àº«àº±àº™à»€àº—àº»à»ˆàº²àº™àº±à»‰àº™)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>à»„àºŠà»‰ (àº„àº±à»ˆàº™àº”à»‰àº§àº ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>àºªàºµ (àº„àº±à»ˆàº™àº”à»‰àº§àº ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>àº®àº¹àºšàº«àº¼àº±àº</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>àº®àº¹àºšàºà»ˆàº­àº/àº®àº¹àºšàºªàºµàº­àº·à»ˆàº™</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">àº®àº¹àºšàº«àº¼àº±àº = àºªàºµàº—àº³àº­àº´àº”, àº®àº¹àºšàºà»ˆàº­àºàº—àºµà»ˆ 1 = àºªàºµàº—àºµà»ˆ 2, àº®àº¹àºšàºà»ˆàº­àºàº—àºµà»ˆ 2 = àºªàºµàº—àºµà»ˆ 3</div></div><div class="field" style="grid-column:1/-1"><label>àº¥àº²àºàº¥àº°àº­àº½àº”</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²</button></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>àº®àº¹àºš</th><th>àºŠàº·à»ˆ</th><th>à»àº§àº”</th><th>àº¥àº²àº„àº²</th><th>àº•àº»à»‰àº™àº—àº¶àº™</th><th>Stock</th><th></th></tr>${db.products.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?p.stock:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">àº¥àº¶àºš</button></td></tr>`).join('')}</table></div>` }
+function adminDashboard(){ const d=adminStats('today'), m=adminStats('month'), y=adminStats('year'); const topAgent=[...db.agents].sort((a,b)=>(b.weekOrders||0)-(a.weekOrders||0))[0]; return `<div class="section-title"><h2>Dashboard</h2></div><div class="stats"><div class="stat">ຍອດມື້ນີ້<b>${money(d.revenue)}</b></div><div class="stat">ກຳໄລມື້ນີ້<b>${money(d.profit)}</b></div><div class="stat">ຍອດເດືອນນີ້<b>${money(m.revenue)}</b></div><div class="stat">ຍອດປີນີ້<b>${money(y.revenue)}</b></div></div><div class="stats"><div class="stat">ຈາກລູກຄ້າ<b>${money(m.customer)}</b></div><div class="stat">ຈາກຕົວແທນ<b>${money(m.agent)}</b></div><div class="stat">Top Agent<b>${topAgent?topAgent.name:'-'}</b></div><div class="stat">ອໍເດີ້ທັງໝົດ<b>${db.orders.length}</b></div></div><div class="card" style="padding:18px"><h3>ອໍເດີ້ລ່າສຸດ</h3>${db.orders.slice(0,5).map(o=>`<div class="summary-row"><span>${o.id} · ${o.customer.name}</span><b>${money(o.total)}</b></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້</div>'}</div>` }
+function adminOrders(){ return `<div class="section-title"><h2>ຈັດການອໍເດີ້</h2><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div>${db.orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} · ${o.customer.name} · ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">ເບິ່ງ/ກວດສະລິບ</button><button class="btn sage small" onclick="nextStatus('${o.id}')">ດັນສະຖານະຕໍ່ໄປ</button><button class="btn danger small" onclick="deleteOrder('${o.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້</div>'}` }
+function adminOpenOrder(id){ const o=db.orders.find(x=>x.id===id); showModal(`<div class="modal-head"><b>Admin · ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body">${orderFullHTML(o,true)}<div class="card" style="padding:16px"><h3>ກວດສອບສະລິບ</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">ຍັງບໍ່ມີສະລິບ</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="ເລກອ້າງອີງ"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">ອະນຸມັດ</button><button class="btn danger" onclick="invalidSlip('${o.id}')">ສະລິບບໍ່ຖືກຕ້ອງ</button></div></div></div>`) }
+function approveSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('refNo'); o.status='ກວດສອບການໂອນ'; o.approvedAt=Date.now(); if(o.role==='agent' && !o.agentTargetCounted){ const ag=db.agents.find(a=>a.id===o.userId); if(ag){ ag.weekOrders=(ag.weekOrders||0)+1; if(state.user&&state.user.id===ag.id) state.user.weekOrders=ag.weekOrders } o.agentTargetCounted=true } saveDB(); toast(o.role==='agent'?'ອະນຸມັດການໂອນແລ້ວ · ເພີ່ມເປົ້າຕົວແທນ 1 ອໍເດີ້':'ອະນຸມັດການໂອນແລ້ວ'); closeModal(); render() }
+function invalidSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('refNo'); o.status='ສະລິບບໍ່ຖືກຕ້ອງ'; saveDB(); toast('ແຈ້ງສະລິບບໍ່ຖືກຕ້ອງ','danger'); closeModal(); render() }
+function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1; if(idx<steps.length-1){ o.status=steps[idx+1].replace(' ✅','') } saveDB(); toast('ອັບເດດສະຖານະແລ້ວ'); render() }
+function deleteOrder(id){ if(!confirm('ລຶບອໍເດີ້ນີ້?'))return; db.orders=db.orders.filter(o=>o.id!==id); saveDB(); render() }
+function adminProducts(){ return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode"></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ສີ (ຄັ່ນດ້ວຍ ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບສີອື່ນ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກ = ສີທຳອິດ, ຮູບຍ່ອຍທີ່ 1 = ສີທີ່ 2, ຮູບຍ່ອຍທີ່ 2 = ສີທີ່ 3</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${db.products.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?p.stock:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
 function readFile(file){ return new Promise(res=>{ if(!file)return res(null); const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file) }) }
-async function addProductAdmin(){ const name=val('pName'), code=val('pCode'); if(!name||!code)return toast('àºàº­àºàºŠàº·à»ˆ à»àº¥àº° Code àºà»ˆàº­àº™','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } const type=val('pType'); db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²à»àº¥à»‰àº§'); render() }
-function deleteProduct(id){ if(!confirm('àº¥àº¶àºšàºªàº´àº™àº„à»‰àº²?'))return; db.products=db.products.filter(p=>p.id!==id); saveDB(); render() }
-function adminCategories(){ return `<div class="section-title"><h2>à»àº§àº”àºªàº´àº™àº„à»‰àº²</h2></div><div class="card" style="padding:18px"><div class="field"><label>à»€àºžàºµà»ˆàº¡à»àº§àº”à»ƒà»à»ˆ</label><input id="newCat" placeholder="à»€àºŠàº±à»ˆàº™ à»àº§àº, à»€àºàºµàºš, à»€àº„àº·à»ˆàº­àº‡àº›àº°àº”àº±àºš"></div><button class="btn sage" onclick="addCategory()">à»€àºžàºµà»ˆàº¡à»àº§àº”</button><div class="pill-row">${db.categories.map(c=>`<span class="pill">${c} <button class="btn light small" onclick="removeCategory('${esc(c)}')">Ã—</button></span>`).join('')}</div></div>` }
+async function addProductAdmin(){ const name=val('pName'), code=val('pCode'); if(!name||!code)return toast('ກອກຊື່ ແລະ Code ກ່ອນ','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } const type=val('pType'); db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('ເພີ່ມສິນຄ້າແລ້ວ'); render() }
+function deleteProduct(id){ if(!confirm('ລຶບສິນຄ້າ?'))return; db.products=db.products.filter(p=>p.id!==id); saveDB(); render() }
+function adminCategories(){ return `<div class="section-title"><h2>ໝວດສິນຄ້າ</h2></div><div class="card" style="padding:18px"><div class="field"><label>ເພີ່ມໝວດໃໝ່</label><input id="newCat" placeholder="ເຊັ່ນ ໝວກ, ເກີບ, ເຄື່ອງປະດັບ"></div><button class="btn sage" onclick="addCategory()">ເພີ່ມໝວດ</button><div class="pill-row">${db.categories.map(c=>`<span class="pill">${c} <button class="btn light small" onclick="removeCategory('${esc(c)}')">×</button></span>`).join('')}</div></div>` }
 function addCategory(){ const c=val('newCat'); if(!c)return; if(!db.categories.includes(c)) db.categories.push(c); saveDB(); render() }
 function removeCategory(c){ db.categories=db.categories.filter(x=>x!==c); saveDB(); render() }
 function adminCustomers(){ return userTable('customer') }
-function adminAgents(){ return userTable('agent') + `<div class="card" style="padding:18px;margin-top:16px"><h3>àºªà»‰àº²àº‡àºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™</h3><div class="form-grid"><div class="field"><label>àºŠàº·à»ˆ</label><input id="agName"></div><div class="field"><label>à»€àºšàºµà»‚àº—</label><input id="agPhone" ${numAttrs()}></div><div class="field"><label>àº¥àº°àº«àº±àº”</label><input id="agPass"></div></div><button class="btn rose" onclick="addAgent()">àºªà»‰àº²àº‡àº•àº»àº§à»àº—àº™</button></div>` }
-function userTable(type){ const arr=type==='customer'?db.users:db.agents; const isAgent=type==='agent'; const title=isAgent?'àºˆàº±àº”àºàº²àº™àº•àº»àº§à»àº—àº™':'àºˆàº±àº”àºàº²àº™àº¥àº¹àºàº„à»‰àº²'; const totalUsers=arr.length; const activeAgents=isAgent?arr.filter(a=>a.active).length:0; return `<div class="section-title"><h2>${title}</h2></div><div class="admin-glow-panel"><h3>${isAgent?'Agent Center':'Customer Center'}</h3><div class="meta">${isAgent?`àº•àº»àº§à»àº—àº™àº—àº±àº‡à»àº»àº” ${totalUsers} Â· à»€àº›àºµàº”à»ƒàºŠà»‰ ${activeAgents} Â· àº›àº´àº”à»ƒàºŠà»‰ ${totalUsers-activeAgents}`:`àº¥àº¹àºàº„à»‰àº²àº—àº±àº‡à»àº»àº” ${totalUsers} Â· à»àº­àº±àº”àº¡àº´àº™àºªàº²àº¡àº²àº”à»€àºšàº´à»ˆàº‡àº­à»à»€àº”àºµà»‰ à»àº¥àº° àº¥àº¶àºš ID à»„àº”à»‰`}</div></div><div class="table-wrap elevated-table"><table class="table"><tr><th>ID</th><th>àºŠàº·à»ˆ</th><th>à»€àºšàºµ</th><th>àº­à»à»€àº”àºµà»‰</th><th>àºàº­àº”àº¥àº§àº¡</th><th>àºªàº°àº–àº²àº™àº°</th><th></th></tr>${arr.map(u=>{const orders=db.orders.filter(o=>o.userId===u.id&&o.role===type); const total=orders.reduce((s,o)=>s+o.total,0); const inactive=isAgent && !u.active; return `<tr class="${inactive?'row-muted':''}"><td><b>${u.id}</b></td><td>${u.name}</td><td>${u.phone}</td><td>${orders.length}</td><td><b>${money(total)}</b></td><td>${isAgent?`<span class="status-pill ${u.active?'':'off'}">${u.active?'à»€àº›àºµàº”à»ƒàºŠà»‰':'àº›àº´àº”à»ƒàºŠà»‰'}</span>`:`<span class="status-pill">à»€àº›àºµàº”à»ƒàºŠà»‰</span>`}</td><td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${u.id}','${type}')">à»€àºšàº´à»ˆàº‡àº­à»à»€àº”àºµà»‰</button>${isAgent?`<button class="btn ${u.active?'danger':'sage'} small" onclick="toggleAgent('${u.id}')">${u.active?'àº›àº´àº” ID':'à»€àº›àºµàº” ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${u.id}')">àº¥àº¶àºš ID</button>`}</div></td></tr>`}).join('')||`<tr><td colspan="7"><div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº‚à»à»‰àº¡àº¹àº™</div></td></tr>`}</table></div>` }
-function deleteCustomer(id){ const u=db.users.find(x=>x.id===id); if(!u)return; const count=db.orders.filter(o=>o.userId===id&&o.role==='customer').length; if(!confirm(`àº¥àº¶àºš ID àº¥àº¹àºàº„à»‰àº² ${u.name}?${count?`\nàº­à»à»€àº”àºµà»‰à»€àºàº»à»ˆàº² ${count} àº¥àº²àºàºàº²àº™àºˆàº°àºàº±àº‡àº¢àº¹à»ˆà»ƒàº™àº›àº°àº«àº§àº±àº”àº­à»à»€àº”àºµà»‰.`:''}`))return; db.users=db.users.filter(x=>x.id!==id); saveDB(); toast('àº¥àº¶àºš ID àº¥àº¹àºàº„à»‰àº²à»àº¥à»‰àº§'); render() }
-function addAgent(){ const name=val('agName'), phone=val('agPhone'), pass=val('agPass'); if(!name||!phone||!pass)return toast('àºàº­àºàº‚à»à»‰àº¡àº¹àº™àº•àº»àº§à»àº—àº™à»ƒàº«à»‰àº„àº»àºš','danger'); db.agents.push({id:uid('AG'),role:'agent',name,phone,password:pass,active:true,weekOrders:0,weekTarget:7,createdAt:Date.now()}); saveDB(); toast('àºªà»‰àº²àº‡àº•àº»àº§à»àº—àº™à»àº¥à»‰àº§'); render() }
-function toggleAgent(id){ const a=db.agents.find(x=>x.id===id); if(!a)return; a.active=!a.active; a.disabledAt=a.active?null:Date.now(); saveDB(); toast(a.active?'à»€àº›àºµàº” ID àº•àº»àº§à»àº—àº™à»àº¥à»‰àº§':'àº›àº´àº” ID àº•àº»àº§à»àº—àº™à»àº¥à»‰àº§ Â· à»àº–àº§àºˆàº°à»€àº›àº±àº™àºªàºµà»€àº—àº»àº²'); render() }
-function viewUserOrders(id,type){ const orders=db.orders.filter(o=>o.userId===id&&o.role===type); showModal(`<div class="modal-head"><b>àº­à»à»€àº”àºµà»‰àº‚àº­àº‡ ${id}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body">${orders.map(o=>orderFullHTML(o,true)).join('')||'<div class="empty">àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰</div>'}</div>`) }
-function adminReports(){ const date=state.reportDate||todayStr(); const orders=db.orders.filter(o=>todayStr(o.createdAt)===date && !o.status.includes('àºàº»àºà»€àº¥àºµàº')); const total=orders.reduce((s,o)=>s+o.total,0), profit=orders.reduce((s,o)=>s+o.profit,0); return `<div class="section-title"><h2>àº¥àº²àºàº‡àº²àº™àºàº­àº”àº‚àº²àº</h2><button class="btn light" onclick="exportPacking()">Export Excel/CSV</button></div><div class="card" style="padding:18px"><div class="field"><label>à»€àº¥àº·àº­àºàº§àº±àº™àº—àºµ</label><input type="date" value="${date}" onchange="state.reportDate=this.value;render()"></div><div class="stats"><div class="stat">àº­à»à»€àº”àºµà»‰<b>${orders.length}</b></div><div class="stat">àº¥àº²àºàº®àº±àºš<b>${money(total)}</b></div><div class="stat">àºàº³à»„àº¥<b>${money(profit)}</b></div><div class="stat">àº•àº»àº§à»àº—àº™<b>${money(orders.filter(o=>o.role==='agent').reduce((s,o)=>s+o.total,0))}</b></div></div></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>Order</th><th>àº¥àº¹àºàº„à»‰àº²</th><th>àºªàº´àº™àº„à»‰àº²</th><th>àºàº­àº”</th><th>àºàº³à»„àº¥</th></tr>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer.name}<br>${o.customer.phone}</td><td>${o.items.map(i=>`${i.name} x${i.qty}`).join('<br>')}</td><td>${money(o.total)}</td><td>${money(o.profit)}</td></tr>`).join('')}</table></div>` }
-function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status']]; db.orders.filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status]))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export à»àº¥à»‰àº§') }
-function adminPromo(){ return `<div class="section-title"><h2>à»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™ / Popup</h2></div><div class="card" style="padding:18px"><div class="field"><label>àº«àº»àº§àº‚à»à»‰</label><input id="promoTitle" value="${esc(db.promo.title)}"></div><div class="field"><label>àº‚à»à»‰àº„àº§àº²àº¡</label><textarea id="promoText" rows="4">${esc(db.promo.text)}</textarea></div><div class="field"><label>àº®àº¹àºšà»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™</label><input id="promoImage" type="file" accept="image/*"></div><label><input id="promoShow" type="checkbox" ${db.promo.show?'checked':''}> à»€àº›àºµàº” Popup à»œà»‰àº²à»€àº§àº±àºš</label><div class="actions"><button class="btn rose" onclick="savePromo()">àºšàº±àº™àº—àº¶àº</button><button class="btn light" onclick="showWelcome()">Preview</button></div></div>` }
-async function savePromo(){ const img=await readFile(document.getElementById('promoImage').files[0]); db.promo.title=val('promoTitle'); db.promo.text=val('promoText'); db.promo.show=document.getElementById('promoShow').checked; if(img) db.promo.image=img; saveDB(); toast('àºšàº±àº™àº—àº¶àºà»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™à»àº¥à»‰àº§'); render() }
-function resetShopData(){ if(confirm('àº¢àº·àº™àº¢àº±àº™àº¥à»‰àº²àº‡àº‚à»à»‰àº¡àº¹àº™àº—àº»àº”àºªàº­àºšà»ƒàº™à»€àº„àº·à»ˆàº­àº‡àº™àºµà»‰?')){localStorage.removeItem(STORAGE_KEY);db=loadDB();state.user=null;render()}}
+function adminAgents(){ return userTable('agent') + `<div class="card" style="padding:18px;margin-top:16px"><h3>ສ້າງບັນຊີຕົວແທນ</h3><div class="form-grid"><div class="field"><label>ຊື່</label><input id="agName"></div><div class="field"><label>ເບີໂທ</label><input id="agPhone" ${numAttrs()}></div><div class="field"><label>ລະຫັດ</label><input id="agPass"></div></div><button class="btn rose" onclick="addAgent()">ສ້າງຕົວແທນ</button></div>` }
+function userTable(type){ const arr=type==='customer'?db.users:db.agents; const isAgent=type==='agent'; const title=isAgent?'ຈັດການຕົວແທນ':'ຈັດການລູກຄ້າ'; const totalUsers=arr.length; const activeAgents=isAgent?arr.filter(a=>a.active).length:0; return `<div class="section-title"><h2>${title}</h2></div><div class="admin-glow-panel"><h3>${isAgent?'Agent Center':'Customer Center'}</h3><div class="meta">${isAgent?`ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents}`:`ລູກຄ້າທັງໝົດ ${totalUsers} · ແອັດມິນສາມາດເບິ່ງອໍເດີ້ ແລະ ລຶບ ID ໄດ້`}</div></div><div class="table-wrap elevated-table"><table class="table"><tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>${arr.map(u=>{const orders=db.orders.filter(o=>o.userId===u.id&&o.role===type); const total=orders.reduce((s,o)=>s+o.total,0); const inactive=isAgent && !u.active; return `<tr class="${inactive?'row-muted':''}"><td><b>${u.id}</b></td><td>${u.name}</td><td>${u.phone}</td><td>${orders.length}</td><td><b>${money(total)}</b></td><td>${isAgent?`<span class="status-pill ${u.active?'':'off'}">${u.active?'ເປີດໃຊ້':'ປິດໃຊ້'}</span>`:`<span class="status-pill">ເປີດໃຊ້</span>`}</td><td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${u.id}','${type}')">ເບິ່ງອໍເດີ້</button>${isAgent?`<button class="btn ${u.active?'danger':'sage'} small" onclick="toggleAgent('${u.id}')">${u.active?'ປິດ ID':'ເປີດ ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${u.id}')">ລຶບ ID</button>`}</div></td></tr>`}).join('')||`<tr><td colspan="7"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}</table></div>` }
+function deleteCustomer(id){ const u=db.users.find(x=>x.id===id); if(!u)return; const count=db.orders.filter(o=>o.userId===id&&o.role==='customer').length; if(!confirm(`ລຶບ ID ລູກຄ້າ ${u.name}?${count?`\nອໍເດີ້ເກົ່າ ${count} ລາຍການຈະຍັງຢູ່ໃນປະຫວັດອໍເດີ້.`:''}`))return; db.users=db.users.filter(x=>x.id!==id); saveDB(); toast('ລຶບ ID ລູກຄ້າແລ້ວ'); render() }
+function addAgent(){ const name=val('agName'), phone=val('agPhone'), pass=val('agPass'); if(!name||!phone||!pass)return toast('ກອກຂໍ້ມູນຕົວແທນໃຫ້ຄົບ','danger'); db.agents.push({id:uid('AG'),role:'agent',name,phone,password:pass,active:true,weekOrders:0,weekTarget:7,createdAt:Date.now()}); saveDB(); toast('ສ້າງຕົວແທນແລ້ວ'); render() }
+function toggleAgent(id){ const a=db.agents.find(x=>x.id===id); if(!a)return; a.active=!a.active; a.disabledAt=a.active?null:Date.now(); saveDB(); toast(a.active?'ເປີດ ID ຕົວແທນແລ້ວ':'ປິດ ID ຕົວແທນແລ້ວ · ແຖວຈະເປັນສີເທົາ'); render() }
+function viewUserOrders(id,type){ const orders=db.orders.filter(o=>o.userId===id&&o.role===type); showModal(`<div class="modal-head"><b>ອໍເດີ້ຂອງ ${id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body">${orders.map(o=>orderFullHTML(o,true)).join('')||'<div class="empty">ບໍ່ມີອໍເດີ້</div>'}</div>`) }
+function adminReports(){ const date=state.reportDate||todayStr(); const orders=db.orders.filter(o=>todayStr(o.createdAt)===date && !o.status.includes('ຍົກເລີກ')); const total=orders.reduce((s,o)=>s+o.total,0), profit=orders.reduce((s,o)=>s+o.profit,0); return `<div class="section-title"><h2>ລາຍງານຍອດຂາຍ</h2><button class="btn light" onclick="exportPacking()">Export Excel/CSV</button></div><div class="card" style="padding:18px"><div class="field"><label>ເລືອກວັນທີ</label><input type="date" value="${date}" onchange="state.reportDate=this.value;render()"></div><div class="stats"><div class="stat">ອໍເດີ້<b>${orders.length}</b></div><div class="stat">ລາຍຮັບ<b>${money(total)}</b></div><div class="stat">ກຳໄລ<b>${money(profit)}</b></div><div class="stat">ຕົວແທນ<b>${money(orders.filter(o=>o.role==='agent').reduce((s,o)=>s+o.total,0))}</b></div></div></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>Order</th><th>ລູກຄ້າ</th><th>ສິນຄ້າ</th><th>ຍອດ</th><th>ກຳໄລ</th></tr>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer.name}<br>${o.customer.phone}</td><td>${o.items.map(i=>`${i.name} x${i.qty}`).join('<br>')}</td><td>${money(o.total)}</td><td>${money(o.profit)}</td></tr>`).join('')}</table></div>` }
+function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status']]; db.orders.filter(o=>!o.status.includes('ຍົກເລີກ')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status]))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export ແລ້ວ') }
+function adminPromo(){ return `<div class="section-title"><h2>ໂປຣໂມຊັ່ນ / Popup</h2></div><div class="card" style="padding:18px"><div class="field"><label>ຫົວຂໍ້</label><input id="promoTitle" value="${esc(db.promo.title)}"></div><div class="field"><label>ຂໍ້ຄວາມ</label><textarea id="promoText" rows="4">${esc(db.promo.text)}</textarea></div><div class="field"><label>ຮູບໂປຣໂມຊັ່ນ</label><input id="promoImage" type="file" accept="image/*"></div><label><input id="promoShow" type="checkbox" ${db.promo.show?'checked':''}> ເປີດ Popup ໜ້າເວັບ</label><div class="actions"><button class="btn rose" onclick="savePromo()">ບັນທຶກ</button><button class="btn light" onclick="showWelcome()">Preview</button></div></div>` }
+async function savePromo(){ const img=await readFile(document.getElementById('promoImage').files[0]); db.promo.title=val('promoTitle'); db.promo.text=val('promoText'); db.promo.show=document.getElementById('promoShow').checked; if(img) db.promo.image=img; saveDB(); toast('ບັນທຶກໂປຣໂມຊັ່ນແລ້ວ'); render() }
+function resetShopData(){ if(confirm('ຢືນຢັນລ້າງຂໍ້ມູນທົດສອບໃນເຄື່ອງນີ້?')){localStorage.removeItem(STORAGE_KEY);db=loadDB();state.user=null;render()}}
 
 /* === Bai Boua shop systems: product filters, admin notifications, shipping bill, auto code, analytics === */
 function normalizeNewFields(){
@@ -250,30 +250,30 @@ function normalizeNewFields(){
 function render(){ normalizeNewFields(); if(!state.user) return renderLogin(); clearExpiredOrders(); if(state.role==='admin') return renderAdmin(); return renderShop() }
 function allProductColors(){ return [...new Set(db.products.flatMap(p=>p.colors||[]).filter(Boolean))] }
 function resetProductFilters(){ state.category='all'; state.search=''; state.filterType='all'; state.filterColor='all'; state.priceSort='default'; render() }
-function productsFiltered(){ normalizeNewFields(); let list=db.products.filter(p=>{ const matchCat=state.category==='all'||p.category===state.category||(state.category==='àºžà»‰àº­àº¡àºªàº»à»ˆàº‡'&&p.type==='ready')||(state.category==='àºžàº£àºµàº­à»à»€àº”àºµà»‰'&&p.type==='preorder'); const matchType=state.filterType==='all'||p.type===state.filterType; const matchColor=state.filterColor==='all'||(p.colors||[]).includes(state.filterColor); const s=(state.search||'').toLowerCase().trim(); const matchSearch=!s||[p.name,p.code,p.category,p.detail,(p.colors||[]).join(' '),(p.sizes||[]).join(' ')].join(' ').toLowerCase().includes(s); return matchCat&&matchType&&matchColor&&matchSearch }); if(state.priceSort==='low') list.sort((a,b)=>(state.role==='agent'?a.agentPrice:a.price)-(state.role==='agent'?b.agentPrice:b.price)); if(state.priceSort==='high') list.sort((a,b)=>(state.role==='agent'?b.agentPrice:b.price)-(state.role==='agent'?a.agentPrice:a.price)); if(state.priceSort==='stock') list.sort((a,b)=>((b.stock||0)-(a.stock||0))); return list }
-function renderProducts(){ normalizeNewFields(); const colors=allProductColors(); const list=productsFiltered(); return `<section class="banner"><div><h1>à»€àº¥àº·àº­àºàºªàº´àº™àº„à»‰àº²à»„àº”à»‰à»€àº¥àºµàº</h1><p class="meta">àº„àº»à»‰àº™àº«àº²àº‡à»ˆàº²àºàº‚àº¶à»‰àº™: àºŠàº·à»ˆ, Code, àºªàºµ, à»àº§àº”, àºžà»‰àº­àº¡àºªàº»à»ˆàº‡ àº«àº¼àº· àºžàº£àºµàº­à»à»€àº”àºµà»‰. àº®àº¹àºšàºˆàº°àº›à»ˆàº½àº™àº•àº²àº¡àºªàºµàº—àºµà»ˆà»€àº¥àº·àº­àº.</p><div class="pill-row"><span class="pill">ðŸª· QR BCEL + LDB</span><span class="pill">â™¡ Wishlist</span><span class="pill">ðŸ“¦ àº•àº´àº”àº•àº²àº¡àºšàº´àº™àºàº²àºà»€àº„àº·à»ˆàº­àº‡</span></div></div><div class="card" style="padding:18px"><b>àºªàº´àº™àº„à»‰àº²à»àº™àº°àº™àº³</b><div class="meta">Product Carousel</div><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
-  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">àº—àº±àº‡à»àº»àº”</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="filter-grid"><div class="field"><label>àº„àº»à»‰àº™àº«àº²àºªàº´àº™àº„à»‰àº²</label><div class="search" style="min-width:0"><span>ðŸ”Ž</span><input placeholder="àºŠàº·à»ˆ / code / àºªàºµ / à»„àºŠà»‰" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>àº›àº°à»€àºžàº”</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>àº—àº¸àºàº›àº°à»€àºžàº”</option><option value="ready" ${state.filterType==='ready'?'selected':''}>àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>àºžàº£àºµàº­à»à»€àº”àºµà»‰</option></select></div><div class="field"><label>àºªàºµ</label><select onchange="state.filterColor=this.value;render()"><option value="all" ${state.filterColor==='all'?'selected':''}>àº—àº¸àºàºªàºµ</option>${colors.map(c=>`<option value="${esc(c)}" ${state.filterColor===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>àºˆàº±àº”àº¥àº½àº‡</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>àº„à»ˆàº²à»€àº¥àºµà»ˆàº¡àº•àº»à»‰àº™</option><option value="low" ${state.priceSort==='low'?'selected':''}>àº¥àº²àº„àº²àº•à»ˆàº³ â†’ àºªàº¹àº‡</option><option value="high" ${state.priceSort==='high'?'selected':''}>àº¥àº²àº„àº²àºªàº¹àº‡ â†’ àº•à»ˆàº³</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock àº«àº¼àº²àºàºà»ˆàº­àº™</option></select></div><button class="btn light" onclick="resetProductFilters()">àº¥à»‰àº²àº‡ Filter</button></div><div class="filter-result">àºžàº»àºš ${list.length} àºªàº´àº™àº„à»‰àº² Â· <span class="soft-chip"><span class="color-dot"></span> Filter à»€àº®àº±àº”àº§àº½àºà»àº¥à»‰àº§</span></div></div>
-  <div class="grid">${list.map(productCard).join('') || `<div class="empty">àºšà»à»ˆàºžàº»àºšàºªàº´àº™àº„à»‰àº²</div>`}</div>` }
-function placeOrder(){ if(!validateCheckout()) return; for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready' && p.stock<item.qty) return toast(`${p.name} àºªàº°àº•àº±àº­àºàºšà»à»ˆàºžà»`,'danger') } for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready') p.stock-=item.qty } const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); const cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0); const hasPre=state.cart.some(i=>i.type==='preorder'); const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™',agentTargetCounted:false,createdAt:Date.now(),adminNewAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')},billNo:'',billImage:''}; db.orders.unshift(order); saveDB(); state.cart=[]; state.paymentOrderId=order.id; state.tab='orders'; toast('àºªà»‰àº²àº‡àº­à»à»€àº”àºµà»‰à»àº¥à»‰àº§ Â· Admin àºˆàº°à»€àº«àº±àº™à»àºˆà»‰àº‡à»€àº•àº·àº­àº™àº­à»à»€àº”àºµà»‰à»ƒà»à»ˆ'); render(); openPayment(order.id) }
-function uploadSlip(id,event){ const file=event.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ const o=db.orders.find(x=>x.id===id); if(!o)return; o.slip=reader.result; o.status='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™'; o.transferUploadedAt=Date.now(); saveDB(); toast('àº­àº±àºšà»‚àº«àº¼àº”àºªàº°àº¥àº´àºšà»àº¥à»‰àº§ Â· Admin àºˆàº°à»€àº«àº±àº™à»àºˆà»‰àº‡à»€àº•àº·àº­àº™àº¥à»àº–à»‰àº²àºàº§àº”àºàº²àº™à»‚àº­àº™'); closeModal(); render() }; reader.readAsDataURL(file) }
-function shipmentHTML(o){ if(!o.billNo&&!o.billImage) return ''; return `<div class="shipment-box"><h3>àºšàº´àº™àºàº²àºà»€àº„àº·à»ˆàº­àº‡ / Tracking</h3><div class="summary-row"><span>à»€àº¥àºàºšàº´àº™</span><b>${o.billNo||'-'}</b></div>${o.billAt?`<div class="meta">à»àºˆà»‰àº‡àºšàº´àº™àº§àº±àº™àº—àºµ ${new Date(o.billAt).toLocaleString()}</div>`:''}${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}</div>` }
-function orderFullHTML(o,admin=false){ return `<div class="order-card"><div class="order-head"><div><b>àºªàº°àº–àº²àº™àº°: ${o.status}</b><div class="meta">àº§àº±àº™àº—àºµ ${new Date(o.createdAt).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span></div>${progressHTML(o)}${shipmentHTML(o)}<div class="divider"></div><h3>àºªàº´àº™àº„à»‰àº²</h3>${o.items.map(i=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} Â· ${i.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'} Â· à»„àºŠà»‰ ${i.size} Â· àºªàºµ ${i.color}</div><div>${money(i.price)} Ã— ${i.qty}</div></div><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="divider"></div><div class="summary-row"><span>àº¥àº§àº¡</span><b>${money(o.total)}</b></div>${admin?`<div class="summary-row"><span>àº•àº»à»‰àº™àº—àº¶àº™</span><b>${money(o.cost)}</b></div><div class="summary-row"><span>àºàº³à»„àº¥</span><b>${money(o.profit)}</b></div>`:''}<div class="divider"></div><h3>àº‚à»à»‰àº¡àº¹àº™àº®àº±àºšà»€àº„àº·à»ˆàº­àº‡</h3><div class="form-grid"><div><b>àºŠàº·à»ˆàº¥àº¹àºàº„à»‰àº²</b><br>${o.customer.name}</div><div><b>à»€àºšàºµ</b><br>${o.customer.phone}</div>${o.sender?`<div><b>àºœàº¹à»‰àºªàº»à»ˆàº‡/àº•àº»àº§à»àº—àº™</b><br>${o.sender.name} Â· ${o.sender.phone}</div>`:''}<div><b>àº‚àº»àº™àºªàº»à»ˆàº‡</b><br>${o.shipping.carrier}</div><div><b>àºªàº²àº‚àº²</b><br>${o.shipping.branch}</div><div><b>à»€àº¡àº·àº­àº‡/à»àº‚àº§àº‡</b><br>${o.shipping.city}, ${o.shipping.province}</div><div style="grid-column:1/-1"><b>à»àº²àºà»€àº«àº”</b><br>${o.shipping.note||'-'}</div></div>${o.slip?`<div class="divider"></div><h3>àºªàº°àº¥àº´àºšà»‚àº­àº™à»€àº‡àº´àº™</h3><img src="${o.slip}" style="width:100%;max-width:360px;border-radius:22px;border:1px solid var(--line)">${o.refNo?`<p><b>Ref No.</b> ${o.refNo}</p>`:''}`:''}</div>` }
-function adminNotifCounts(){ const pendingPay=db.orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™').length; const waitingTransfer=db.orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™').length; const needBill=db.orders.filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº') && (o.status==='àºàº½àº¡àºàº²àºà»€àº„àº·à»ˆàº­àº‡'||o.status==='à»€àº„àº·à»ˆàº­àº‡àº®àº­àº”à»àº¥à»‰àº§àºàº½àº¡àºàº²àº'||o.status==='à»àºˆà»‰àº‡àºšàº´àº™') && !o.billNo && !o.billImage).length; const lowStock=db.products.filter(p=>p.type==='ready' && Number(p.stock)>0 && Number(p.stock)<=3).length; return {pendingPay,waitingTransfer,needBill,lowStock,total:pendingPay+waitingTransfer+needBill} }
-function notificationPanel(){ const n=adminNotifCounts(); return `<div class="notification-box"><div class="section-title" style="margin-top:0"><h2>ðŸ”” à»àºˆà»‰àº‡à»€àº•àº·àº­àº™ Admin</h2><button class="btn rose small" onclick="state.adminTab='orders';render()">à»„àº›àºàº§àº”àº­à»à»€àº”àºµà»‰</button></div><div class="notif-list"><div class="notif-card">àº­à»à»€àº”àºµà»‰à»ƒà»à»ˆ / àº¥à»àº–à»‰àº²à»‚àº­àº™<strong>${n.pendingPay}</strong></div><div class="notif-card">àº¥à»àº–à»‰àº²àºàº§àº”àºàº²àº™à»‚àº­àº™<strong>${n.waitingTransfer}</strong></div><div class="notif-card">àº¥à»àº–à»‰àº²à»àºˆà»‰àº‡àºšàº´àº™<strong>${n.needBill}</strong></div></div>${n.lowStock?`<div class="notice" style="margin-top:12px">Stock à»ƒàºà»‰à»àº»àº” ${n.lowStock} àº¥àº²àºàºàº²àº™ Â· àº„àº§àº™à»€àºŠàº±àºà»ƒàº™à»œà»‰àº²àºªàº´àº™àº„à»‰àº²</div>`:''}</div>` }
-function renderAdmin(){ normalizeNewFields(); document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">ðŸª·</div><div><b>Bai Boua Admin</b><div class="meta">àº«àº¼àº±àº‡àºšà»‰àº²àº™ Â· àº¡àºµà»àºˆà»‰àº‡à»€àº•àº·àº­àº™àº­à»à»€àº”àºµà»‰à»ƒà»à»ˆ/àºàº²àº™à»‚àº­àº™/àºšàº´àº™àºàº²àº</div></div></div><div class="nav"><button onclick="logout()">àº­àº­àºàºˆàº²àºàº¥àº°àºšàº»àºš</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','àº­à»à»€àº”àºµà»‰')}${adminMenuBtn('products','àºªàº´àº™àº„à»‰àº²')}${adminMenuBtn('categories','à»àº§àº”')}${adminMenuBtn('customers','àº¥àº¹àºàº„à»‰àº²')}${adminMenuBtn('agents','àº•àº»àº§à»àº—àº™')}${adminMenuBtn('reports','àº¥àº²àºàº‡àº²àº™')}${adminMenuBtn('promo','à»‚àº›àº£à»‚àº¡àºŠàº±à»ˆàº™')}</aside><section>${adminPage()}</section></main></div>` }
+function productsFiltered(){ normalizeNewFields(); let list=db.products.filter(p=>{ const matchCat=state.category==='all'||p.category===state.category||(state.category==='ພ້ອມສົ່ງ'&&p.type==='ready')||(state.category==='ພຣີອໍເດີ້'&&p.type==='preorder'); const matchType=state.filterType==='all'||p.type===state.filterType; const matchColor=state.filterColor==='all'||(p.colors||[]).includes(state.filterColor); const s=(state.search||'').toLowerCase().trim(); const matchSearch=!s||[p.name,p.code,p.category,p.detail,(p.colors||[]).join(' '),(p.sizes||[]).join(' ')].join(' ').toLowerCase().includes(s); return matchCat&&matchType&&matchColor&&matchSearch }); if(state.priceSort==='low') list.sort((a,b)=>(state.role==='agent'?a.agentPrice:a.price)-(state.role==='agent'?b.agentPrice:b.price)); if(state.priceSort==='high') list.sort((a,b)=>(state.role==='agent'?b.agentPrice:b.price)-(state.role==='agent'?a.agentPrice:a.price)); if(state.priceSort==='stock') list.sort((a,b)=>((b.stock||0)-(a.stock||0))); return list }
+function renderProducts(){ normalizeNewFields(); const colors=allProductColors(); const list=productsFiltered(); return `<section class="banner"><div><h1>ເລືອກສິນຄ້າໄດ້ເລີຍ</h1><p class="meta">ຄົ້ນຫາງ່າຍຂຶ້ນ: ຊື່, Code, ສີ, ໝວດ, ພ້ອມສົ່ງ ຫຼື ພຣີອໍເດີ້. ຮູບຈະປ່ຽນຕາມສີທີ່ເລືອກ.</p><div class="pill-row"><span class="pill">🪷 QR BCEL + LDB</span><span class="pill">♡ Wishlist</span><span class="pill">📦 ຕິດຕາມບິນຝາກເຄື່ອງ</span></div></div><div class="card" style="padding:18px"><b>ສິນຄ້າແນະນຳ</b><div class="meta">Product Carousel</div><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
+  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">ທັງໝົດ</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="filter-grid"><div class="field"><label>ຄົ້ນຫາສິນຄ້າ</label><div class="search" style="min-width:0"><span>🔎</span><input placeholder="ຊື່ / code / ສີ / ໄຊ້" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>ປະເພດ</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>ທຸກປະເພດ</option><option value="ready" ${state.filterType==='ready'?'selected':''}>ພ້ອມສົ່ງ</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>ພຣີອໍເດີ້</option></select></div><div class="field"><label>ສີ</label><select onchange="state.filterColor=this.value;render()"><option value="all" ${state.filterColor==='all'?'selected':''}>ທຸກສີ</option>${colors.map(c=>`<option value="${esc(c)}" ${state.filterColor===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>ຈັດລຽງ</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>ຄ່າເລີ່ມຕົ້ນ</option><option value="low" ${state.priceSort==='low'?'selected':''}>ລາຄາຕ່ຳ → ສູງ</option><option value="high" ${state.priceSort==='high'?'selected':''}>ລາຄາສູງ → ຕ່ຳ</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock ຫຼາຍກ່ອນ</option></select></div><button class="btn light" onclick="resetProductFilters()">ລ້າງ Filter</button></div><div class="filter-result">ພົບ ${list.length} ສິນຄ້າ · <span class="soft-chip"><span class="color-dot"></span> Filter ເຮັດວຽກແລ້ວ</span></div></div>
+  <div class="grid">${list.map(productCard).join('') || `<div class="empty">ບໍ່ພົບສິນຄ້າ</div>`}</div>` }
+function placeOrder(){ if(!validateCheckout()) return; for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready' && p.stock<item.qty) return toast(`${p.name} ສະຕັອກບໍ່ພໍ`,'danger') } for(const item of state.cart){ const p=db.products.find(x=>x.id===item.productId); if(p.type==='ready') p.stock-=item.qty } const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); const cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0); const hasPre=state.cart.some(i=>i.type==='preorder'); const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'ລໍຖ້າຍອດໂອນ',agentTargetCounted:false,createdAt:Date.now(),adminNewAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')},billNo:'',billImage:''}; db.orders.unshift(order); saveDB(); state.cart=[]; state.paymentOrderId=order.id; state.tab='orders'; toast('ສ້າງອໍເດີ້ແລ້ວ · Admin ຈະເຫັນແຈ້ງເຕືອນອໍເດີ້ໃໝ່'); render(); openPayment(order.id) }
+function uploadSlip(id,event){ const file=event.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ const o=db.orders.find(x=>x.id===id); if(!o)return; o.slip=reader.result; o.status='ລໍຖ້າກວດສອບການໂອນ'; o.transferUploadedAt=Date.now(); saveDB(); toast('ອັບໂຫຼດສະລິບແລ້ວ · Admin ຈະເຫັນແຈ້ງເຕືອນລໍຖ້າກວດການໂອນ'); closeModal(); render() }; reader.readAsDataURL(file) }
+function shipmentHTML(o){ if(!o.billNo&&!o.billImage) return ''; return `<div class="shipment-box"><h3>ບິນຝາກເຄື່ອງ / Tracking</h3><div class="summary-row"><span>ເລກບິນ</span><b>${o.billNo||'-'}</b></div>${o.billAt?`<div class="meta">ແຈ້ງບິນວັນທີ ${new Date(o.billAt).toLocaleString()}</div>`:''}${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}</div>` }
+function orderFullHTML(o,admin=false){ return `<div class="order-card"><div class="order-head"><div><b>ສະຖານະ: ${o.status}</b><div class="meta">ວັນທີ ${new Date(o.createdAt).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${shipmentHTML(o)}<div class="divider"></div><h3>ສິນຄ້າ</h3>${o.items.map(i=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="divider"></div><div class="summary-row"><span>ລວມ</span><b>${money(o.total)}</b></div>${admin?`<div class="summary-row"><span>ຕົ້ນທຶນ</span><b>${money(o.cost)}</b></div><div class="summary-row"><span>ກຳໄລ</span><b>${money(o.profit)}</b></div>`:''}<div class="divider"></div><h3>ຂໍ້ມູນຮັບເຄື່ອງ</h3><div class="form-grid"><div><b>ຊື່ລູກຄ້າ</b><br>${o.customer.name}</div><div><b>ເບີ</b><br>${o.customer.phone}</div>${o.sender?`<div><b>ຜູ້ສົ່ງ/ຕົວແທນ</b><br>${o.sender.name} · ${o.sender.phone}</div>`:''}<div><b>ຂົນສົ່ງ</b><br>${o.shipping.carrier}</div><div><b>ສາຂາ</b><br>${o.shipping.branch}</div><div><b>ເມືອງ/ແຂວງ</b><br>${o.shipping.city}, ${o.shipping.province}</div><div style="grid-column:1/-1"><b>ໝາຍເຫດ</b><br>${o.shipping.note||'-'}</div></div>${o.slip?`<div class="divider"></div><h3>ສະລິບໂອນເງິນ</h3><img src="${o.slip}" style="width:100%;max-width:360px;border-radius:22px;border:1px solid var(--line)">${o.refNo?`<p><b>Ref No.</b> ${o.refNo}</p>`:''}`:''}</div>` }
+function adminNotifCounts(){ const pendingPay=db.orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ').length; const waitingTransfer=db.orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ').length; const needBill=db.orders.filter(o=>!o.status.includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage).length; const lowStock=db.products.filter(p=>p.type==='ready' && Number(p.stock)>0 && Number(p.stock)<=3).length; return {pendingPay,waitingTransfer,needBill,lowStock,total:pendingPay+waitingTransfer+needBill} }
+function notificationPanel(){ const n=adminNotifCounts(); return `<div class="notification-box"><div class="section-title" style="margin-top:0"><h2>🔔 ແຈ້ງເຕືອນ Admin</h2><button class="btn rose small" onclick="state.adminTab='orders';render()">ໄປກວດອໍເດີ້</button></div><div class="notif-list"><div class="notif-card">ອໍເດີ້ໃໝ່ / ລໍຖ້າໂອນ<strong>${n.pendingPay}</strong></div><div class="notif-card">ລໍຖ້າກວດການໂອນ<strong>${n.waitingTransfer}</strong></div><div class="notif-card">ລໍຖ້າແຈ້ງບິນ<strong>${n.needBill}</strong></div></div>${n.lowStock?`<div class="notice" style="margin-top:12px">Stock ໃກ້ໝົດ ${n.lowStock} ລາຍການ · ຄວນເຊັກໃນໜ້າສິນຄ້າ</div>`:''}</div>` }
+function renderAdmin(){ normalizeNewFields(); document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ມີແຈ້ງເຕືອນອໍເດີ້ໃໝ່/ການໂອນ/ບິນຝາກ</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>` }
 function adminMenuBtn(tab,label){ const n=adminNotifCounts(); const badge=tab==='orders'?n.total:(tab==='products'?n.lowStock:0); return `<button class="${state.adminTab===tab?'active':''}" onclick="state.adminTab='${tab}'; render()"><span>${label}</span>${badge?`<span class="notif-badge">${badge}</span>`:''}</button>` }
-function bestSellingProducts(){ const map={}; db.orders.filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº') && (o.approvedAt||o.status!=='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™')).forEach(o=>o.items.forEach(i=>{ const k=i.productId||i.code; map[k]=map[k]||{name:i.name,code:i.code,qty:0,total:0}; map[k].qty+=Number(i.qty)||0; map[k].total+=(Number(i.price)||0)*(Number(i.qty)||0) })); return Object.values(map).sort((a,b)=>b.qty-a.qty).slice(0,6) }
+function bestSellingProducts(){ const map={}; db.orders.filter(o=>!o.status.includes('ຍົກເລີກ') && (o.approvedAt||o.status!=='ລໍຖ້າຍອດໂອນ')).forEach(o=>o.items.forEach(i=>{ const k=i.productId||i.code; map[k]=map[k]||{name:i.name,code:i.code,qty:0,total:0}; map[k].qty+=Number(i.qty)||0; map[k].total+=(Number(i.price)||0)*(Number(i.qty)||0) })); return Object.values(map).sort((a,b)=>b.qty-a.qty).slice(0,6) }
 function lowStockProducts(){ return db.products.filter(p=>p.type==='ready' && Number(p.stock)>=0 && Number(p.stock)<=3).slice(0,6) }
-function adminDashboard(){ const d=adminStats('today'), m=adminStats('month'), y=adminStats('year'); const topAgent=[...db.agents].sort((a,b)=>(b.weekOrders||0)-(a.weekOrders||0))[0]; const best=bestSellingProducts(); const low=lowStockProducts(); return `${notificationPanel()}<div class="section-title"><h2>Dashboard</h2></div><div class="stats"><div class="stat">àºàº­àº”àº¡àº·à»‰àº™àºµà»‰<b>${money(d.revenue)}</b></div><div class="stat">àºàº³à»„àº¥àº¡àº·à»‰àº™àºµà»‰<b>${money(d.profit)}</b></div><div class="stat">àºàº­àº”à»€àº”àº·àº­àº™àº™àºµà»‰<b>${money(m.revenue)}</b></div><div class="stat">àºàº­àº”àº›àºµàº™àºµà»‰<b>${money(y.revenue)}</b></div></div><div class="stats"><div class="stat">àºˆàº²àºàº¥àº¹àºàº„à»‰àº²<b>${money(m.customer)}</b></div><div class="stat">àºˆàº²àºàº•àº»àº§à»àº—àº™<b>${money(m.agent)}</b></div><div class="stat">Top Agent<b>${topAgent?topAgent.name:'-'}</b></div><div class="stat">àº­à»à»€àº”àºµà»‰àº—àº±àº‡à»àº»àº”<b>${db.orders.length}</b></div></div><div class="analytics-grid"><div class="card" style="padding:18px"><h3>àºªàº´àº™àº„à»‰àº²àº‚àº²àºàº”àºµ</h3>${best.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code} Â· ${p.qty} àºŠàº´à»‰àº™</span></span><b>${money(p.total)}</b></div>`).join('')||'<div class="empty-soft">àºàº±àº‡àºšà»à»ˆàº¡àºµàºàº­àº”àº‚àº²àºàº—àºµà»ˆàº¢àº·àº™àº¢àº±àº™</div>'}</div><div class="card" style="padding:18px"><h3>Stock à»ƒàºà»‰à»àº»àº”</h3>${low.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code}</span></span><b class="${Number(p.stock)===0?'':'kpi-good'}">${p.stock} àºŠàº´à»‰àº™</b></div>`).join('')||'<div class="empty-soft">Stock àºàº±àº‡àºžà»</div>'}</div></div><div class="card" style="padding:18px;margin-top:16px"><h3>àº­à»à»€àº”àºµà»‰àº¥à»ˆàº²àºªàº¸àº”</h3>${db.orders.slice(0,5).map(o=>`<div class="summary-row"><span>${o.id} Â· ${o.customer.name}<br><span class="meta">${o.status}</span></span><b>${money(o.total)}</b></div>`).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰</div>'}</div>` }
-function adminOrders(){ const f=state.adminOrderFilter||'all'; let orders=[...db.orders]; if(f==='pay') orders=orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº­àº”à»‚àº­àº™'); if(f==='verify') orders=orders.filter(o=>o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™'); if(f==='bill') orders=orders.filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº') && (o.status==='àºàº½àº¡àºàº²àºà»€àº„àº·à»ˆàº­àº‡'||o.status==='à»€àº„àº·à»ˆàº­àº‡àº®àº­àº”à»àº¥à»‰àº§àºàº½àº¡àºàº²àº'||o.status==='à»àºˆà»‰àº‡àºšàº´àº™') && !o.billNo && !o.billImage); if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage); return `${notificationPanel()}<div class="admin-toolbar"><h2>àºˆàº±àº”àºàº²àº™àº­à»à»€àº”àºµà»‰</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>àº—àº±àº‡à»àº»àº”</option><option value="pay" ${f==='pay'?'selected':''}>àº¥à»àº–à»‰àº²à»‚àº­àº™</option><option value="verify" ${f==='verify'?'selected':''}>àº¥à»àº–à»‰àº²àºàº§àº”àºàº²àº™à»‚àº­àº™</option><option value="bill" ${f==='bill'?'selected':''}>àº¥à»àº–à»‰àº²à»àºˆà»‰àº‡àºšàº´àº™</option><option value="done" ${f==='done'?'selected':''}>àº¡àºµàºšàº´àº™à»àº¥à»‰àº§</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div></div>${orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} Â· ${o.customer.name} Â· ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'àºžà»‰àº­àº¡àºªàº»à»ˆàº‡':'àºžàº£àºµàº­à»à»€àº”àºµà»‰'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">ðŸ“¦ à»àºˆà»‰àº‡àºšàº´àº™à»àº¥à»‰àº§ ${o.billNo||''}</div>`:''}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">à»€àºšàº´à»ˆàº‡/àºˆàº±àº”àºàº²àº™</button><button class="btn sage small" onclick="nextStatus('${o.id}')">àº”àº±àº™àºªàº°àº–àº²àº™àº°àº•à»à»ˆà»„àº›</button><button class="btn danger small" onclick="deleteOrder('${o.id}')">àº¥àº¶àºš</button></div></div>`).join('')||'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº­à»à»€àº”àºµà»‰à»ƒàº™ Filter àº™àºµà»‰</div>'}` }
-function adminOpenOrder(id){ const o=db.orders.find(x=>x.id===id); showModal(`<div class="modal-head"><b>Admin Â· ${o.id}</b><button class="btn light small" onclick="closeModal()">âœ•</button></div><div class="modal-body">${orderFullHTML(o,true)}<div class="card" style="padding:16px"><h3>àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàºªàº°àº¥àº´àºš</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="à»€àº¥àºàº­à»‰àº²àº‡àº­àºµàº‡"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">àº­àº°àº™àº¸àº¡àº±àº”àºàº²àº™à»‚àº­àº™</button><button class="btn danger" onclick="invalidSlip('${o.id}')">àºªàº°àº¥àº´àºšàºšà»à»ˆàº–àº·àºàº•à»‰àº­àº‡</button></div></div><div class="card" style="padding:16px;margin-top:16px"><h3>à»àºˆà»‰àº‡àºšàº´àº™àºàº²àºà»€àº„àº·à»ˆàº­àº‡</h3><div class="form-grid"><div class="field"><label>à»€àº¥àºàºšàº´àº™ / Tracking No.</label><input id="billNo" value="${esc(o.billNo||'')}" placeholder="à»€àºŠàº±à»ˆàº™ ANS123456"></div><div class="field"><label>àº­àº±àºšà»‚àº«àº¼àº”àº®àº¹àºšàºšàº´àº™</label><input id="billImage" type="file" accept="image/*"></div></div>${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}<div class="file-mini">à»€àº¡àº·à»ˆàº­àºšàº±àº™àº—àº¶àº àº¥àº¹àºàº„à»‰àº²àºˆàº°à»€àº«àº±àº™à»€àº¥àºàºšàº´àº™/àº®àº¹àºšàºšàº´àº™à»ƒàº™à»œà»‰àº²àºªàº°àº–àº²àº™àº°àº­à»à»€àº”àºµà»‰</div><button class="btn rose" onclick="saveShippingBill('${o.id}')">àºšàº±àº™àº—àº¶àº à»àº¥àº° à»àºˆà»‰àº‡àºšàº´àº™</button></div></div>`) }
-async function saveShippingBill(id){ const o=db.orders.find(x=>x.id===id); if(!o) return; const img=await readFile(document.getElementById('billImage')?.files?.[0]); const no=val('billNo'); if(!no&&!img&&!o.billImage) return toast('àºàº°àº¥àº¸àº™àº²à»ƒàºªà»ˆà»€àº¥àºàºšàº´àº™ àº«àº¼àº· àº­àº±àºšà»‚àº«àº¼àº”àº®àº¹àºšàºšàº´àº™','danger'); o.billNo=no||o.billNo||''; if(img) o.billImage=img; o.billAt=Date.now(); o.status='à»àºˆà»‰àº‡àºšàº´àº™'; saveDB(); toast('à»àºˆà»‰àº‡àºšàº´àº™à»ƒàº«à»‰àº¥àº¹àºàº„à»‰àº²à»àº¥à»‰àº§'); closeModal(); render() }
-function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='àº¥à»àº–à»‰àº²àºàº§àº”àºªàº­àºšàºàº²àº™à»‚àº­àº™') idx=1; if(idx<steps.length-1){ const next=steps[idx+1].replace(' âœ…',''); o.status=next; if(next==='à»àºˆà»‰àº‡àºšàº´àº™' && !o.billNo && !o.billImage){ toast('àº¢à»ˆàº²àº¥àº·àº¡à»ƒàºªà»ˆà»€àº¥àºàºšàº´àº™/àº®àº¹àºšàºšàº´àº™à»ƒàº«à»‰àº¥àº¹àºàº„à»‰àº²à»€àº”àºµà»‰') } else { toast('àº­àº±àºšà»€àº”àº”àºªàº°àº–àº²àº™àº°à»àº¥à»‰àº§') } } saveDB(); render() }
+function adminDashboard(){ const d=adminStats('today'), m=adminStats('month'), y=adminStats('year'); const topAgent=[...db.agents].sort((a,b)=>(b.weekOrders||0)-(a.weekOrders||0))[0]; const best=bestSellingProducts(); const low=lowStockProducts(); return `${notificationPanel()}<div class="section-title"><h2>Dashboard</h2></div><div class="stats"><div class="stat">ຍອດມື້ນີ້<b>${money(d.revenue)}</b></div><div class="stat">ກຳໄລມື້ນີ້<b>${money(d.profit)}</b></div><div class="stat">ຍອດເດືອນນີ້<b>${money(m.revenue)}</b></div><div class="stat">ຍອດປີນີ້<b>${money(y.revenue)}</b></div></div><div class="stats"><div class="stat">ຈາກລູກຄ້າ<b>${money(m.customer)}</b></div><div class="stat">ຈາກຕົວແທນ<b>${money(m.agent)}</b></div><div class="stat">Top Agent<b>${topAgent?topAgent.name:'-'}</b></div><div class="stat">ອໍເດີ້ທັງໝົດ<b>${db.orders.length}</b></div></div><div class="analytics-grid"><div class="card" style="padding:18px"><h3>ສິນຄ້າຂາຍດີ</h3>${best.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code} · ${p.qty} ຊິ້ນ</span></span><b>${money(p.total)}</b></div>`).join('')||'<div class="empty-soft">ຍັງບໍ່ມີຍອດຂາຍທີ່ຢືນຢັນ</div>'}</div><div class="card" style="padding:18px"><h3>Stock ໃກ້ໝົດ</h3>${low.map(p=>`<div class="summary-row"><span>${p.name}<br><span class="meta">${p.code}</span></span><b class="${Number(p.stock)===0?'':'kpi-good'}">${p.stock} ຊິ້ນ</b></div>`).join('')||'<div class="empty-soft">Stock ຍັງພໍ</div>'}</div></div><div class="card" style="padding:18px;margin-top:16px"><h3>ອໍເດີ້ລ່າສຸດ</h3>${db.orders.slice(0,5).map(o=>`<div class="summary-row"><span>${o.id} · ${o.customer.name}<br><span class="meta">${o.status}</span></span><b>${money(o.total)}</b></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້</div>'}</div>` }
+function adminOrders(){ const f=state.adminOrderFilter||'all'; let orders=[...db.orders]; if(f==='pay') orders=orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ'); if(f==='verify') orders=orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ'); if(f==='bill') orders=orders.filter(o=>!o.status.includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage); if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage); return `${notificationPanel()}<div class="admin-toolbar"><h2>ຈັດການອໍເດີ້</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option><option value="pay" ${f==='pay'?'selected':''}>ລໍຖ້າໂອນ</option><option value="verify" ${f==='verify'?'selected':''}>ລໍຖ້າກວດການໂອນ</option><option value="bill" ${f==='bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option><option value="done" ${f==='done'?'selected':''}>ມີບິນແລ້ວ</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button></div></div>${orders.map(o=>`<div class="order-card"><div class="order-head"><div><b>${o.id}</b><div class="meta">${o.role} · ${o.customer.name} · ${o.customer.phone}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${o.billNo||''}</div>`:''}<div class="summary-row"><span>${o.status}</span><b>${money(o.total)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${o.id}')">ເບິ່ງ/ຈັດການ</button><button class="btn sage small" onclick="nextStatus('${o.id}')">ດັນສະຖານະຕໍ່ໄປ</button><button class="btn danger small" onclick="deleteOrder('${o.id}')">ລຶບ</button></div></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້ໃນ Filter ນີ້</div>'}` }
+function adminOpenOrder(id){ const o=db.orders.find(x=>x.id===id); showModal(`<div class="modal-head"><b>Admin · ${o.id}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body">${orderFullHTML(o,true)}<div class="card" style="padding:16px"><h3>ກວດສອບການໂອນ</h3>${o.slip?`<img src="${o.slip}" style="width:100%;max-width:440px;border-radius:24px;border:1px solid var(--line)">`:'<div class="empty">ຍັງບໍ່ມີສະລິບ</div>'}<div class="field"><label>Ref No.</label><input id="refNo" ${numAttrs()} value="${o.refNo||''}" placeholder="ເລກອ້າງອີງ"></div><div class="actions"><button class="btn sage" onclick="approveSlip('${o.id}')">ອະນຸມັດການໂອນ</button><button class="btn danger" onclick="invalidSlip('${o.id}')">ສະລິບບໍ່ຖືກຕ້ອງ</button></div></div><div class="card" style="padding:16px;margin-top:16px"><h3>ແຈ້ງບິນຝາກເຄື່ອງ</h3><div class="form-grid"><div class="field"><label>ເລກບິນ / Tracking No.</label><input id="billNo" value="${esc(o.billNo||'')}" placeholder="ເຊັ່ນ ANS123456"></div><div class="field"><label>ອັບໂຫຼດຮູບບິນ</label><input id="billImage" type="file" accept="image/*"></div></div>${o.billImage?`<img class="bill-img" src="${o.billImage}">`:''}<div class="file-mini">ເມື່ອບັນທຶກ ລູກຄ້າຈະເຫັນເລກບິນ/ຮູບບິນໃນໜ້າສະຖານະອໍເດີ້</div><button class="btn rose" onclick="saveShippingBill('${o.id}')">ບັນທຶກ ແລະ ແຈ້ງບິນ</button></div></div>`) }
+async function saveShippingBill(id){ const o=db.orders.find(x=>x.id===id); if(!o) return; const img=await readFile(document.getElementById('billImage')?.files?.[0]); const no=val('billNo'); if(!no&&!img&&!o.billImage) return toast('ກະລຸນາໃສ່ເລກບິນ ຫຼື ອັບໂຫຼດຮູບບິນ','danger'); o.billNo=no||o.billNo||''; if(img) o.billImage=img; o.billAt=Date.now(); o.status='ແຈ້ງບິນ'; saveDB(); toast('ແຈ້ງບິນໃຫ້ລູກຄ້າແລ້ວ'); closeModal(); render() }
+function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1; if(idx<steps.length-1){ const next=steps[idx+1].replace(' ✅',''); o.status=next; if(next==='ແຈ້ງບິນ' && !o.billNo && !o.billImage){ toast('ຢ່າລືມໃສ່ເລກບິນ/ຮູບບິນໃຫ້ລູກຄ້າເດີ້') } else { toast('ອັບເດດສະຖານະແລ້ວ') } } saveDB(); render() }
 function nextProductCode(type='ready'){ const prefix=type==='preorder'?'PRE':'BB'; let max=0; db.products.forEach(p=>{ const m=String(p.code||'').match(/(\d+)$/); if(m) max=Math.max(max,parseInt(m[1],10)||0) }); return `${prefix}-${String(max+1).padStart(4,'0')}` }
 function updateAutoCode(){ const el=document.getElementById('pCode'); if(!el) return; if(el.dataset.auto==='1'||!el.value.trim()){ el.value=nextProductCode(val('pType')||'ready'); el.dataset.auto='1' } }
-function adminProducts(){ const s=(state.adminProductSearch||'').toLowerCase(); const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s)); return `<div class="section-title"><h2>à»€àºžàºµà»ˆàº¡/àºˆàº±àº”àºàº²àº™àºªàº´àº™àº„à»‰àº²</h2></div><div class="card" style="padding:18px"><h3>à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²à»ƒà»à»ˆ</h3><div class="form-grid"><div class="field"><label>àºŠàº·à»ˆàºªàº´àº™àº„à»‰àº²</label><input id="pName"></div><div class="field"><label>Code/à»€àº¥àºàºªàº´àº™àº„à»‰àº²</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: àº–à»‰àº²àºšà»à»ˆà»àºà»‰ àº¥àº°àºšàº»àºšàºˆàº°àºªà»‰àº²àº‡à»ƒàº«à»‰à»€àº­àº‡</div></div><div class="field"><label>à»àº§àº”</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>àº›àº°à»€àºžàº”</label><select id="pType" onchange="updateAutoCode()"><option value="ready">àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</option><option value="preorder">àºžàº£àºµàº­à»à»€àº”àºµà»‰</option></select></div><div class="field"><label>àº¥àº²àº„àº²àº¥àº¹àºàº„à»‰àº²</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>àº¥àº²àº„àº²àº•àº»àº§à»àº—àº™</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>àº•àº»à»‰àº™àº—àº¶àº™ (à»àº­àº±àº”àº¡àº´àº™à»€àº«àº±àº™à»€àº—àº»à»ˆàº²àº™àº±à»‰àº™)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>à»„àºŠà»‰ (àº„àº±à»ˆàº™àº”à»‰àº§àº ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>àºªàºµ (àº„àº±à»ˆàº™àº”à»‰àº§àº ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>àº®àº¹àºšàº«àº¼àº±àº</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>àº®àº¹àºšàºà»ˆàº­àº/àº®àº¹àºšàºªàºµàº­àº·à»ˆàº™</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">àº®àº¹àºšàº«àº¼àº±àº = àºªàºµàº—àº³àº­àº´àº”, àº®àº¹àºšàºà»ˆàº­àºàº—àºµà»ˆ 1 = àºªàºµàº—àºµà»ˆ 2, àº®àº¹àºšàºà»ˆàº­àºàº—àºµà»ˆ 2 = àºªàºµàº—àºµà»ˆ 3</div></div><div class="field" style="grid-column:1/-1"><label>àº¥àº²àºàº¥àº°àº­àº½àº”</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>àº¥àº²àºàºàº²àº™àºªàº´àº™àº„à»‰àº²</h3><div class="search"><span>ðŸ”Ž</span><input placeholder="àº„àº»à»‰àº™àº«àº²àºªàº´àº™àº„à»‰àº²à»ƒàº™ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>àº®àº¹àºš</th><th>àºŠàº·à»ˆ</th><th>à»àº§àº”</th><th>àº¥àº²àº„àº²</th><th>àº•àº»à»‰àº™àº—àº¶àº™</th><th>Stock</th><th></th></tr>${list.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">à»ƒàºà»‰à»àº»àº”</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">àº¥àº¶àºš</button></td></tr>`).join('')}</table></div>` }
-async function addProductAdmin(){ const name=val('pName'); const type=val('pType')||'ready'; const code=val('pCode')||nextProductCode(type); if(!name)return toast('àºàº­àºàºŠàº·à»ˆàºªàº´àº™àº„à»‰àº²àºà»ˆàº­àº™','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('à»€àºžàºµà»ˆàº¡àºªàº´àº™àº„à»‰àº²à»àº¥à»‰àº§ Â· Code '+code); render() }
-function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No']]; db.orders.filter(o=>!o.status.includes('àºàº»àºà»€àº¥àºµàº')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export à»àº¥à»‰àº§') }
+function adminProducts(){ const s=(state.adminProductSearch||'').toLowerCase(); const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s)); return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: ຖ້າບໍ່ແກ້ ລະບົບຈະສ້າງໃຫ້ເອງ</div></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType" onchange="updateAutoCode()"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ສີ (ຄັ່ນດ້ວຍ ,)</label><input id="pColors" placeholder="Dusty Rose, Cream"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບສີອື່ນ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກ = ສີທຳອິດ, ຮູບຍ່ອຍທີ່ 1 = ສີທີ່ 2, ຮູບຍ່ອຍທີ່ 2 = ສີທີ່ 3</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>ລາຍການສິນຄ້າ</h3><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາສິນຄ້າໃນ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${list.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">ໃກ້ໝົດ</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
+async function addProductAdmin(){ const name=val('pName'); const type=val('pType')||'ready'; const code=val('pCode')||nextProductCode(type); if(!name)return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:(val('pColors')||'Default').split(',').map(x=>x.trim()).filter(Boolean),images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code); render() }
+function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No']]; db.orders.filter(o=>!o.status.includes('ຍົກເລີກ')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export ແລ້ວ') }
 
 initCloudDB().finally(()=>render());
 
@@ -284,23 +284,23 @@ function renderLogin(){
   <div class="screen login-wrap mobile-login">
     <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="hero mobile-compact-hero">
-      <div class="hero-badge">ðŸª· Bai Boua Shop</div>
+      <div class="hero-badge">🪷 Bai Boua Shop</div>
       <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
-      <div class="mobile-quick-tags"><span>àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</span><span>àºžàº£àºµàº­à»à»€àº”àºµà»‰</span><span>QR Payment</span><span>àº•àº´àº”àº•àº²àº¡àº­à»à»€àº”àºµà»‰</span></div>
+      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
     </div>
     <div class="login-card">
       <div class="role-tabs">
-        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">àº¥àº¹àºàº„à»‰àº²</button>
-        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">àº•àº»àº§à»àº—àº™</button>
-        <button class="${state.loginRole==='admin'?'active':''}" onclick="loginRole('admin')">à»àº­àº±àº”àº¡àº´àº™</button>
+        <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+        <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        <button class="${state.loginRole==='admin'?'active':''}" onclick="loginRole('admin')">ແອັດມິນ</button>
       </div>
-      <h2 style="margin:0 0 4px">à»€àº‚àº»à»‰àº²àºªàº¹à»ˆàº¥àº°àºšàº»àºš</h2>
-      <div class="login-help-text">${state.loginRole==='customer'?'àº¥àº¹àºàº„à»‰àº²àºªàº²àº¡àº²àº”àºªàº°à»àº±àºà»€àº­àº‡à»„àº”à»‰':'à»ƒàºŠà»‰ ID àº—àºµà»ˆàº®à»‰àº²àº™àºàº³àº™àº»àº”à»ƒàº«à»‰'}</div>
-      <div class="field"><label>${state.loginRole==='admin'?'Username':'à»€àºšàºµà»‚àº— / ID'}</label><input id="loginId" placeholder="àº›à»‰àº­àº™àº‚à»à»‰àº¡àº¹àº™"></div>
-      <div class="field"><label>àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™</label><input id="loginPass" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"></div>
-      <button class="btn rose full" onclick="doLogin()">à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºš</button>
-      ${state.loginRole==='customer'?`<div class="register-box"><b>àºªàº°à»àº±àºàº¥àº¹àºàº„à»‰àº²à»ƒà»à»ˆ</b><div class="form-grid" style="margin-top:10px"><div class="field"><label>àºŠàº·à»ˆ</label><input id="regName" placeholder="àºŠàº·à»ˆàº‚àº­àº‡àº¥àº¹àºàº„à»‰àº²"></div><div class="field"><label>à»€àºšàºµà»‚àº—</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div><div class="field" style="grid-column:1/-1"><label>àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™</label><input id="regPass" type="password" placeholder="àº•àº±à»‰àº‡àº¥àº°àº«àº±àº”"></div></div><button class="btn light full" onclick="registerCustomer()">àºªàº°à»àº±àº à»àº¥àº° à»€àº‚àº»à»‰àº²à»ƒàºŠà»‰</button></div>`:''}
-      <div class="contact-line"><span>àº¥àº·àº¡àº¥àº°àº«àº±àº” / àº•àº´àº”àº•à»à»ˆàº®à»‰àº²àº™<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('àºªàº°àºšàº²àºàº”àºµà»àº­àº±àº”àº¡àº´àº™ àº‚à»‰àº­àºàº¥àº·àº¡àº¥àº°àº«àº±àº”àºœà»ˆàº²àº™ / àº•à»‰àº­àº‡àºàº²àº™àº•àº´àº”àº•à»à»ˆàº®à»‰àº²àº™ Bai Boua')}">WhatsApp</a></div>
+      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+      <div class="login-help-text">${state.loginRole==='customer'?'ລູກຄ້າສາມາດສະໝັກເອງໄດ້':'ໃຊ້ ID ທີ່ຮ້ານກຳນົດໃຫ້'}</div>
+      <div class="field"><label>${state.loginRole==='admin'?'Username':'ເບີໂທ / ID'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+      ${state.loginRole==='customer'?`<div class="register-box"><b>ສະໝັກລູກຄ້າໃໝ່</b><div class="form-grid" style="margin-top:10px"><div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div><div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div><div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div></div><button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button></div>`:''}
+      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
     </div>
   </div>`;
 }
@@ -309,9 +309,9 @@ function renderProducts(){
   normalizeNewFields();
   const colors=allProductColors();
   const list=productsFiltered();
-  return `<section class="banner shop-banner-compact"><div><h1>à»€àº¥àº·àº­àºàºªàº´àº™àº„à»‰àº²</h1><div class="banner-actions"><span class="pill">QR BCEL + LDB</span><span class="pill">Wishlist</span><span class="pill">Tracking</span></div></div><div class="card desktop-carousel" style="padding:14px"><b>àºªàº´àº™àº„à»‰àº²à»àº™àº°àº™àº³</b><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
-  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">àº—àº±àº‡à»àº»àº”</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="filter-grid"><div class="field"><label>àº„àº»à»‰àº™àº«àº²</label><div class="search" style="min-width:0"><span>ðŸ”Ž</span><input placeholder="àºŠàº·à»ˆ / code / àºªàºµ / à»„àºŠà»‰" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>àº›àº°à»€àºžàº”</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>àº—àº¸àºàº›àº°à»€àºžàº”</option><option value="ready" ${state.filterType==='ready'?'selected':''}>àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>àºžàº£àºµàº­à»à»€àº”àºµà»‰</option></select></div><div class="field"><label>àºªàºµ</label><select onchange="state.filterColor=this.value;render()"><option value="all" ${state.filterColor==='all'?'selected':''}>àº—àº¸àºàºªàºµ</option>${colors.map(c=>`<option value="${esc(c)}" ${state.filterColor===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>àºˆàº±àº”àº¥àº½àº‡</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>àº„à»ˆàº²à»€àº¥àºµà»ˆàº¡àº•àº»à»‰àº™</option><option value="low" ${state.priceSort==='low'?'selected':''}>àº¥àº²àº„àº²àº•à»ˆàº³ â†’ àºªàº¹àº‡</option><option value="high" ${state.priceSort==='high'?'selected':''}>àº¥àº²àº„àº²àºªàº¹àº‡ â†’ àº•à»ˆàº³</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock àº«àº¼àº²àºàºà»ˆàº­àº™</option></select></div><button class="btn light" onclick="resetProductFilters()">àº¥à»‰àº²àº‡ Filter</button></div><div class="filter-result">àºžàº»àºš ${list.length} àºªàº´àº™àº„à»‰àº²</div></div>
-  <div class="grid">${list.map(productCard).join('') || `<div class="empty">àºšà»à»ˆàºžàº»àºšàºªàº´àº™àº„à»‰àº²</div>`}</div>`;
+  return `<section class="banner shop-banner-compact"><div><h1>ເລືອກສິນຄ້າ</h1><div class="banner-actions"><span class="pill">QR BCEL + LDB</span><span class="pill">Wishlist</span><span class="pill">Tracking</span></div></div><div class="card desktop-carousel" style="padding:14px"><b>ສິນຄ້າແນະນຳ</b><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${p.name}">`).join('')}</div></div></section>
+  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">ທັງໝົດ</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${c}</button>`).join('')}</div><div class="filter-grid"><div class="field"><label>ຄົ້ນຫາ</label><div class="search" style="min-width:0"><span>🔎</span><input placeholder="ຊື່ / code / ສີ / ໄຊ້" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>ປະເພດ</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>ທຸກປະເພດ</option><option value="ready" ${state.filterType==='ready'?'selected':''}>ພ້ອມສົ່ງ</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>ພຣີອໍເດີ້</option></select></div><div class="field"><label>ສີ</label><select onchange="state.filterColor=this.value;render()"><option value="all" ${state.filterColor==='all'?'selected':''}>ທຸກສີ</option>${colors.map(c=>`<option value="${esc(c)}" ${state.filterColor===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>ຈັດລຽງ</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>ຄ່າເລີ່ມຕົ້ນ</option><option value="low" ${state.priceSort==='low'?'selected':''}>ລາຄາຕ່ຳ → ສູງ</option><option value="high" ${state.priceSort==='high'?'selected':''}>ລາຄາສູງ → ຕ່ຳ</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock ຫຼາຍກ່ອນ</option></select></div><button class="btn light" onclick="resetProductFilters()">ລ້າງ Filter</button></div><div class="filter-result">ພົບ ${list.length} ສິນຄ້າ</div></div>
+  <div class="grid">${list.map(productCard).join('') || `<div class="empty">ບໍ່ພົບສິນຄ້າ</div>`}</div>`;
 }
 
 function enhanceMobileTables(){
@@ -373,8 +373,8 @@ registerCustomer = function(){
   const name = val('regName');
   const phone = cleanPhoneV12(val('regPhone'));
   const pass = val('regPass');
-  if(!name || !phone || !pass) return toast('àºàº°àº¥àº¸àº™àº²àºàº­àºàºŠàº·à»ˆ à»€àºšàºµà»‚àº— à»àº¥àº° àº¥àº°àº«àº±àº”','danger');
-  if(db.users.some(u => cleanPhoneV12(u.phone) === phone)) return toast('à»€àºšàºµàº™àºµà»‰àº¡àºµàºšàº±àº™àºŠàºµà»àº¥à»‰àº§','danger');
+  if(!name || !phone || !pass) return toast('ກະລຸນາກອກຊື່ ເບີໂທ ແລະ ລະຫັດ','danger');
+  if(db.users.some(u => cleanPhoneV12(u.phone) === phone)) return toast('ເບີນີ້ມີບັນຊີແລ້ວ','danger');
   const u = { id: uid('C'), role:'customer', name, phone, password:pass, active:true, createdAt:Date.now() };
   db.users.push(u);
   state.user = u;
@@ -383,7 +383,7 @@ registerCustomer = function(){
   state.cart = [];
   saveSessionV12();
   saveDB();
-  toast('àºªàº°à»àº±àºàºªàº³à»€àº¥àº±àº” à»€àº‚àº»à»‰àº²à»œà»‰àº²àºŠàº·à»‰à»€àº„àº·à»ˆàº­àº‡à»àº¥à»‰àº§');
+  toast('ສະໝັກສຳເລັດ ເຂົ້າໜ້າຊື້ເຄື່ອງແລ້ວ');
   render();
   showWelcome();
 };
@@ -399,34 +399,34 @@ doLogin = function(){
       state.role = 'admin';
       state.adminTab = 'dashboard';
       saveSessionV12();
-      toast('à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºšà»àº­àº±àº”àº¡àº´àº™à»àº¥à»‰àº§');
+      toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
       render();
-    }else toast('Username àº«àº¼àº· password àºšà»à»ˆàº–àº·àº','danger');
+    }else toast('Username ຫຼື password ບໍ່ຖືກ','danger');
     return;
   }
   const idDigits = cleanPhoneV12(rawId);
   if(r === 'customer'){
     const u = db.users.find(x => (cleanPhoneV12(x.phone) === idDigits || x.id === rawId || x.id === idDigits) && x.password === pass);
-    if(!u) return toast('àºšà»à»ˆàºžàº»àºšàºšàº±àº™àºŠàºµàº¥àº¹àºàº„à»‰àº² àº«àº¼àº· àº¥àº°àº«àº±àº”àºšà»à»ˆàº–àº·àº','danger');
-    if(u.active === false) return toast('àºšàº±àº™àºŠàºµàº™àºµà»‰àº–àº·àºàº›àº´àº” àºàº°àº¥àº¸àº™àº²àº•àº´àº”àº•à»à»ˆà»àº­àº±àº”àº¡àº´àº™','danger');
+    if(!u) return toast('ບໍ່ພົບບັນຊີລູກຄ້າ ຫຼື ລະຫັດບໍ່ຖືກ','danger');
+    if(u.active === false) return toast('ບັນຊີນີ້ຖືກປິດ ກະລຸນາຕິດຕໍ່ແອັດມິນ','danger');
     state.user = u;
     state.role = 'customer';
     state.tab = 'shop';
     saveSessionV12();
-    toast('àºàº´àº™àº”àºµàº•à»‰àº­àº™àº®àº±àºš');
+    toast('ຍິນດີຕ້ອນຮັບ');
     render();
     showWelcome();
     return;
   }
   if(r === 'agent'){
     const u = db.agents.find(x => (cleanPhoneV12(x.phone) === idDigits || x.id === rawId || x.id === idDigits) && x.password === pass);
-    if(!u) return toast('àºšà»à»ˆàºžàº»àºšàºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™ àº«àº¼àº· àº¥àº°àº«àº±àº”àºšà»à»ˆàº–àº·àº','danger');
-    if(!u.active) return toast('àºšàº±àº™àºŠàºµàº•àº»àº§à»àº—àº™àº–àº·àºàº›àº´àº” àºàº°àº¥àº¸àº™àº²àº•àº´àº”àº•à»à»ˆà»àº­àº±àº”àº¡àº´àº™','danger');
+    if(!u) return toast('ບໍ່ພົບບັນຊີຕົວແທນ ຫຼື ລະຫັດບໍ່ຖືກ','danger');
+    if(!u.active) return toast('ບັນຊີຕົວແທນຖືກປິດ ກະລຸນາຕິດຕໍ່ແອັດມິນ','danger');
     state.user = u;
     state.role = 'agent';
     state.tab = 'shop';
     saveSessionV12();
-    toast('à»€àº‚àº»à»‰àº²àº¥àº°àºšàº»àºšàº•àº»àº§à»àº—àº™à»àº¥à»‰àº§');
+    toast('ເຂົ້າລະບົບຕົວແທນແລ້ວ');
     render();
     showWelcome();
   }
@@ -448,66 +448,727 @@ render = function(){
 
 try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
 
-/* === v25: remove color filter dropdown + show customer/agent passwords for Admin === */
-function baiBouaCopyTextV25(text){
-  text = String(text || '');
-  if(navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(text).then(()=>toast('Copy àº¥àº°àº«àº±àº”à»àº¥à»‰àº§')).catch(()=>baiBouaFallbackCopyV25(text));
-  }else{
-    baiBouaFallbackCopyV25(text);
+/* === v18: Packing List Print + Wishlist admin dashboard === */
+(function(){
+  function e18(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   }
-}
-function baiBouaFallbackCopyV25(text){
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.left = '-9999px';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  try{ document.execCommand('copy'); toast('Copy àº¥àº°àº«àº±àº”à»àº¥à»‰àº§'); }catch(e){ toast('Copy àºšà»à»ˆàºªàº³à»€àº¥àº±àº”','danger'); }
-  ta.remove();
-}
-function copyAdminPasswordV25(id, type){
-  const arr = type === 'agent' ? db.agents : db.users;
-  const u = (arr || []).find(x => x.id === id);
-  if(!u) return toast('àºšà»à»ˆàºžàº»àºšàºšàº±àº™àºŠàºµ','danger');
-  baiBouaCopyTextV25(u.password || '');
-}
-function passwordCellV25(u, type){
-  const pw = u.password || '-';
-  return `<div class="password-cell"><code>${esc(pw)}</code><button class="btn light tiny" onclick="copyAdminPasswordV25('${esc(u.id)}','${type}')">Copy</button></div>`;
-}
+  function orderDate18(o){ return todayStr(o.createdAt || Date.now()); }
+  function isCanceled18(o){ return String(o.status || '').includes('ຍົກເລີກ'); }
+  function packingOrders18(){
+    const mode = state.packingMode || 'today';
+    const date = state.packingDate || todayStr();
+    let orders = (db.orders || []).filter(o => !isCanceled18(o));
+    if(mode === 'today') orders = orders.filter(o => orderDate18(o) === date);
+    if(mode === 'paid') orders = orders.filter(o => ['ກວດຍອດເງິນເເລ້ວ','ກຽມຝາກເຄື່ອງ','ເຄື່ອງຮອດແລ້ວກຽມຝາກ','ແຈ້ງບິນ'].some(s => String(o.status||'').includes(s)));
+    if(mode === 'need_bill') orders = orders.filter(o => !o.billNo && !o.billImage && ['ກຽມຝາກເຄື່ອງ','ເຄື່ອງຮອດແລ້ວກຽມຝາກ','ແຈ້ງບິນ'].some(s => String(o.status||'').includes(s)));
+    return orders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  }
+  function packingItemRows18(order, forPrint=false){
+    return (order.items||[]).map((i,idx)=>`<tr>
+      <td>${idx+1}</td>
+      <td>${forPrint && i.image ? `<img src="${i.image}" class="print-img">` : (i.image?`<img src="${i.image}" class="preview-img">`:'')}</td>
+      <td><b>${e18(i.name)}</b><div class="meta">${e18(i.code || '')}</div></td>
+      <td>${e18(i.size || '-')}</td>
+      <td>${e18(i.color || '-')}</td>
+      <td><b>${e18(i.qty || 1)}</b></td>
+      <td>${money((i.price||0) * (i.qty||1))}</td>
+    </tr>`).join('');
+  }
+  function packingOrderCard18(o){
+    return `<div class="packing-card">
+      <div class="packing-head">
+        <div><b>${e18(o.id)}</b><div class="meta">${new Date(o.createdAt||Date.now()).toLocaleString()} · ${e18(o.role)}</div></div>
+        <div class="actions"><button class="btn light small" onclick="printOrderPackingV18('${e18(o.id)}')">ພິມອໍເດີ້ນີ້</button><button class="btn sage small" onclick="printShippingLabelV18('${e18(o.id)}')">ພິມໃບແປະກ່ອງ</button></div>
+      </div>
+      <div class="packing-info">
+        <div><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || o.userName || '-')}</b><small>${e18(o.customer?.phone || o.userPhone || '-')}</small></div>
+        <div><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b><small>${e18(o.shipping?.branch || '-')}, ${e18(o.shipping?.city || '-')}, ${e18(o.shipping?.province || '-')}</small></div>
+        <div><span>ສະຖານະ</span><b>${e18(o.status || '-')}</b><small>${o.billNo ? 'Bill: '+e18(o.billNo) : 'ຍັງບໍ່ມີບິນ'}</small></div>
+        <div><span>ຍອດ</span><b>${money(o.total||0)}</b><small>${(o.items||[]).reduce((s,i)=>s+(+i.qty||1),0)} ຊິ້ນ</small></div>
+      </div>
+      <div class="table-wrap"><table class="table packing-table"><tr><th>#</th><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ໄຊ້</th><th>ສີ</th><th>ຈຳນວນ</th><th>ລາຄາ</th></tr>${packingItemRows18(o)}</table></div>
+      ${o.shipping?.note ? `<div class="notice"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}
+    </div>`;
+  }
+  window.adminPackingPrintPage = function(){
+    const orders = packingOrders18();
+    const pieces = orders.reduce((s,o)=>s+(o.items||[]).reduce((a,i)=>a+(+i.qty||1),0),0);
+    return `<div class="section-title"><h2>📦 Packing List / ພິມລາຍການແພັກເຄື່ອງ</h2></div>
+      <div class="card packing-control">
+        <div class="form-grid">
+          <div class="field"><label>ວັນທີ</label><input type="date" value="${state.packingDate||todayStr()}" onchange="state.packingDate=this.value;render()"></div>
+          <div class="field"><label>Filter</label><select onchange="state.packingMode=this.value;render()">
+            <option value="today" ${(state.packingMode||'today')==='today'?'selected':''}>ຕາມວັນທີ່ເລືອກ</option>
+            <option value="paid" ${state.packingMode==='paid'?'selected':''}>ກວດເງິນແລ້ວ / ກຽມຝາກ</option>
+            <option value="need_bill" ${state.packingMode==='need_bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option>
+            <option value="all" ${state.packingMode==='all'?'selected':''}>ອໍເດີ້ທັງໝົດ</option>
+          </select></div>
+        </div>
+        <div class="stats mini-stats"><div class="stat">ອໍເດີ້<b>${orders.length}</b></div><div class="stat">ຈຳນວນຊິ້ນ<b>${pieces}</b></div><div class="stat">ຍອດລວມ<b>${money(orders.reduce((s,o)=>s+(+o.total||0),0))}</b></div></div>
+        <div class="actions"><button class="btn rose" onclick="printPackingListV18()">ພິມ Packing List</button><button class="btn sage" onclick="printAllLabelsV18()">ພິມໃບແປະກ່ອງທັງໝົດ</button><button class="btn light" onclick="exportPackingV18()">Export CSV</button></div>
+      </div>
+      ${orders.map(packingOrderCard18).join('') || '<div class="empty">ບໍ່ມີອໍເດີ້ຕາມ filter ນີ້</div>'}`;
+  }
+  function printFrame18(title, body){
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${e18(title)}</title><style>
+      *{box-sizing:border-box}body{font-family:Arial,'Noto Sans Lao',sans-serif;margin:18px;color:#2f2a24}h1,h2,h3{margin:0 0 8px}.print-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #81785a;padding-bottom:12px;margin-bottom:14px}.brand{font-size:24px;font-weight:900;color:#81785a}.muted{color:#6f675d;font-size:12px;line-height:1.45}.order-box{break-inside:avoid;border:1px solid #d8d0c2;border-radius:14px;padding:12px;margin:0 0 12px}.print-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 10px}.print-grid div{border:1px solid #eee6da;border-radius:10px;padding:8px}.print-grid span{display:block;color:#7c7267;font-size:11px}.print-grid b{display:block;font-size:14px;margin-top:2px}.print-table{width:100%;border-collapse:collapse;font-size:12px}.print-table th,.print-table td{border:1px solid #ddd4c8;padding:6px;vertical-align:top}.print-table th{background:#f4eee6}.print-img{width:52px;height:52px;object-fit:cover;border-radius:8px}.label{break-inside:avoid;border:2px solid #333;border-radius:12px;padding:14px;margin:0 0 14px;min-height:260px}.label h2{font-size:22px}.label-row{display:grid;grid-template-columns:100px 1fr;gap:8px;border-bottom:1px dashed #bbb;padding:7px 0}.label-row b{font-size:18px}.note{background:#fff8e8;border:1px solid #ead8aa;border-radius:10px;padding:8px;margin-top:8px}@media print{body{margin:10mm}.no-print{display:none}.order-box,.label{page-break-inside:avoid}}
+    </style></head><body>${body}<script>setTimeout(()=>window.print(),350)<\/script></body></html>`;
+    const w = window.open('', '_blank');
+    if(!w){ toast('Browser ບລັອກ popup · ກະລຸນາ allow popup ກ່ອນ','danger'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  function printOrderHTML18(o){
+    return `<div class="order-box"><div class="print-top"><div><div class="brand">🪷 Bai Boua Shop</div><div class="muted">Packing List · ${e18(o.id)}</div></div><div class="muted">${new Date(o.createdAt||Date.now()).toLocaleString()}<br>Status: ${e18(o.status||'')}</div></div>
+      <div class="print-grid"><div><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || '-')}</b><span>${e18(o.customer?.phone || '-')}</span></div><div><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b><span>${e18(o.shipping?.branch || '-')}</span></div><div><span>ເມືອງ / ແຂວງ</span><b>${e18(o.shipping?.city || '-')}</b><span>${e18(o.shipping?.province || '-')}</span></div><div><span>ຍອດ</span><b>${money(o.total||0)}</b><span>${e18(o.type||'')}</span></div></div>
+      <table class="print-table"><tr><th>#</th><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ໄຊ້</th><th>ສີ</th><th>ຈຳນວນ</th><th>ລາຄາ</th></tr>${packingItemRows18(o,true)}</table>
+      ${o.shipping?.note ? `<div class="note"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}</div>`;
+  }
+  function labelHTML18(o){
+    const itemText = (o.items||[]).map(i=>`${e18(i.name)} / ${e18(i.size)} / ${e18(i.color)} x${e18(i.qty||1)}`).join('<br>');
+    return `<div class="label"><h2>🪷 Bai Boua Shop</h2><div class="muted">Order: ${e18(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div><div class="label-row"><span>ຜູ້ຮັບ</span><b>${e18(o.customer?.name || '-')}</b></div><div class="label-row"><span>ເບີໂທ</span><b>${e18(o.customer?.phone || '-')}</b></div><div class="label-row"><span>ຂົນສົ່ງ</span><b>${e18(o.shipping?.carrier || '-')}</b></div><div class="label-row"><span>ສາຂາ</span><b>${e18(o.shipping?.branch || '-')}</b></div><div class="label-row"><span>ເມືອງ/ແຂວງ</span><b>${e18(o.shipping?.city || '-')} / ${e18(o.shipping?.province || '-')}</b></div><div class="note"><b>ລາຍການ:</b><br>${itemText}</div>${o.shipping?.note?`<div class="note"><b>Note:</b> ${e18(o.shipping.note)}</div>`:''}</div>`;
+  }
+  window.printPackingListV18 = function(){
+    const orders = packingOrders18();
+    if(!orders.length) return toast('ບໍ່ມີອໍເດີ້ໃຫ້ພິມ','danger');
+    printFrame18('Bai Boua Packing List', `<h1>📦 Packing List</h1><div class="muted">${orders.length} orders · ${new Date().toLocaleString()}</div>${orders.map(printOrderHTML18).join('')}`);
+  }
+  window.printOrderPackingV18 = function(id){
+    const o = (db.orders||[]).find(x=>x.id===id); if(!o) return toast('ບໍ່ພົບອໍເດີ້','danger');
+    printFrame18(`Packing ${id}`, printOrderHTML18(o));
+  }
+  window.printShippingLabelV18 = function(id){
+    const o = (db.orders||[]).find(x=>x.id===id); if(!o) return toast('ບໍ່ພົບອໍເດີ້','danger');
+    printFrame18(`Label ${id}`, labelHTML18(o));
+  }
+  window.printAllLabelsV18 = function(){
+    const orders = packingOrders18();
+    if(!orders.length) return toast('ບໍ່ມີອໍເດີ້ໃຫ້ພິມ','danger');
+    printFrame18('Bai Boua Labels', `<h1>ໃບແປະກ່ອງ</h1>${orders.map(labelHTML18).join('')}`);
+  }
+  window.exportPackingV18 = function(){
+    const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No','Note']];
+    packingOrders18().forEach(o=>(o.items||[]).forEach(i=>rows.push([o.id,new Date(o.createdAt||Date.now()).toLocaleString(),o.role,o.customer?.name||'',o.customer?.phone||'',o.shipping?.carrier||'',o.shipping?.branch||'',o.shipping?.city||'',o.shipping?.province||'',i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'',o.shipping?.note||''])));
+    const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_Print_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export Packing CSV ແລ້ວ');
+  }
+  function wishlistCount18(pid){ return Object.values(db.wishlist||{}).filter(arr=>Array.isArray(arr)&&arr.includes(pid)).length; }
+  function wishlistPeople18(pid){
+    const out=[]; Object.entries(db.wishlist||{}).forEach(([key,arr])=>{ if(!Array.isArray(arr)||!arr.includes(pid)) return; const [role,id]=key.split(':'); const u=(role==='agent'?db.agents:db.users).find(x=>x.id===id); out.push(`${role||''}: ${u?u.name:id}`); }); return out;
+  }
+  window.adminWishlistPageV18 = function(){
+    const rows=(db.products||[]).map(p=>({p,count:wishlistCount18(p.id),people:wishlistPeople18(p.id)})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+    const total=rows.reduce((s,r)=>s+r.count,0);
+    return `<div class="section-title"><h2>♡ Wishlist Analytics / ສິນຄ້າທີ່ລູກຄ້າຖືກໃຈ</h2><button class="btn light" onclick="exportWishlistV18()">Export CSV</button></div>
+      <div class="stats mini-stats"><div class="stat">ສິນຄ້າຖືກໃຈ<b>${rows.length}</b></div><div class="stat">ກົດຖືກໃຈລວມ<b>${total}</b></div><div class="stat">Top Product<b>${rows[0]?e18(rows[0].p.name):'-'}</b></div></div>
+      <div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ສິນຄ້າ</th><th>ຈຳນວນຖືກໃຈ</th><th>ຜູ້ກົດຖືກໃຈ</th></tr>${rows.map(r=>`<tr><td><img src="${r.p.images?.[0]||''}" class="preview-img"></td><td><b>${e18(r.p.name)}</b><div class="meta">${e18(r.p.code||'')} · ${e18(r.p.category||'')}</div></td><td><b>${r.count}</b></td><td>${r.people.map(e18).join('<br>')||'-'}</td></tr>`).join('') || '<tr><td colspan="4"><div class="empty">ຍັງບໍ່ມີລູກຄ້າກົດ Wishlist</div></td></tr>'}</table></div>`;
+  }
+  window.exportWishlistV18 = function(){
+    const rows=[['Product','Code','Category','Wishlist Count','Liked By']];
+    (db.products||[]).forEach(p=>{ const people=wishlistPeople18(p.id); if(people.length) rows.push([p.name,p.code,p.category,people.length,people.join(' | ')]); });
+    const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x??'').replaceAll('"','""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Wishlist_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export Wishlist CSV ແລ້ວ');
+  }
+  try{
+    const oldAdminPage18 = adminPage;
+    adminPage = function(){
+      if(state.adminTab === 'packing') return adminPackingPrintPage();
+      if(state.adminTab === 'wishlist') return adminWishlistPageV18();
+      return oldAdminPage18();
+    };
+    const oldAdminOrders18 = adminOrders;
+    adminOrders = function(){
+      let html = oldAdminOrders18();
+      html = html.replace('Export Packing CSV</button>', 'Export Packing CSV</button><button class="btn sage" onclick="state.adminTab=\'packing\';render()">Packing Print</button>');
+      html = html.replace(/<button class="btn rose small" onclick="adminOpenOrder\('([^']+)'\)">ເບິ່ງ\/ຈັດການ<\/button>/g, (m,id)=>`${m}<button class="btn light small" onclick="printOrderPackingV18('${id}')">ພິມ</button>`);
+      return html;
+    };
+    const oldProductCard18 = productCard;
+    productCard = function(p){
+      const count = wishlistCount18(p.id);
+      let html = oldProductCard18(p);
+      if(count>0) html = html.replace('<button class="heart', `<div class="wish-count">♡ ${count}</div><button class="heart`);
+      return html;
+    };
+    renderAdmin = function(){
+      try{ normalizeNewFields(); }catch(e){}
+      document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · Packing Print · Wishlist Analytics</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('packing','ແພັກເຄື່ອງ')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('wishlist','Wishlist')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
+    };
+  }catch(err){ console.warn('v18 admin patch skipped', err); }
+})();
 
-const oldProductsFilteredV25 = productsFiltered;
-productsFiltered = function(){
-  if(state) state.filterColor = 'all';
-  return oldProductsFilteredV25();
-};
+/* === v19: Agent product image download + swipe gallery + order ID search === */
+(function(){
+  function e19(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function safeId19(v){ return String(v ?? '').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+  function uniqueImgs19(items){
+    const seen = new Set();
+    return (items||[]).filter(x => x && x.img).filter(x => {
+      const k = String(x.img).slice(0,1200);
+      if(seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+  function gallery19(p){
+    if(!p) return [];
+    const out = [];
+    const colors = (Array.isArray(p.colors) && p.colors.length ? p.colors : ['Default']);
+    (p.images || []).forEach((img,idx)=>out.push({img, label:`ຮູບ ${idx+1}`, color: idx===0 ? colors[0] : ''}));
+    (p.variantImages || []).forEach((img,idx)=>out.push({img, label: colors[idx+1] || `ຮູບສີ ${idx+1}`, color: colors[idx+1] || ''}));
+    (p.gallery || p.galleryImages || []).forEach((img,idx)=>out.push({img, label:`Gallery ${idx+1}`, color:''}));
+    const byColor = (typeof productImagesByColor === 'function') ? productImagesByColor(p) : [];
+    byColor.forEach(x=>out.push({img:x.img, label:x.color || 'ຮູບສິນຄ້າ', color:x.color||''}));
+    const list = uniqueImgs19(out);
+    return list.length ? list : [{img:'', label:'ບໍ່ມີຮູບ', color:''}];
+  }
+  function productFileName19(p,idx,img){
+    let ext = 'png';
+    const m = String(img||'').match(/^data:image\/(png|jpeg|jpg|webp)/i);
+    if(m) ext = m[1].toLowerCase().replace('jpeg','jpg');
+    const code = String(p?.code || p?.id || 'product').replace(/[^a-zA-Z0-9_-]/g,'-');
+    return `BaiBoua_${code}_${idx+1}.${ext}`;
+  }
+  function orderText19(o){
+    return [
+      o.id, o.status, o.role, o.type,
+      o.customer?.name, o.customer?.phone,
+      o.userName, o.userPhone,
+      o.sender?.name, o.sender?.phone,
+      o.shipping?.carrier, o.shipping?.branch, o.shipping?.city, o.shipping?.province,
+      ...(o.items||[]).flatMap(i=>[i.name,i.code,i.size,i.color,i.type,i.qty])
+    ].join(' ').toLowerCase();
+  }
+  function orderMatches19(o,q){
+    q = String(q||'').trim().toLowerCase();
+    if(!q) return true;
+    return orderText19(o).includes(q);
+  }
+  function orderMiniItems19(o){
+    return `<div class="order-mini-items">${(o.items||[]).map(i=>`<div class="order-mini-item"><img src="${i.image||''}"><div><b>${e19(i.name)}</b><small>${e19(i.code||'')} · ໄຊ້ ${e19(i.size||'-')} · ສີ ${e19(i.color||'-')} · x${e19(i.qty||1)}</small></div></div>`).join('')}</div>`;
+  }
 
-const oldResetProductFiltersV25 = resetProductFilters;
-resetProductFilters = function(){
-  oldResetProductFiltersV25();
-  state.filterColor = 'all';
-};
+  window.downloadProductImageV19 = function(id, idx){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    const g = gallery19(p);
+    const item = g[Number(idx)||0];
+    if(!item || !item.img) return toast('ບໍ່ພົບຮູບ','danger');
+    const a = document.createElement('a');
+    a.href = item.img;
+    a.download = productFileName19(p, Number(idx)||0, item.img);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast('ບັນທຶກຮູບແລ້ວ');
+  };
+  window.downloadAllProductImagesV19 = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    gallery19(p).forEach((_,idx)=>setTimeout(()=>downloadProductImageV19(id,idx), idx*220));
+  };
+  window.copyOrderIdV19 = function(id){
+    const txt = String(id||'');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(()=>toast('Copy Order ID ແລ້ວ')).catch(()=>{});
+    }else{
+      const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); toast('Copy Order ID ແລ້ວ');
+    }
+  };
+  window.setProductGalleryImageV19 = function(id, idx){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const g = gallery19(p); if(!g.length) return;
+    idx = ((Number(idx)||0) + g.length) % g.length;
+    state.productGalleryIndexV19 = state.productGalleryIndexV19 || {};
+    state.productGalleryIndexV19[id] = idx;
+    const sid = safeId19(id);
+    const img = document.getElementById(`mainProductImage_${sid}`) || document.getElementById('mainProductImage');
+    if(img && g[idx].img) img.src = g[idx].img;
+    const counter = document.getElementById(`galleryCounter_${sid}`);
+    if(counter) counter.textContent = `${idx+1}/${g.length}`;
+    const label = document.getElementById(`galleryLabel_${sid}`);
+    if(label) label.textContent = g[idx].label || '';
+    document.querySelectorAll(`[data-v19-thumb="${sid}"]`).forEach(el=>el.classList.remove('selected'));
+    const th = document.querySelector(`[data-v19-thumb="${sid}"][data-idx="${idx}"]`);
+    if(th) th.classList.add('selected');
+    if(g[idx].color){
+      const sel = document.getElementById('selColor');
+      if(sel){ sel.value = g[idx].color; }
+      document.querySelectorAll('[data-color-thumb]').forEach(el=>el.classList.toggle('selected', el.getAttribute('data-color-thumb') === g[idx].color));
+    }
+  };
+  window.slideProductGalleryV19 = function(id, step){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const cur = (state.productGalleryIndexV19 && state.productGalleryIndexV19[id]) || 0;
+    setProductGalleryImageV19(id, cur + (Number(step)||0));
+  };
+  window.bindGallerySwipeV19 = function(id){
+    const el = document.getElementById(`gallerySwipe_${safeId19(id)}`);
+    if(!el || el.dataset.boundV19) return;
+    el.dataset.boundV19 = '1';
+    let sx=0, sy=0;
+    el.addEventListener('touchstart', ev=>{ const t=ev.touches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+    el.addEventListener('touchend', ev=>{ const t=ev.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){ slideProductGalleryV19(id, dx<0?1:-1); } }, {passive:true});
+  };
+  window.changeProductColorImage = function(id){
+    const p = (db.products||[]).find(x=>x.id===id); if(!p) return;
+    const color = val('selColor');
+    const img = (typeof productColorImage === 'function') ? productColorImage(p,color) : '';
+    const g = gallery19(p);
+    const idx = Math.max(0, g.findIndex(x => x.img === img || x.color === color));
+    setProductGalleryImageV19(id, idx);
+  };
+  window.pickProductColor = function(id,color){
+    const sel = document.getElementById('selColor');
+    if(sel) sel.value = color;
+    changeProductColorImage(id);
+  };
 
-renderProducts = function(){
-  normalizeNewFields();
-  state.filterColor = 'all';
-  const list = productsFiltered();
-  return `<section class="banner shop-banner-compact"><div><h1>à»€àº¥àº·àº­àºàºªàº´àº™àº„à»‰àº²</h1><div class="banner-actions"><span class="pill">QR BCEL + LDB</span><span class="pill">Wishlist</span><span class="pill">Tracking</span></div></div><div class="card desktop-carousel" style="padding:14px"><b>àºªàº´àº™àº„à»‰àº²à»àº™àº°àº™àº³</b><div class="actions" style="overflow:auto;flex-wrap:nowrap">${db.products.slice(0,4).map(p=>`<img src="${p.images[0]}" class="preview-img" title="${esc(p.name)}">`).join('')}</div></div></section>
-  <div class="filter-panel"><div class="cat-tabs" style="margin-bottom:12px"><button class="${state.category==='all'?'active':''}" onclick="state.category='all';render()">àº—àº±àº‡à»àº»àº”</button>${db.categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${esc(c)}';render()">${esc(c)}</button>`).join('')}</div><div class="filter-grid filter-grid-no-color"><div class="field"><label>àº„àº»à»‰àº™àº«àº²</label><div class="search" style="min-width:0"><span>ðŸ”Ž</span><input placeholder="àºŠàº·à»ˆ / code / àºªàºµ / à»„àºŠà»‰" value="${esc(state.search)}" oninput="state.search=this.value; render()"></div></div><div class="field"><label>àº›àº°à»€àºžàº”</label><select onchange="state.filterType=this.value;render()"><option value="all" ${state.filterType==='all'?'selected':''}>àº—àº¸àºàº›àº°à»€àºžàº”</option><option value="ready" ${state.filterType==='ready'?'selected':''}>àºžà»‰àº­àº¡àºªàº»à»ˆàº‡</option><option value="preorder" ${state.filterType==='preorder'?'selected':''}>àºžàº£àºµàº­à»à»€àº”àºµà»‰</option></select></div><div class="field"><label>àºˆàº±àº”àº¥àº½àº‡</label><select onchange="state.priceSort=this.value;render()"><option value="default" ${state.priceSort==='default'?'selected':''}>àº„à»ˆàº²à»€àº¥àºµà»ˆàº¡àº•àº»à»‰àº™</option><option value="low" ${state.priceSort==='low'?'selected':''}>àº¥àº²àº„àº²àº•à»ˆàº³ â†’ àºªàº¹àº‡</option><option value="high" ${state.priceSort==='high'?'selected':''}>àº¥àº²àº„àº²àºªàº¹àº‡ â†’ àº•à»ˆàº³</option><option value="stock" ${state.priceSort==='stock'?'selected':''}>Stock àº«àº¼àº²àºàºà»ˆàº­àº™</option></select></div><button class="btn light" onclick="resetProductFilters()">àº¥à»‰àº²àº‡ Filter</button></div><div class="filter-result">àºžàº»àºš ${list.length} àºªàº´àº™àº„à»‰àº²</div></div>
-  <div class="grid">${list.map(productCard).join('') || `<div class="empty">àºšà»à»ˆàºžàº»àºšàºªàº´àº™àº„à»‰àº²</div>`}</div>`;
-};
+  const oldOpenProduct19 = window.openProduct || openProduct;
+  window.openProduct = openProduct = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return;
+    const price = state.role==='agent' ? p.agentPrice : p.price;
+    const colors = (Array.isArray(p.colors) && p.colors.length ? p.colors : ['Default']);
+    const sizes = (Array.isArray(p.sizes) && p.sizes.length ? p.sizes : ['Free size']);
+    const g = gallery19(p);
+    const sid = safeId19(id);
+    state.productGalleryIndexV19 = state.productGalleryIndexV19 || {};
+    state.productGalleryIndexV19[id] = 0;
+    const colorImgs = (typeof productImagesByColor === 'function') ? productImagesByColor(p) : colors.map(c=>({color:c,img:g[0]?.img||''}));
+    const agentDownload = state.role === 'agent' ? `<div class="agent-download-box"><b>ສຳລັບຕົວແທນ</b><div class="meta">ກົດບັນທຶກຮູບໄປໂພສຂາຍໄດ້ເລີຍ</div><div class="actions"><button class="btn sage small" onclick="downloadProductImageV19('${e19(id)}',(state.productGalleryIndexV19&&state.productGalleryIndexV19['${e19(id)}'])||0)">ບັນທຶກຮູບນີ້</button><button class="btn light small" onclick="downloadAllProductImagesV19('${e19(id)}')">ບັນທຶກທຸກຮູບ</button></div></div>` : '';
+    showModal(`<div class="modal-head"><b>${e19(p.name)}</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body product-detail product-detail-v19">
+        <div>
+          <div class="product-gallery-v19" id="gallerySwipe_${sid}">
+            <button class="gallery-arrow left" onclick="slideProductGalleryV19('${e19(id)}',-1)">‹</button>
+            <img id="mainProductImage_${sid}" class="big-img" src="${g[0]?.img || ''}" alt="${e19(p.name)}">
+            <button class="gallery-arrow right" onclick="slideProductGalleryV19('${e19(id)}',1)">›</button>
+            <div class="gallery-badge"><span id="galleryCounter_${sid}">1/${g.length}</span> · <span id="galleryLabel_${sid}">${e19(g[0]?.label||'')}</span></div>
+          </div>
+          <div class="gallery-thumbs-v19">${g.map((it,idx)=>`<button class="gallery-thumb-btn ${idx===0?'selected':''}" data-v19-thumb="${sid}" data-idx="${idx}" onclick="setProductGalleryImageV19('${e19(id)}',${idx})"><img src="${it.img}" alt="${e19(it.label)}"><span>${e19(it.label||('ຮູບ '+(idx+1)))}</span></button>`).join('')}</div>
+          ${agentDownload}
+        </div>
+        <div>
+          <span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span>
+          <h2>${e19(p.name)}</h2>
+          <div class="order-id-box"><span>Product ID / Code</span><b>${e19(p.code || p.id)}</b></div>
+          <div class="meta">${e19(p.category||'')} · ${g.length} ຮູບ · ${colors.length} ສີ</div>
+          <div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div>
+          <p>${e19(p.detail||'')}</p>
+          <div class="form-grid">
+            <div class="field"><label>ໄຊ້</label><select id="selSize">${sizes.map(s=>`<option>${e19(s)}</option>`).join('')}</select></div>
+            <div class="field"><label>ສີ</label><select id="selColor" data-product-id="${e19(id)}" onchange="changeProductColorImage('${e19(id)}')">${colors.map(s=>`<option>${e19(s)}</option>`).join('')}</select></div>
+            <div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div>
+          </div>
+          <div class="color-pick-row">${colorImgs.map((item,idx)=>`<button class="color-pick ${idx===0?'selected':''}" data-color-thumb="${e19(item.color)}" onclick="pickProductColor('${e19(id)}','${e19(item.color)}')"><img src="${item.img}"><span>${e19(item.color)}</span></button>`).join('')}</div>
+          <div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${e19(p.stock)} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div>
+          <div class="actions"><button class="btn rose" onclick="addToCart('${e19(id)}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${e19(id)}')">♡ ຖືກໃຈ</button></div>
+        </div>
+      </div>`);
+    setTimeout(()=>bindGallerySwipeV19(id),80);
+  };
 
-userTable = function(type){
-  const arr = type === 'customer' ? (db.users || []) : (db.agents || []);
-  const isAgent = type === 'agent';
-  const title = isAgent ? 'àºˆàº±àº”àºàº²àº™àº•àº»àº§à»àº—àº™' : 'àºˆàº±àº”àºàº²àº™àº¥àº¹àºàº„à»‰àº²';
-  const totalUsers = arr.length;
-  const activeAgents = isAgent ? arr.filter(a => a.active).length : 0;
-  return `<div class="section-title"><h2>${title}</h2></div>
-  <div class="admin-glow-panel"><h3>${isAgent?'Agent Center':'Customer Center'}</h3><div class="meta">${isAgent?`àº•àº»àº§à»àº—àº™àº—àº±àº‡à»àº»àº” ${totalUsers} Â· à»€àº›àºµàº”à»ƒàºŠà»‰ ${activeAgents} Â· àº›àº´àº”à»ƒàºŠà»‰ ${totalUsers-activeAgents}`:`àº¥àº¹àºàº„à»‰àº²àº—àº±àº‡à»àº»àº” ${totalUsers} Â· à»àº­àº±àº”àº¡àº´àº™à»€àºšàº´à»ˆàº‡àº¥àº°àº«àº±àº” / Copy / àº¥àº¶àºš ID à»„àº”à»‰`}</div></div>
-  <div class="password-warning">ðŸ” à»€àº«àº±àº™àº¥àº°àº«àº±àº”à»„àº”à»‰àºªàº°à»€àºžàº²àº° Admin. àº¢à»ˆàº²à»àºŠàº£à»Œà»ƒàº«à»‰àº„àº»àº™àº­àº·à»ˆàº™.</div>
-  <div class="table-wrap elevated-table"><table class="table admin-user-table"><tr><th>ID</th><th>àºŠàº·à»ˆ</th><th>à»€àºšàºµ</th><th>àº¥àº°àº«àº±àº”</th><th>àº­à»à»€àº”àºµà»‰</th><th>àºàº­àº”àº¥àº§àº¡</th><th>àºªàº°àº–àº²àº™àº°</th><th></th></tr>${arr.map(u=>{const orders=(db.orders||[]).filter(o=>o.userId===u.id&&o.role===type); const total=orders.reduce((s,o)=>s+(Number(o.total)||0),0); const inactive=isAgent && !u.active; return `<tr class="${inactive?'row-muted':''}"><td><b>${esc(u.id)}</b></td><td>${esc(u.name)}</td><td>${esc(u.phone)}</td><td>${passwordCellV25(u,type)}</td><td>${orders.length}</td><td><b>${money(total)}</b></td><td>${isAgent?`<span class="status-pill ${u.active?'':'off'}">${u.active?'à»€àº›àºµàº”à»ƒàºŠà»‰':'àº›àº´àº”à»ƒàºŠà»‰'}</span>`:`<span class="status-pill">à»€àº›àºµàº”à»ƒàºŠà»‰</span>`}</td><td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${esc(u.id)}','${type}')">à»€àºšàº´à»ˆàº‡àº­à»à»€àº”àºµà»‰</button>${isAgent?`<button class="btn ${u.active?'danger':'sage'} small" onclick="toggleAgent('${esc(u.id)}')">${u.active?'àº›àº´àº” ID':'à»€àº›àºµàº” ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${esc(u.id)}')">àº¥àº¶àºš ID</button>`}</div></td></tr>`}).join('') || `<tr><td colspan="8"><div class="empty">àºàº±àº‡àºšà»à»ˆàº¡àºµàº‚à»à»‰àº¡àº¹àº™</div></td></tr>`}</table></div>`;
-};
+  window.addToCart = addToCart = function(id){
+    const p = (db.products||[]).find(x=>x.id===id);
+    if(!p) return toast('ບໍ່ພົບສິນຄ້າ','danger');
+    const qty = Math.max(1, parseInt(val('selQty') || '1'));
+    if(p.type==='ready' && (+p.stock||0)<qty) return toast('ສະຕັອກບໍ່ພໍ','danger');
+    const size = val('selSize') || '-';
+    const color = val('selColor') || '-';
+    const price = state.role==='agent' ? p.agentPrice : p.price;
+    const main = document.querySelector('.product-detail-v19 img.big-img');
+    const selectedImage = (main && main.src) ? main.src : ((typeof productColorImage === 'function') ? productColorImage(p,color) : (p.images||[])[0]);
+    const existing = state.cart.find(i=>i.productId===id && i.size===size && i.color===color);
+    if(existing) existing.qty += qty;
+    else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage});
+    closeModal();
+    toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ');
+    state.tab='cart';
+    try{ if(typeof saveCartV17 === 'function') saveCartV17(); }catch(e){}
+    render();
+  };
+
+  window.orderCard = orderCard = function(o){
+    const canCancel = o.status==='ລໍຖ້າຍອດໂອນ' && !o.slip;
+    return `<div class="order-card order-card-v19"><div class="order-head"><div><b>${e19(o.id)}</b><button class="btn ghost tiny" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><div class="meta">${new Date(o.createdAt||Date.now()).toLocaleString()} · ${(o.items||[]).length} ລາຍການ</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${orderMiniItems19(o)}<div class="summary-row"><span>${e19(o.status)}</span><b>${money(o.total||0)}</b></div><div class="actions"><button class="btn rose small" onclick="openOrderDetail('${e19(o.id)}')">ເບິ່ງລາຍລະອຽດ</button>${o.status==='ລໍຖ້າຍອດໂອນ'?`<button class="btn sage small" onclick="openPayment('${e19(o.id)}')">ໄປໜ້າໂອນ</button>`:''}${canCancel?`<button class="btn danger small" onclick="cancelOrder('${e19(o.id)}')">ຍົກເລີກອໍເດີ້</button>`:''}<a class="btn light small" target="_blank" href="${waLink(`ສະບາຍດີແອັດມິນ ຂ້ອຍຕ້ອງການສອບຖາມອໍເດີ້ ${o.id} ຊື່ ${o.customer?.name||''} ເບີ ${o.customer?.phone||''} ສະຖານະ ${o.status} ຕອນນີ້ຮອດໃສແລ້ວ?`)}">ທັກແອັດມິນ</a></div></div>`;
+  };
+
+  const oldRenderOrders19 = window.renderOrders || renderOrders;
+  window.renderOrders = renderOrders = function(){
+    const all = userOrders();
+    const q = state.orderSearchV19 || '';
+    if(!all.length) return `<div class="empty">ຍັງບໍ່ມີອໍເດີ້<br><button class="btn rose" onclick="state.tab='shop';render()">ກັບໄປຊື້ເຄື່ອງ</button></div>`;
+    const orders = all.filter(o=>orderMatches19(o,q));
+    return `<div class="section-title"><h2>ປະຫວັດອໍເດີ້</h2><button class="btn light" onclick="state.tab='shop';render()">← ກັບໄປໜ້າຊື້ເຄື່ອງ</button></div>
+      <div class="order-search-panel"><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາ Order ID / Code ສິນຄ້າ / ຊື່ສິນຄ້າ" value="${e19(q)}" oninput="state.orderSearchV19=this.value;render()"></div><div class="meta">ຕົວຢ່າງ: ORD001, BB-001, ຊື່ສິນຄ້າ, ສີ</div></div>
+      ${orders.map(orderCard).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ ID/ຄຳຄົ້ນຫານີ້</div>'}`;
+  };
+
+  const oldOrderFullHTML19 = window.orderFullHTML || orderFullHTML;
+  window.orderFullHTML = orderFullHTML = function(o,admin=false){
+    return `<div class="order-id-hero"><span>Order ID</span><b>${e19(o.id)}</b><button class="btn light small" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><small>ໃຊ້ ID ນີ້ຄົ້ນຫາ / ສອບຖາມກັບແອັດມິນໄດ້</small></div>` + oldOrderFullHTML19(o,admin);
+  };
+
+  const oldAdminOrders19 = window.adminOrders || adminOrders;
+  window.adminOrders = adminOrders = function(){
+    const f = state.adminOrderFilter || 'all';
+    const q = state.adminOrderSearchV19 || '';
+    let orders = [...(db.orders||[])];
+    if(f==='pay') orders=orders.filter(o=>o.status==='ລໍຖ້າຍອດໂອນ');
+    if(f==='verify') orders=orders.filter(o=>o.status==='ລໍຖ້າກວດສອບການໂອນ');
+    if(f==='bill') orders=orders.filter(o=>!String(o.status||'').includes('ຍົກເລີກ') && (o.status==='ກຽມຝາກເຄື່ອງ'||o.status==='ເຄື່ອງຮອດແລ້ວກຽມຝາກ'||o.status==='ແຈ້ງບິນ') && !o.billNo && !o.billImage);
+    if(f==='done') orders=orders.filter(o=>o.billNo||o.billImage);
+    orders = orders.filter(o=>orderMatches19(o,q)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    return `${typeof notificationPanel==='function'?notificationPanel():''}<div class="admin-toolbar"><h2>ຈັດການອໍເດີ້</h2><div class="actions"><select onchange="state.adminOrderFilter=this.value;render()"><option value="all" ${f==='all'?'selected':''}>ທັງໝົດ</option><option value="pay" ${f==='pay'?'selected':''}>ລໍຖ້າໂອນ</option><option value="verify" ${f==='verify'?'selected':''}>ລໍຖ້າກວດການໂອນ</option><option value="bill" ${f==='bill'?'selected':''}>ລໍຖ້າແຈ້ງບິນ</option><option value="done" ${f==='done'?'selected':''}>ມີບິນແລ້ວ</option></select><button class="btn light" onclick="exportPacking()">Export Packing CSV</button>${typeof printPackingListV18==='function'?`<button class="btn sage" onclick="state.adminTab='packing';render()">Packing Print</button>`:''}</div></div>
+      <div class="order-search-panel"><div class="search"><span>🔎</span><input placeholder="Admin search: Order ID / ຊື່ / ເບີ / Code ສິນຄ້າ" value="${e19(q)}" oninput="state.adminOrderSearchV19=this.value;render()"></div><div class="meta">ພົບ ${orders.length} ອໍເດີ້</div></div>
+      ${orders.map(o=>`<div class="order-card order-card-v19"><div class="order-head"><div><b>${e19(o.id)}</b><button class="btn ghost tiny" onclick="copyOrderIdV19('${e19(o.id)}')">Copy ID</button><div class="meta">${e19(o.role)} · ${e19(o.customer?.name||'')} · ${e19(o.customer?.phone||'')}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>${progressHTML(o)}${(o.billNo||o.billImage)?`<div class="soft-chip">📦 ແຈ້ງບິນແລ້ວ ${e19(o.billNo||'')}</div>`:''}${orderMiniItems19(o)}<div class="summary-row"><span>${e19(o.status)}</span><b>${money(o.total||0)}</b></div><div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${e19(o.id)}')">ເບິ່ງ/ຈັດການ</button>${typeof printOrderPackingV18==='function'?`<button class="btn light small" onclick="printOrderPackingV18('${e19(o.id)}')">ພິມ</button>`:''}<button class="btn sage small" onclick="nextStatus('${e19(o.id)}')">ດັນສະຖານະຕໍ່ໄປ</button><button class="btn danger small" onclick="deleteOrder('${e19(o.id)}')">ລຶບ</button></div></div>`).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ Filter/Search ນີ້</div>'}`;
+  };
+})();
+
+/* === v20: Admin dashboard order search + cleaner admin login modal === */
+(function(){
+  function e20(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function orderText20(o){
+    return [
+      o.id, o.status, o.role, o.type,
+      o.customer?.name, o.customer?.phone,
+      o.userName, o.userPhone,
+      o.sender?.name, o.sender?.phone,
+      o.shipping?.carrier, o.shipping?.branch, o.shipping?.city, o.shipping?.province,
+      ...(o.items||[]).flatMap(i=>[i.name,i.code,i.size,i.color,i.type,i.qty])
+    ].join(' ').toLowerCase();
+  }
+  function matchOrder20(o,q){
+    q = String(q||'').trim().toLowerCase();
+    if(!q) return true;
+    return orderText20(o).includes(q);
+  }
+  function miniOrderItems20(o){
+    return `<div class="order-mini-items">${(o.items||[]).map(i=>`<div class="order-mini-item"><img src="${i.image||''}"><div><b>${e20(i.name)}</b><small>${e20(i.code||'')} · ໄຊ້ ${e20(i.size||'-')} · ສີ ${e20(i.color||'-')} · x${e20(i.qty||1)}</small></div></div>`).join('')}</div>`;
+  }
+
+  window.adminDashboardSearchBoxV20 = function(){
+    const q = state.adminDashOrderSearchV20 || '';
+    const orders = (db.orders||[]).filter(o=>matchOrder20(o,q)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const show = String(q||'').trim().length > 0;
+    return `<div class="card admin-order-lookup-v20">
+      <div class="lookup-head"><div><h3>🔎 ຄົ້ນຫາອໍເດີ້ດ່ວນ</h3><div class="meta">ພິມ Order ID ແລ້ວເບິ່ງລາຍລະອຽດໄດ້ທັນທີ</div></div><button class="btn light small" onclick="state.adminTab='orders';state.adminOrderSearchV19=state.adminDashOrderSearchV20||'';render()">ໄປໜ້າອໍເດີ້</button></div>
+      <div class="search big-search"><span>🔎</span><input placeholder="ຄົ້ນຫາ Order ID / ຊື່ລູກຄ້າ / ເບີ / Code ສິນຄ້າ" value="${e20(q)}" oninput="state.adminDashOrderSearchV20=this.value;render()"></div>
+      ${show ? `<div class="meta lookup-count">ພົບ ${orders.length} ອໍເດີ້</div>
+        <div class="lookup-results-v20">${orders.slice(0,5).map(o=>`<div class="lookup-order-card">
+          <div class="order-head"><div><b>${e20(o.id)}</b><div class="meta">${e20(o.customer?.name||'')} · ${e20(o.customer?.phone||'')} · ${new Date(o.createdAt||Date.now()).toLocaleString()}</div></div><span class="type-badge ${o.type==='ready'?'ready':''}">${o.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span></div>
+          ${miniOrderItems20(o)}
+          <div class="summary-row"><span>${e20(o.status||'')}</span><b>${money(o.total||0)}</b></div>
+          <div class="actions"><button class="btn rose small" onclick="adminOpenOrder('${e20(o.id)}')">ເປີດລາຍລະອຽດ</button><button class="btn light small" onclick="state.adminTab='orders';state.adminOrderSearchV19='${e20(o.id)}';render()">ເບິ່ງໃນໜ້າອໍເດີ້</button></div>
+        </div>`).join('') || '<div class="empty">ບໍ່ພົບອໍເດີ້ຕາມ ID/ຄຳຄົ້ນຫານີ້</div>'}</div>` : '<div class="meta lookup-hint">ຕົວຢ່າງ: ORD001, ເບີໂທ, ຊື່ລູກຄ້າ, Code ສິນຄ້າ</div>'}
+    </div>`;
+  };
+
+  try{
+    const oldAdminDashboardV20 = adminDashboard;
+    adminDashboard = function(){
+      return adminDashboardSearchBoxV20() + oldAdminDashboardV20();
+    };
+  }catch(err){ console.warn('v20 dashboard search skipped', err); }
+
+  window.showAdminLogin = showAdminLogin = function(){
+    showModal(`<div class="modal-head"><b>ເຂົ້າຫຼັງບ້ານ Admin</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+    <div class="modal-body admin-login-modal clean-admin-login-v20">
+      <div class="field"><label>Username</label><input id="adminLoginId" placeholder="Admin username" autocomplete="username"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="adminLoginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn rose full" onclick="doAdminLoginSeparate()">ເຂົ້າຫຼັງບ້ານ</button>
+    </div>`);
+  };
+
+  window.doAdminLoginSeparate = doAdminLoginSeparate = function(){
+    const id = (document.getElementById('adminLoginId')||{}).value?.trim() || '';
+    const pass = (document.getElementById('adminLoginPass')||{}).value?.trim() || '';
+    if(id === ADMIN_USER && pass === ADMIN_PASS){
+      state.user = {id:'ADMIN', name:'Bai Boua Admin'};
+      state.role = 'admin';
+      state.adminTab = 'dashboard';
+      try{ if(typeof saveSessionV12 === 'function') saveSessionV12(); }catch(e){}
+      closeModal();
+      toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
+      render();
+    }else{
+      toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+    }
+  };
+
+  window.toggleRegister = toggleRegister = function(){
+    state.showRegister = !state.showRegister;
+    renderLogin();
+  };
+
+  window.loginRole = loginRole = function(role){
+    if(role === 'admin') role = 'customer';
+    state.loginRole = role;
+    state.showRegister = false;
+    renderLogin();
+  };
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    const isCustomer = state.loginRole === 'customer';
+    const registerHTML = isCustomer && state.showRegister ? `
+      <div class="register-box register-inline">
+        <div class="register-title-row"><b>ສະໝັກລູກຄ້າໃໝ່</b><button class="btn light small" onclick="toggleRegister()">ປິດ</button></div>
+        <div class="form-grid" style="margin-top:10px">
+          <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
+          <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
+          <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
+        </div>
+        <button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+      </div>` : '';
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v20-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua</h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>Tracking</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າ Login ຫຼື ສະໝັກໃໝ່ໄດ້ດ້ານລຸ່ມ':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer && !state.showRegister ? `<div class="login-switch">ຍັງບໍ່ມີບັນຊີ? <button onclick="toggleRegister()">ສະໝັກລູກຄ້າໃໝ່</button></div>` : ''}
+        ${registerHTML}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
+
+/* === v21: put Admin login back as a small bottom link, not a tab === */
+(function(){
+  function safePhoneTextV21(){
+    try{ return (typeof ADMIN_PHONE_TEXT !== 'undefined' && ADMIN_PHONE_TEXT) ? ADMIN_PHONE_TEXT : '+856 20 9980 9749'; }
+    catch(e){ return '+856 20 9980 9749'; }
+  }
+
+  window.loginRole = loginRole = function(role){
+    // Admin must not appear as a main login tab. It is opened from the small bottom link only.
+    if(role === 'admin') role = 'customer';
+    state.loginRole = role;
+    state.showRegister = false;
+    renderLogin();
+  };
+
+  window.showAdminLogin = showAdminLogin = function(){
+    showModal(`<div class="modal-head"><b>ເຂົ້າຫຼັງບ້ານ Admin</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body admin-login-modal clean-admin-login-v21">
+        <div class="field"><label>Username</label><input id="adminLoginId" placeholder="Admin username" autocomplete="username"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="adminLoginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn rose full" onclick="doAdminLoginSeparate()">ເຂົ້າຫຼັງບ້ານ</button>
+      </div>`);
+  };
+
+  window.doAdminLoginSeparate = doAdminLoginSeparate = function(){
+    const id = (document.getElementById('adminLoginId') || {}).value?.trim() || '';
+    const pass = (document.getElementById('adminLoginPass') || {}).value?.trim() || '';
+    if(id === ADMIN_USER && pass === ADMIN_PASS){
+      state.user = {id:'ADMIN', name:'Bai Boua Admin'};
+      state.role = 'admin';
+      state.adminTab = 'dashboard';
+      try{ if(typeof saveSessionV12 === 'function') saveSessionV12(); }catch(e){}
+      closeModal();
+      toast('ເຂົ້າລະບົບແອັດມິນແລ້ວ');
+      render();
+    }else{
+      toast('Username ຫຼື password ບໍ່ຖືກ','danger');
+    }
+  };
+
+  window.toggleRegister = toggleRegister = function(){
+    state.showRegister = !state.showRegister;
+    renderLogin();
+  };
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    const isCustomer = state.loginRole === 'customer';
+    const phoneText = safePhoneTextV21();
+    const registerHTML = isCustomer && state.showRegister ? `
+      <div class="register-box register-inline">
+        <div class="register-title-row"><b>ສະໝັກລູກຄ້າໃໝ່</b><button class="btn light small" onclick="toggleRegister()">ປິດ</button></div>
+        <div class="form-grid" style="margin-top:10px">
+          <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
+          <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
+          <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
+        </div>
+        <button class="btn light full" onclick="registerCustomer()">ສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+      </div>` : '';
+
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v21-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua<br><span>Shop</span></h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າ Login ຫຼື ສະໝັກໃໝ່ໄດ້ດ້ານລຸ່ມ':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer && !state.showRegister ? `<div class="login-switch">ຍັງບໍ່ມີບັນຊີ? <button onclick="toggleRegister()">ສະໝັກລູກຄ້າໃໝ່</button></div>` : ''}
+        ${registerHTML}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${phoneText}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry admin-hidden-entry-v21"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
+
+/* === v22: Signup opens as a separate modal/page, not inline under login === */
+(function(){
+  function safePhoneTextV22(){
+    try{ return (typeof ADMIN_PHONE_TEXT !== 'undefined' && ADMIN_PHONE_TEXT) ? ADMIN_PHONE_TEXT : '+856 20 9980 9749'; }
+    catch(e){ return '+856 20 9980 9749'; }
+  }
+  function e22(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  window.loginRole = loginRole = function(role){
+    if(role === 'admin') role = 'customer';
+    state.loginRole = role;
+    state.showRegister = false;
+    renderLogin();
+  };
+
+  window.openCustomerRegister = openCustomerRegister = function(){
+    state.showRegister = false;
+    showModal(`<div class="modal-head"><b>ສະໝັກບັນຊີໃໝ່</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body customer-register-modal-v22">
+        <div class="register-welcome-v22">
+          <div class="lotus">🪷</div>
+          <div><b>Bai Boua</b><br><span>ກອກຂໍ້ມູນແລ້ວກົດຢືນຢັນ ລະບົບຈະເຂົ້າໜ້າເວັບໃຫ້ເລີຍ</span></div>
+        </div>
+        <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ" autocomplete="name"></div>
+        <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..." autocomplete="tel"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ" autocomplete="new-password"></div>
+        <button class="btn rose full" onclick="registerCustomer()">ຢືນຢັນສະໝັກ ແລະ ເຂົ້າໃຊ້</button>
+      </div>`);
+    setTimeout(()=>{ try{ document.getElementById('regName')?.focus(); }catch(e){} },80);
+  };
+
+  window.toggleRegister = toggleRegister = function(){
+    openCustomerRegister();
+  };
+
+  window.registerCustomer = registerCustomer = function(){
+    const name = val('regName');
+    const phone = val('regPhone');
+    const pass = val('regPass');
+    if(!name || !phone || !pass) return toast('ກະລຸນາກອກຊື່ ເບີໂທ ແລະ ລະຫັດ','danger');
+    if(db.users.some(u => String(u.phone) === String(phone))) return toast('ເບີນີ້ມີບັນຊີແລ້ວ','danger');
+    const u = {id:uid('C'), role:'customer', name, phone, password:pass, createdAt:Date.now()};
+    db.users.push(u);
+    saveDB();
+    state.user = u;
+    state.role = 'customer';
+    state.loginRole = 'customer';
+    state.tab = 'shop';
+    state.showRegister = false;
+    try{ if(typeof saveSessionV12 === 'function') saveSessionV12(); }catch(e){}
+    try{ closeModal(); }catch(e){}
+    toast('ສະໝັກສຳເລັດ ເຂົ້າໜ້າເວັບແລ້ວ');
+    render();
+    try{ showWelcome(); }catch(e){}
+  };
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    state.showRegister = false;
+    const isCustomer = state.loginRole === 'customer';
+    const phoneText = safePhoneTextV22();
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v22-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua<br><span>Shop</span></h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າລັອກອິນ ຫຼື ກົດສະໝັກບັນຊີໃໝ່':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer ? `<button class="btn light full signup-open-v22" onclick="openCustomerRegister()">ສະໝັກບັນຊີໃໝ່</button>` : ''}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${e22(phoneText)}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry admin-hidden-entry-v21"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
+
+/* === v23: prettier customer signup CTA button === */
+(function(){
+  function safePhoneTextV23(){
+    try{ return (typeof ADMIN_PHONE_TEXT !== 'undefined' && ADMIN_PHONE_TEXT) ? ADMIN_PHONE_TEXT : '+856 20 9980 9749'; }
+    catch(e){ return '+856 20 9980 9749'; }
+  }
+  function e23(v){
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  window.renderLogin = renderLogin = function(){
+    if(state.loginRole === 'admin') state.loginRole = 'customer';
+    state.showRegister = false;
+    const isCustomer = state.loginRole === 'customer';
+    const phoneText = safePhoneTextV23();
+    document.getElementById('app').innerHTML = `
+    <div class="screen login-wrap mobile-login v23-login">
+      <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="hero mobile-compact-hero">
+        <div class="hero-badge">🪷 Bai Boua</div>
+        <h1 class="brand-title">Bai Boua<br><span>Shop</span></h1>
+        <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>ພຣີອໍເດີ້</span><span>QR Payment</span><span>ຕິດຕາມອໍເດີ້</span></div>
+      </div>
+      <div class="login-card customer-login-card">
+        <div class="role-tabs customer-agent-tabs">
+          <button class="${state.loginRole==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+          <button class="${state.loginRole==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+        </div>
+        <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+        <div class="login-help-text">${isCustomer?'ລູກຄ້າລັອກອິນ ຫຼື ກົດສະໝັກບັນຊີໃໝ່':'ຕົວແທນໃຊ້ ID/ເບີໂທ ແລະລະຫັດທີ່ແອັດມິນສ້າງໃຫ້'}</div>
+        <div class="field"><label>${isCustomer?'ເບີໂທ / ID':'ເບີໂທ / ID ຕົວແທນ'}</label><input id="loginId" placeholder="ປ້ອນຂໍ້ມູນ"></div>
+        <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+        <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+        ${isCustomer ? `<div class="signup-card-v23">
+          <div class="signup-card-text-v23"><b>ຍັງບໍ່ມີບັນຊີ?</b><span>ສະໝັກຟຣີ ແລ້ວເຂົ້າຊື້ສິນຄ້າໄດ້ເລີຍ</span></div>
+          <button class="signup-btn-v23" onclick="openCustomerRegister()"><span>🌸</span> ສະໝັກບັນຊີໃໝ່</button>
+        </div>` : ''}
+        <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${e23(phoneText)}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+        <div class="admin-hidden-entry admin-hidden-entry-v21"><button onclick="showAdminLogin()">ສຳລັບແອັດມິນ</button></div>
+      </div>
+    </div>`;
+  };
+})();
