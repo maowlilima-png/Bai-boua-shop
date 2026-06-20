@@ -535,3 +535,46 @@ renderLogin = function(){
     ${card}
   </div>`;
 };
+
+/* v20: keep admin login as a tiny separate link at the very bottom of auth screen */
+function renderLoginCardV20(){
+  const role = state.loginRole === 'agent' ? 'agent' : 'customer';
+  state.loginRole = role;
+  return `
+    <div class="login-card login-card-v19 login-card-v20">
+      <div class="role-tabs role-tabs-v19">
+        <button class="${role==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
+        <button class="${role==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
+      </div>
+      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
+      <div class="login-help-text">${role==='customer'?'ລູກຄ້າເຂົ້າດ້ວຍເບີໂທ ຫຼື ID':'ຕົວແທນໃຊ້ ID / ເບີໂທທີ່ຮ້ານກຳນົດໃຫ້'}</div>
+      <div class="field"><label>ເບີໂທ / ID</label><input id="loginId" placeholder="ປ້ອນເບີໂທ ຫຼື ID"></div>
+      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
+      ${role==='customer' ? `<button class="btn sage full create-account-main-btn" onclick="openCustomerRegister()">＋ ສ້າງບັນຊີໃໝ່</button>` : ''}
+      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
+    </div>`;
+}
+
+function renderTinyAdminFooterV20(){
+  return `
+    <div class="admin-footer-entry-v20">
+      <button onclick="openAdminLogin()">ສຳລັບແອັດມິນ</button>
+    </div>`;
+}
+
+renderLogin = function(){
+  const mode = state.authMode || 'login';
+  const card = mode === 'register' ? renderCustomerRegisterCardV19() : (mode === 'admin' ? renderAdminLoginCardV19() : renderLoginCardV20());
+  document.getElementById('app').innerHTML = `
+  <div class="screen login-wrap mobile-login v19-auth-screen v20-auth-screen">
+    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="hero mobile-compact-hero">
+      <div class="hero-badge">🪷 Bai Boua</div>
+      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
+      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>Pre-order</span><span>QR Payment</span><span>Tracking</span></div>
+    </div>
+    ${card}
+    ${mode === 'login' ? renderTinyAdminFooterV20() : ''}
+  </div>`;
+};
