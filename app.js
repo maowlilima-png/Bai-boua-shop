@@ -448,133 +448,70 @@ render = function(){
 
 try{ db = removeSeedRecords(db); localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
 
-/* v19: separate customer register screen + dedicated create account button */
-function openCustomerRegister(){
-  state.authMode = 'register';
-  state.loginRole = 'customer';
-  renderLogin();
+/* v21: Admin can view and copy customer/agent passwords */
+function safePasswordV21(u){
+  return (u && (u.password || u.pass || u.pin)) ? String(u.password || u.pass || u.pin) : '—';
 }
-function openCustomerLogin(role='customer'){
-  state.authMode = 'login';
-  state.loginRole = role;
-  renderLogin();
+function copyAdminPasswordV21(id, type){
+  const arr = type === 'agent' ? (db.agents || []) : (db.users || []);
+  const u = arr.find(x => x.id === id);
+  const pass = safePasswordV21(u);
+  if(!u || pass === '—') return toast('ບໍ່ພົບລະຫັດ','danger');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(pass).then(()=>toast('Copy ລະຫັດແລ້ວ')).catch(()=>fallbackCopyPasswordV21(pass));
+  }else fallbackCopyPasswordV21(pass);
 }
-function openAdminLogin(){
-  state.authMode = 'admin';
-  state.loginRole = 'admin';
-  renderLogin();
+function fallbackCopyPasswordV21(text){
+  const input = document.createElement('textarea');
+  input.value = text;
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.appendChild(input);
+  input.focus();
+  input.select();
+  try{ document.execCommand('copy'); toast('Copy ລະຫັດແລ້ວ'); }
+  catch(e){ toast('Copy ບໍ່ໄດ້ ກະລຸນາກົດຄ້າງແລ້ວ copy ເອງ','danger'); }
+  document.body.removeChild(input);
+}
+function passwordViewCellV21(u, type){
+  const pass = safePasswordV21(u);
+  return `<div class="password-cell admin-password-visible"><code>${esc(pass)}</code>${pass !== '—' ? `<button class="btn light small" onclick="copyAdminPasswordV21('${u.id}','${type}')">Copy</button>` : ''}</div>`;
 }
 
-loginRole = function(role){
-  state.authMode = 'login';
-  state.loginRole = role;
-  renderLogin();
+userTable = function(type){
+  const arr = type === 'customer' ? (db.users || []) : (db.agents || []);
+  const isAgent = type === 'agent';
+  const title = isAgent ? 'ຈັດການຕົວແທນ' : 'ຈັດການລູກຄ້າ';
+  const totalUsers = arr.length;
+  const activeAgents = isAgent ? arr.filter(a => a.active).length : 0;
+  return `<div class="section-title"><h2>${title}</h2></div>
+    <div class="admin-glow-panel">
+      <h3>${isAgent ? 'Agent Center' : 'Customer Center'}</h3>
+      <div class="meta">${isAgent ? `ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents}` : `ລູກຄ້າທັງໝົດ ${totalUsers} · ແອັດມິນສາມາດເບິ່ງລະຫັດ ແລະ ລຶບ ID ໄດ້`}</div>
+      <div class="password-warning">🔐 ລະຫັດນີ້ໃຫ້ແອັດມິນເບິ່ງເທົ່ານັ້ນ ຫ້າມແຊຣໃຫ້ຄົນອື່ນ</div>
+    </div>
+    <div class="table-wrap elevated-table"><table class="table">
+      <tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ລະຫັດ</th><th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>
+      ${arr.map(u => {
+        const orders = db.orders.filter(o => o.userId === u.id && o.role === type);
+        const total = orders.reduce((s,o) => s + o.total, 0);
+        const inactive = isAgent && !u.active;
+        return `<tr class="${inactive ? 'row-muted' : ''}">
+          <td><b>${esc(u.id)}</b></td>
+          <td>${esc(u.name || '')}</td>
+          <td>${esc(u.phone || '')}</td>
+          <td>${passwordViewCellV21(u, type)}</td>
+          <td>${orders.length}</td>
+          <td><b>${money(total)}</b></td>
+          <td>${isAgent ? `<span class="status-pill ${u.active ? '' : 'off'}">${u.active ? 'ເປີດໃຊ້' : 'ປິດໃຊ້'}</span>` : `<span class="status-pill">ເປີດໃຊ້</span>`}</td>
+          <td><div class="actions"><button class="btn light small" onclick="viewUserOrders('${u.id}','${type}')">ເບິ່ງອໍເດີ້</button>${isAgent ? `<button class="btn ${u.active ? 'danger' : 'sage'} small" onclick="toggleAgent('${u.id}')">${u.active ? 'ປິດ ID' : 'ເປີດ ID'}</button>` : `<button class="btn danger small" onclick="deleteCustomer('${u.id}')">ລຶບ ID</button>`}</div></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="8"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}
+    </table></div>`;
 };
 
-function renderCustomerRegisterCardV19(){
-  return `
-    <div class="login-card register-card-v19">
-      <button class="btn light small back-login-btn" onclick="openCustomerLogin('customer')">← ກັບໄປເຂົ້າລະບົບ</button>
-      <div class="register-icon-v19">🪷</div>
-      <h2 style="margin:0 0 4px">ສ້າງບັນຊີໃໝ່</h2>
-      <div class="login-help-text">ສຳລັບລູກຄ້າ Bai Boua · ສ້າງບັນຊີແລ້ວເຂົ້າຊື້ຂອງໄດ້ທັນທີ</div>
-      <div class="form-grid register-form-v19">
-        <div class="field"><label>ຊື່</label><input id="regName" placeholder="ຊື່ຂອງລູກຄ້າ"></div>
-        <div class="field"><label>ເບີໂທ</label><input id="regPhone" ${numAttrs()} placeholder="020..."></div>
-        <div class="field" style="grid-column:1/-1"><label>ລະຫັດຜ່ານ</label><input id="regPass" type="password" placeholder="ຕັ້ງລະຫັດ"></div>
-      </div>
-      <button class="btn rose full create-submit-v19" onclick="registerCustomer()">ສ້າງບັນຊີ</button>
-      <button class="btn light full" onclick="openCustomerLogin('customer')">ມີບັນຊີແລ້ວ · ເຂົ້າລະບົບ</button>
-    </div>`;
-}
-
-function renderAdminLoginCardV19(){
-  return `
-    <div class="login-card admin-login-card-v19">
-      <button class="btn light small back-login-btn" onclick="openCustomerLogin('customer')">← ກັບໄປໜ້າລູກຄ້າ</button>
-      <div class="admin-lock-v19">🔐</div>
-      <h2 style="margin:0 0 4px">ເຂົ້າລະບົບແອັດມິນ</h2>
-      <div class="login-help-text">ສຳລັບແອັດມິນຮ້ານເທົ່ານັ້ນ</div>
-      <div class="field"><label>Username</label><input id="loginId" placeholder="Admin username"></div>
-      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບແອັດມິນ</button>
-    </div>`;
-}
-
-function renderLoginCardV19(){
-  const role = state.loginRole === 'agent' ? 'agent' : 'customer';
-  state.loginRole = role;
-  return `
-    <div class="login-card login-card-v19">
-      <div class="role-tabs role-tabs-v19">
-        <button class="${role==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
-        <button class="${role==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
-      </div>
-      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
-      <div class="login-help-text">${role==='customer'?'ລູກຄ້າເຂົ້າດ້ວຍເບີໂທ ຫຼື ID':'ຕົວແທນໃຊ້ ID / ເບີໂທທີ່ຮ້ານກຳນົດໃຫ້'}</div>
-      <div class="field"><label>ເບີໂທ / ID</label><input id="loginId" placeholder="ປ້ອນເບີໂທ ຫຼື ID"></div>
-      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
-      ${role==='customer' ? `<button class="btn sage full create-account-main-btn" onclick="openCustomerRegister()">＋ ສ້າງບັນຊີໃໝ່</button>` : ''}
-      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
-      <div class="admin-entry-v19"><button onclick="openAdminLogin()">ສຳລັບແອັດມິນ</button></div>
-    </div>`;
-}
-
-renderLogin = function(){
-  const mode = state.authMode || 'login';
-  const card = mode === 'register' ? renderCustomerRegisterCardV19() : (mode === 'admin' ? renderAdminLoginCardV19() : renderLoginCardV19());
-  document.getElementById('app').innerHTML = `
-  <div class="screen login-wrap mobile-login v19-auth-screen">
-    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="hero mobile-compact-hero">
-      <div class="hero-badge">🪷 Bai Boua</div>
-      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
-      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>Pre-order</span><span>QR Payment</span><span>Tracking</span></div>
-    </div>
-    ${card}
-  </div>`;
-};
-
-/* v20: keep admin login as a tiny separate link at the very bottom of auth screen */
-function renderLoginCardV20(){
-  const role = state.loginRole === 'agent' ? 'agent' : 'customer';
-  state.loginRole = role;
-  return `
-    <div class="login-card login-card-v19 login-card-v20">
-      <div class="role-tabs role-tabs-v19">
-        <button class="${role==='customer'?'active':''}" onclick="loginRole('customer')">ລູກຄ້າ</button>
-        <button class="${role==='agent'?'active':''}" onclick="loginRole('agent')">ຕົວແທນ</button>
-      </div>
-      <h2 style="margin:0 0 4px">ເຂົ້າສູ່ລະບົບ</h2>
-      <div class="login-help-text">${role==='customer'?'ລູກຄ້າເຂົ້າດ້ວຍເບີໂທ ຫຼື ID':'ຕົວແທນໃຊ້ ID / ເບີໂທທີ່ຮ້ານກຳນົດໃຫ້'}</div>
-      <div class="field"><label>ເບີໂທ / ID</label><input id="loginId" placeholder="ປ້ອນເບີໂທ ຫຼື ID"></div>
-      <div class="field"><label>ລະຫັດຜ່ານ</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-      <button class="btn rose full" onclick="doLogin()">ເຂົ້າລະບົບ</button>
-      ${role==='customer' ? `<button class="btn sage full create-account-main-btn" onclick="openCustomerRegister()">＋ ສ້າງບັນຊີໃໝ່</button>` : ''}
-      <div class="contact-line"><span>ລືມລະຫັດ / ຕິດຕໍ່ຮ້ານ<br><b>${ADMIN_PHONE_TEXT}</b></span><a class="btn sage small" target="_blank" href="${waLink('ສະບາຍດີແອັດມິນ ຂ້ອຍລືມລະຫັດຜ່ານ / ຕ້ອງການຕິດຕໍ່ຮ້ານ Bai Boua')}">WhatsApp</a></div>
-    </div>`;
-}
-
-function renderTinyAdminFooterV20(){
-  return `
-    <div class="admin-footer-entry-v20">
-      <button onclick="openAdminLogin()">ສຳລັບແອັດມິນ</button>
-    </div>`;
-}
-
-renderLogin = function(){
-  const mode = state.authMode || 'login';
-  const card = mode === 'register' ? renderCustomerRegisterCardV19() : (mode === 'admin' ? renderAdminLoginCardV19() : renderLoginCardV20());
-  document.getElementById('app').innerHTML = `
-  <div class="screen login-wrap mobile-login v19-auth-screen v20-auth-screen">
-    <div class="star-rain"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="hero mobile-compact-hero">
-      <div class="hero-badge">🪷 Bai Boua</div>
-      <h1 class="brand-title">Bai Boua <span>Shop</span></h1>
-      <div class="mobile-quick-tags"><span>ພ້ອມສົ່ງ</span><span>Pre-order</span><span>QR Payment</span><span>Tracking</span></div>
-    </div>
-    ${card}
-    ${mode === 'login' ? renderTinyAdminFooterV20() : ''}
-  </div>`;
+const oldRenderAdminV21 = renderAdmin;
+renderAdmin = function(){
+  if(typeof normalizeNewFields === 'function') normalizeNewFields();
+  document.getElementById('app').innerHTML = `<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ເບິ່ງລະຫັດລູກຄ້າ/ຕົວແທນໄດ້</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
 };
