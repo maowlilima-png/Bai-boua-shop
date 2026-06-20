@@ -578,3 +578,75 @@ renderLogin = function(){
     ${mode === 'login' ? renderTinyAdminFooterV20() : ''}
   </div>`;
 };
+
+/* v21: show customer/agent passwords in Admin customer/agent center */
+function adminCopyTextV21(text){
+  const value = String(text || '');
+  if(!value) return toast('ບໍ່ມີລະຫັດໃຫ້ Copy','danger');
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(value).then(()=>toast('Copy ລະຫັດແລ້ວ')).catch(()=>adminFallbackCopyV21(value));
+  }else{
+    adminFallbackCopyV21(value);
+  }
+}
+function adminFallbackCopyV21(text){
+  const ta=document.createElement('textarea');
+  ta.value=String(text || '');
+  ta.style.position='fixed';
+  ta.style.left='-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try{ document.execCommand('copy'); toast('Copy ລະຫັດແລ້ວ'); }
+  catch(e){ toast('Copy ບໍ່ໄດ້ ກົດຄ້າງເພື່ອ Copy ເອງ','danger'); }
+  document.body.removeChild(ta);
+}
+function passwordCellV21(u){
+  const pw = String((u && u.password) ? u.password : '');
+  if(!pw) return '<span class="meta">ບໍ່ມີຂໍ້ມູນ</span>';
+  return `<div class="password-cell-v21"><code>${esc(pw)}</code><button class="btn light small" onclick='adminCopyTextV21(${JSON.stringify(pw)})'>Copy</button></div>`;
+}
+
+userTable = function(type){
+  const arr = type === 'customer' ? (db.users || []) : (db.agents || []);
+  const isAgent = type === 'agent';
+  const title = isAgent ? 'ຈັດການຕົວແທນ' : 'ຈັດການລູກຄ້າ';
+  const totalUsers = arr.length;
+  const activeAgents = isAgent ? arr.filter(a => a.active !== false).length : 0;
+  const note = isAgent
+    ? `ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents} · ເບິ່ງລະຫັດໄດ້`
+    : `ລູກຄ້າທັງໝົດ ${totalUsers} · ເບິ່ງ ID / ລະຫັດ / ອໍເດີ້ ໄດ້`;
+  return `<div class="section-title"><h2>${title}</h2></div>
+    <div class="admin-glow-panel">
+      <h3>${isAgent ? 'Agent Center' : 'Customer Center'}</h3>
+      <div class="meta">${note}</div>
+    </div>
+    <div class="notice password-notice-v21"><b>ໝາຍເຫດ:</b> ລະຫັດນີ້ໂຊว์ສະເພາະໃນໜ້າ Admin ເທົ່ານັ້ນ ແລະມີປຸ່ມ Copy ໃຫ້ໃຊ້.</div>
+    <div class="table-wrap elevated-table admin-user-table-v21"><table class="table">
+      <tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ລະຫັດ</th><th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>
+      ${arr.map(u=>{
+        const orders = (db.orders || []).filter(o => o.userId === u.id && o.role === type);
+        const total = orders.reduce((s,o)=>s+(+o.total||0),0);
+        const inactive = isAgent && u.active === false;
+        return `<tr class="${inactive?'row-muted':''}">
+          <td><b>${esc(u.id)}</b></td>
+          <td>${esc(u.name)}</td>
+          <td>${esc(u.phone)}</td>
+          <td>${passwordCellV21(u)}</td>
+          <td>${orders.length}</td>
+          <td><b>${money(total)}</b></td>
+          <td>${isAgent?`<span class="status-pill ${u.active===false?'off':''}">${u.active===false?'ປິດໃຊ້':'ເປີດໃຊ້'}</span>`:`<span class="status-pill">ເປີດໃຊ້</span>`}</td>
+          <td><div class="actions">
+            <button class="btn light small" onclick="viewUserOrders('${esc(u.id)}','${type}')">ເບິ່ງອໍເດີ້</button>
+            ${isAgent?`<button class="btn ${u.active===false?'sage':'danger'} small" onclick="toggleAgent('${esc(u.id)}')">${u.active===false?'ເປີດ ID':'ປິດ ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${esc(u.id)}')">ລຶບ ID</button>`}
+          </div></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="8"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}
+    </table></div>`;
+};
+
+const renderAdminBeforePasswordV21 = renderAdmin;
+renderAdmin = function(){
+  normalizeNewFields();
+  document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ເບິ່ງ ID/ລະຫັດລູກຄ້າ ແລະ ຕົວແທນໄດ້</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
+};
