@@ -242,37 +242,26 @@ select { max-width: 100%; }
 .seo-grid p{margin:0;line-height:1.7;color:#74695c}.seo-noscript{padding:16px;text-align:center;background:#fff3f3;color:#7d4242;font-weight:800}
 @media (max-width:720px){.seo-grid{grid-template-columns:1fr}.seo-landing{padding:16px 12px 36px}.seo-hero{border-radius:24px;padding:24px 16px}.seo-links a{width:100%;justify-content:center}}
 
-/* v21: Admin password visible cells */
-.password-cell.admin-password-visible{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.password-cell.admin-password-visible code{
-  display:inline-block;
-  max-width:190px;
-  overflow:auto;
-  white-space:nowrap;
-  padding:7px 10px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:#fff7f4;
-  color:#5b5140;
-  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight:800;
-}
-.password-warning{
-  margin-top:10px;
-  padding:10px 12px;
-  border-radius:16px;
-  background:rgba(255,247,244,.78);
-  border:1px solid var(--line);
-  color:#81785A;
-  font-size:13px;
-  line-height:1.45;
-}
-@media(max-width:700px){
-  .password-cell.admin-password-visible{justify-content:flex-start;}
-  .password-cell.admin-password-visible code{max-width:145px;font-size:13px;}
-}
+/* v19: dedicated create account button + separated register/admin screens */
+.v19-auth-screen .login-card{position:relative;overflow:hidden}
+.v19-auth-screen .login-card:before{content:"";position:absolute;inset:-70px -70px auto auto;width:150px;height:150px;background:rgba(196,150,161,.16);border-radius:999px;pointer-events:none}
+.role-tabs-v19{grid-template-columns:1fr 1fr}
+.create-account-main-btn{margin-top:10px;font-weight:900;letter-spacing:.1px;border:1px solid rgba(145,157,133,.32)}
+.register-card-v19,.admin-login-card-v19{animation:softPopV19 .22s ease-out}
+.register-icon-v19,.admin-lock-v19{width:58px;height:58px;border-radius:22px;display:grid;place-items:center;background:#fff7f4;border:1px solid var(--line);box-shadow:0 12px 30px rgba(129,120,90,.12);font-size:30px;margin-bottom:12px}
+.register-form-v19{margin-top:14px}
+.create-submit-v19{margin-top:10px}
+.back-login-btn{margin-bottom:14px;width:auto}
+.admin-entry-v19{margin-top:14px;text-align:center;border-top:1px dashed var(--line);padding-top:12px}
+.admin-entry-v19 button{border:0;background:transparent;color:#81785A;font-weight:800;font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 12px;border-radius:999px}
+.admin-entry-v19 button:hover{background:#fff7f4;color:#C496A1}
+@keyframes softPopV19{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:720px){.create-account-main-btn{padding:14px 16px}.register-icon-v19,.admin-lock-v19{width:52px;height:52px;font-size:26px}.back-login-btn{width:100%}}
+
+/* v20: tiny admin login at bottom of auth page */
+.v20-auth-screen{position:relative;min-height:100svh;padding-bottom:34px!important}
+.login-card-v20 .admin-entry-v19{display:none!important}
+.admin-footer-entry-v20{width:100%;display:flex;justify-content:center;margin-top:12px;margin-bottom:4px;opacity:.72}
+.admin-footer-entry-v20 button{border:0;background:transparent;color:#81785A;font-size:11px;font-weight:800;line-height:1;padding:7px 10px;border-radius:999px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;letter-spacing:.05px}
+.admin-footer-entry-v20 button:hover{background:#fff7f4;color:#C496A1;opacity:1}
+@media(max-width:720px){.admin-footer-entry-v20{margin-top:8px}.admin-footer-entry-v20 button{font-size:10.5px;padding:6px 9px}}
