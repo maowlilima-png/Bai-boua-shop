@@ -242,16 +242,18 @@ select { max-width: 100%; }
 .seo-grid p{margin:0;line-height:1.7;color:#74695c}.seo-noscript{padding:16px;text-align:center;background:#fff3f3;color:#7d4242;font-weight:800}
 @media (max-width:720px){.seo-grid{grid-template-columns:1fr}.seo-landing{padding:16px 12px 36px}.seo-hero{border-radius:24px;padding:24px 16px}.seo-links a{width:100%;justify-content:center}}
 
-/* === v18 Packing List Print + Wishlist === */
-.packing-control{padding:18px;margin-bottom:16px;border-radius:24px}
-.mini-stats{grid-template-columns:repeat(3,1fr);margin:12px 0}
-.packing-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:16px;margin:14px 0;box-shadow:0 12px 30px rgba(81,75,61,.06)}
-.packing-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
-.packing-info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 14px}
-.packing-info>div{background:#fbf7f0;border:1px solid #efe5d9;border-radius:18px;padding:12px;min-width:0}
-.packing-info span{display:block;font-size:12px;color:#85786a;font-weight:800;margin-bottom:4px}
-.packing-info b{display:block;color:#393127;word-break:break-word}
-.packing-info small{display:block;color:#777064;line-height:1.45;margin-top:4px;word-break:break-word}
-.packing-table .preview-img{width:54px;height:54px;border-radius:12px;object-fit:cover}
-.wish-count{position:absolute;right:58px;top:14px;background:rgba(255,255,255,.92);border:1px solid rgba(129,120,90,.18);border-radius:999px;padding:7px 10px;font-weight:950;color:#a25d71;box-shadow:0 8px 18px rgba(81,75,61,.08);z-index:2}
-@media(max-width:720px){.mini-stats,.packing-info{grid-template-columns:1fr!important}.packing-head{display:block}.packing-head .actions{margin-top:10px}.packing-card{padding:12px;border-radius:20px}.wish-count{right:58px;top:12px;font-size:12px;padding:6px 8px}}
+/* v19: dedicated create account button + separated register/admin screens */
+.v19-auth-screen .login-card{position:relative;overflow:hidden}
+.v19-auth-screen .login-card:before{content:"";position:absolute;inset:-70px -70px auto auto;width:150px;height:150px;background:rgba(196,150,161,.16);border-radius:999px;pointer-events:none}
+.role-tabs-v19{grid-template-columns:1fr 1fr}
+.create-account-main-btn{margin-top:10px;font-weight:900;letter-spacing:.1px;border:1px solid rgba(145,157,133,.32)}
+.register-card-v19,.admin-login-card-v19{animation:softPopV19 .22s ease-out}
+.register-icon-v19,.admin-lock-v19{width:58px;height:58px;border-radius:22px;display:grid;place-items:center;background:#fff7f4;border:1px solid var(--line);box-shadow:0 12px 30px rgba(129,120,90,.12);font-size:30px;margin-bottom:12px}
+.register-form-v19{margin-top:14px}
+.create-submit-v19{margin-top:10px}
+.back-login-btn{margin-bottom:14px;width:auto}
+.admin-entry-v19{margin-top:14px;text-align:center;border-top:1px dashed var(--line);padding-top:12px}
+.admin-entry-v19 button{border:0;background:transparent;color:#81785A;font-weight:800;font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 12px;border-radius:999px}
+.admin-entry-v19 button:hover{background:#fff7f4;color:#C496A1}
+@keyframes softPopV19{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:720px){.create-account-main-btn{padding:14px 16px}.register-icon-v19,.admin-lock-v19{width:52px;height:52px;font-size:26px}.back-login-btn{width:100%}}
