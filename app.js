@@ -36,8 +36,8 @@ function removeSeedRecords(d){
   d.agents=(d.agents||[]).filter(a=>!((a.id==='AG001'||a.phone==='02022223333') && a.password==='agent123'));
   return d;
 }
-const SUPABASE_REST_URL = "https://yvqpfaxcphoqzfiybqag.supabase.co/rest/v1";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2cXBmYXhjcGhvcXpmaXlicWFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NzMxMzcsImV4cCI6MjA5NTU0OTEzN30.gJswdu9dUuDy8LkMTvWstmxwqZGBqtIFtGhx4uvMxKA";
+const SUPABASE_REST_URL = "https://mdaeizsxtiexvamltvfo.supabase.co/rest/v1";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
 const SUPABASE_STATE_ID = "main";
 let cloudReady = false;
 let cloudSaving = false;
@@ -58,11 +58,11 @@ function loadLocalDB(){
 }
 async function initCloudDB(){
   try{
-    const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=data`,{headers:supabaseHeaders()});
+    const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=value`,{headers:supabaseHeaders()});
     if(!res.ok) throw new Error(await res.text());
     const rows=await res.json();
-    if(rows && rows.length && rows[0].data){
-      db=removeSeedRecords(rows[0].data);
+    if(rows && rows.length && rows[0].value){
+      db=removeSeedRecords(rows[0].value);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
     }else{
       await saveDBToCloud(true);
@@ -82,7 +82,7 @@ async function saveDBToCloud(force=false){
     const res=await fetch(`${SUPABASE_REST_URL}/app_state`,{
       method:'POST',
       headers:supabaseHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),
-      body:JSON.stringify({id:SUPABASE_STATE_ID,data:db,updated_at:new Date().toISOString()})
+      body:JSON.stringify({id:SUPABASE_STATE_ID,value:db,updated_at:new Date().toISOString()})
     });
     if(!res.ok) throw new Error(await res.text());
     cloudReady=true;
