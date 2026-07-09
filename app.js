@@ -164,15 +164,74 @@ function renderProducts(){ return `<section class="banner"><div><h1>ເລືອ
   <div class="grid">${productsFiltered().map(productCard).join('') || `<div class="empty">ບໍ່ພົບສິນຄ້າ</div>`}</div>` }
 function productCard(p){ const out=p.type==='ready' && p.stock<=0; const price=state.role==='agent'?`<span class="oldprice">${money(p.price)}</span> ${money(p.agentPrice)}`:money(p.price); return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${p.images[0]}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">♡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${price}</div><div class="meta">${p.type==='ready'?`Stock: ${p.stock}`:'ລໍຖ້າ 14-18 ມື້'} · ${p.colors.join(', ')}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">ເບິ່ງ/ສັ່ງ</button>${out?'<span class="type-badge">ໝົດ</span>':''}</div></div></div>` }
 function esc(s){ return String(s??'').replace(/[&<>'"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])) }
-function productImagesByColor(p){ const colors=(p.colors&&p.colors.length?p.colors:['Default']); return colors.map((color,idx)=>({color,img:idx===0?(p.images&&p.images[0]):((p.variantImages||[])[idx-1]||(p.images&&p.images[0]))})).filter(item=>item.img) }
-function productColorImage(p,color){ const list=productImagesByColor(p); const found=list.find(x=>x.color===color); return (found&&found.img)||(p.images&&p.images[0])||'' }
-function updateProductColorThumbs(color){ document.querySelectorAll('[data-color-thumb]').forEach(el=>el.classList.toggle('selected',el.dataset.colorThumb===color)) }
-function syncProductGalleryPosition(id,color,smooth=true){ const p=db.products.find(x=>x.id===id); if(!p)return; const list=productImagesByColor(p); const idx=Math.max(0,list.findIndex(x=>x.color===color)); const stage=document.getElementById('productGalleryStage'); if(stage){ const slide=stage.querySelector(`[data-gallery-index="${idx}"]`); if(slide){ stage.scrollTo({left:slide.offsetLeft,behavior:smooth?'smooth':'auto'}); } } const main=document.getElementById('mainProductImage'); const img=productColorImage(p,color); if(main&&img) main.src=img; updateProductColorThumbs(color) }
-function changeProductColorImage(id){ const p=db.products.find(x=>x.id===id); if(!p)return; const color=val('selColor'); syncProductGalleryPosition(id,color,true) }
-function pickProductColor(id,color){ const sel=document.getElementById('selColor'); if(sel){ sel.value=color; } syncProductGalleryPosition(id,color,true) }
-function syncGalleryColorFromScroll(id){ const p=db.products.find(x=>x.id===id); const stage=document.getElementById('productGalleryStage'); if(!p||!stage)return; const list=productImagesByColor(p); if(!list.length)return; const idx=Math.max(0,Math.min(list.length-1,Math.round(stage.scrollLeft/Math.max(stage.clientWidth,1)))); const color=list[idx].color; const sel=document.getElementById('selColor'); if(sel && sel.value!==color) sel.value=color; const main=document.getElementById('mainProductImage'); if(main && list[idx].img) main.src=list[idx].img; updateProductColorThumbs(color) }
-function openProduct(id){ const p=db.products.find(x=>x.id===id); if(!p)return; const price=state.role==='agent'?p.agentPrice:p.price; const colorImgs=productImagesByColor(p); const defaultColor=(p.colors&&p.colors[0])||((colorImgs[0]&&colorImgs[0].color)||'Default'); showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail"><div class="product-gallery"><div id="productGalleryStage" class="gallery-stage" onscroll="syncGalleryColorFromScroll('${p.id}')">${colorImgs.map((item,idx)=>`<div class="gallery-slide" data-gallery-index="${idx}"><img id="${idx===0?'mainProductImage':''}" class="big-img" src="${item.img}" alt="${esc(p.name)} - ${esc(item.color)}"></div>`).join('')}</div><div class="thumb-row">${colorImgs.map((item,idx)=>`<button type="button" class="thumb-item ${idx===0?'selected':''}" data-color-thumb="${esc(item.color)}" onclick="pickProductColor('${p.id}','${esc(item.color)}')"><img class="preview-img" src="${item.img}" alt="${esc(item.color)}"><div class="color-caption">${item.color}</div></button>`).join('')}</div></div><div class="product-info-panel"><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div><p>${p.detail}</p><div class="form-grid"><div class="field"><label>ໄຊ້</label><select id="selSize">${p.sizes.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ສີ</label><select id="selColor" data-product-id="${p.id}" onchange="changeProductColorImage('${p.id}')">${(p.colors||['Default']).map(s=>`<option ${s===defaultColor?'selected':''}>${s}</option>`).join('')}</select></div><div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${p.stock} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div><div class="actions product-cta"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div></div></div>`); syncProductGalleryPosition(id,defaultColor,false) }
-function addToCart(id){ const p=db.products.find(x=>x.id===id); const qty=Math.max(1,parseInt(val('selQty')||'1')); if(p.type==='ready' && p.stock<qty) return toast('ສະຕັອກບໍ່ພໍ','danger'); const size=val('selSize'), color=val('selColor'); const price=state.role==='agent'?p.agentPrice:p.price; const selectedImage=productColorImage(p,color); const existing=state.cart.find(i=>i.productId===id&&i.size===size&&i.color===color); if(existing) existing.qty+=qty; else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage}); closeModal(); toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ'); state.tab='cart'; render() }
+function productGalleryImages(p){
+  const merged=[...(p.images||[]), ...((p.variantImages||[]).filter(Boolean))].filter(Boolean);
+  return [...new Set(merged)];
+}
+function setProductGalleryIndex(index,smooth=true){
+  const stage=document.getElementById('productGalleryStage');
+  if(!stage) return;
+  const slides=[...stage.querySelectorAll('.gallery-slide')];
+  const safeIndex=Math.max(0, Math.min(index, slides.length-1));
+  stage.dataset.currentIndex=String(safeIndex);
+  const target=slides[safeIndex];
+  if(target) stage.scrollTo({left:target.offsetLeft, behavior:smooth?'smooth':'auto'});
+  document.querySelectorAll('[data-gallery-thumb]').forEach((el,i)=>el.classList.toggle('selected', i===safeIndex));
+}
+function pickProductGalleryImage(index){ setProductGalleryIndex(index,true) }
+function syncProductGalleryFromScroll(){
+  const stage=document.getElementById('productGalleryStage');
+  if(!stage) return;
+  const slides=[...stage.querySelectorAll('.gallery-slide')];
+  if(!slides.length) return;
+  const index=Math.round(stage.scrollLeft/Math.max(stage.clientWidth,1));
+  const safeIndex=Math.max(0, Math.min(index, slides.length-1));
+  stage.dataset.currentIndex=String(safeIndex);
+  document.querySelectorAll('[data-gallery-thumb]').forEach((el,i)=>el.classList.toggle('selected', i===safeIndex));
+}
+function openProduct(id){
+  const p=db.products.find(x=>x.id===id); if(!p)return;
+  const price=state.role==='agent'?p.agentPrice:p.price;
+  const images=productGalleryImages(p);
+  const firstImg=(images[0] || (p.images&&p.images[0]) || '');
+  showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+  <div class="modal-body product-detail">
+    <div class="product-gallery">
+      <div id="productGalleryStage" class="gallery-stage" onscroll="syncProductGalleryFromScroll()">
+        ${images.map((src,idx)=>`<div class="gallery-slide"><img class="big-img" src="${src}" alt="${esc(p.name)} image ${idx+1}"></div>`).join('') || `<div class="gallery-slide"><img class="big-img" src="${firstImg}" alt="${esc(p.name)}"></div>`}
+      </div>
+      ${images.length>1?`<div class="thumb-row">${images.map((src,idx)=>`<button type="button" class="thumb-item ${idx===0?'selected':''}" data-gallery-thumb onclick="pickProductGalleryImage(${idx})"><img class="preview-img" src="${src}" alt="${esc(p.name)} ${idx+1}"></button>`).join('')}</div>`:''}
+    </div>
+    <div class="product-info-panel">
+      <span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span>
+      <h2>${p.name}</h2>
+      <div class="meta">Code: ${p.code} · ${p.category}</div>
+      <div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div>
+      <div class="form-grid compact-product-form">
+        <div class="field"><label>ໄຊ້</label><select id="selSize">${p.sizes.map(s=>`<option>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div>
+      </div>
+      <div class="notice">${p.type==='ready'?`ສະຕັອກຄົງເຫຼືອ ${p.stock} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້ ຫຼັງແອັດມິນຢືນຢັນ'}</div>
+      <div class="actions product-modal-actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div>
+    </div>
+  </div>`);
+  setTimeout(()=>setProductGalleryIndex(0,false),0);
+}
+function addToCart(id){
+  const p=db.products.find(x=>x.id===id);
+  const qty=Math.max(1,parseInt(val('selQty')||'1'));
+  if(p.type==='ready' && p.stock<qty) return toast('ສະຕັອກບໍ່ພໍ','danger');
+  const size=val('selSize');
+  const color='';
+  const price=state.role==='agent'?p.agentPrice:p.price;
+  const stage=document.getElementById('productGalleryStage');
+  const currentIndex=parseInt(stage?.dataset.currentIndex || '0',10) || 0;
+  const galleryImages=productGalleryImages(p);
+  const selectedImage=galleryImages[currentIndex] || (p.images&&p.images[0]) || '';
+  const existing=state.cart.find(i=>i.productId===id&&i.size===size&&i.color===color);
+  if(existing) existing.qty+=qty; else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color,image:selectedImage});
+  closeModal(); toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ'); state.tab='cart'; render()
+}
 function renderCart(){ if(!state.cart.length) return `<div class="empty">ກະຕ້າຍັງວ່າງ <br><button class="btn rose" onclick="state.tab='shop';render()">ໄປຊື້ເຄື່ອງ</button></div>`; const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0); return `<div class="section-title"><h2>ກະຕ້າ / ສະຫຼຸບກ່ອນຊຳລະ</h2><button class="btn light" onclick="state.cart=[];render()">ລ້າງກະຕ້າ</button></div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.code} · ${i.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'} · ໄຊ້ ${i.size} · ສີ ${i.color}</div><div>${money(i.price)} × ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="state.cart[${idx}].qty=Math.max(1,state.cart[${idx}].qty-1);render()">−</button><button class="btn light small" onclick="state.cart[${idx}].qty++;render()">＋</button><button class="btn danger small" onclick="state.cart.splice(${idx},1);render()">ລຶບ</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>ຍອດລວມ</h3><div class="summary-row"><span>ລາຄາສິນຄ້າ</span><b>${money(total)}</b></div><div class="meta">ບໍ່ຂຽນຄ່າຝາກໃນລະບົບ — ລູກຄ້າຈະເຫັນຈາກບິນຝາກເຄື່ອງ.</div><div class="divider"></div><button class="btn rose full" onclick="placeOrder()">ຢືນຢັນອໍເດີ້ / ໄປໜ້າໂອນ</button></aside></div>` }
 function checkoutForm(){ const options=provinces.map(p=>`<option>${p}</option>`).join(''); if(state.role==='agent') return `<div class="card" style="padding:16px;margin-top:16px"><h3>ຂໍ້ມູນຕົວແທນ ແລະ ຜູ້ຮັບ</h3><div class="form-grid"><div class="field"><label>ຊື່ຕົວແທນ (ຜູ້ສົ່ງ)</label><input id="senderName" value="${state.user.name}"></div><div class="field"><label>ເບີຕົວແທນ</label><input id="senderPhone" ${numAttrs()} value="${state.user.phone}"></div><div class="field"><label>ຊື່ລູກຄ້າ (ຜູ້ຮັບ)</label><input id="customerName"></div><div class="field"><label>ເບີໂທຜູ້ຮັບ</label><input id="customerPhone" ${numAttrs()}></div>${shippingFields(options)}</div></div>`; return `<div class="card" style="padding:16px;margin-top:16px"><h3>ຂໍ້ມູນຜູ້ຮັບ</h3><div class="form-grid"><div class="field"><label>ຊື່</label><input id="customerName" value="${state.user.name}"></div><div class="field"><label>ເບີໂທ</label><input id="customerPhone" ${numAttrs()} value="${state.user.phone}"></div>${shippingFields(options)}</div></div>` }
 function shippingFields(options){ return `<div class="field"><label>ຂົນສົ່ງ</label><select id="carrier"><option>Anousith / ANS</option><option>HAL</option></select></div><div class="field"><label>ສາຂາ</label><input id="branch" placeholder="ຊື່ສາຂາຮັບເຄື່ອງ"></div><div class="field"><label>ເມືອງ</label><input id="city" placeholder="ເມືອງ"></div><div class="field"><label>ແຂວງ</label><select id="province">${options}</select></div><div class="field" style="grid-column:1/-1"><label>ໝາຍເຫດ</label><textarea id="note" rows="3" placeholder="ໝາຍເຫດເພີ່ມເຕີມ"></textarea></div>` }
