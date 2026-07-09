@@ -37,7 +37,7 @@ function removeSeedRecords(d){
   return d;
 }
 const SUPABASE_REST_URL = "https://mdaeizsxtiexvamltvfo.supabase.co/rest/v1";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kYWVpenN4dGlleHZhbWx0dmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzMyMzksImV4cCI6MjA5MzkwOTIzOX0.lAw23mf9jrjZPeoKXSCJ0wei50xvcuzTqrlby6igWGw";
 const SUPABASE_STATE_ID = "main";
 let cloudReady = false;
 let cloudSaving = false;
