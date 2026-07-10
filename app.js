@@ -279,9 +279,72 @@ function approveSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('ref
 function invalidSlip(id){ const o=db.orders.find(x=>x.id===id); o.refNo=val('refNo'); o.status='ສະລິບບໍ່ຖືກຕ້ອງ'; saveDB(); toast('ແຈ້ງສະລິບບໍ່ຖືກຕ້ອງ','danger'); closeModal(); render() }
 function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1; if(idx<steps.length-1){ o.status=steps[idx+1].replace(' ✅','') } saveDB(); toast('ອັບເດດສະຖານະແລ້ວ'); render() }
 function deleteOrder(id){ if(!confirm('ລຶບອໍເດີ້ນີ້?'))return; db.orders=db.orders.filter(o=>o.id!==id); saveDB(); render() }
-function adminProducts(){ return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode"></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບເພີ່ມເຕີມ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກຈະສະແດງກ່ອນ ແລະ ຮູບຍ່ອຍຈະໃຊ້ເລື່ອນເບິ່ງລາຍລະອຽດສິນຄ້າ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${db.products.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?p.stock:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
-function readFile(file){ return new Promise(res=>{ if(!file)return res(null); const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file) }) }
-async function addProductAdmin(){ const name=val('pName'), code=val('pCode'); if(!name||!code)return toast('ກອກຊື່ ແລະ Code ກ່ອນ','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } const type=val('pType'); db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('ເພີ່ມສິນຄ້າແລ້ວ'); render() }
+function adminProducts(){ return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode"></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບເພີ່ມເຕີມ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກຈະສະແດງກ່ອນ ແລະ ຮູບຍ່ອຍຈະໃຊ້ເລື່ອນເບິ່ງລາຍລະອຽດສິນຄ້າ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button id="addProductBtn" class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="table-wrap" style="margin-top:16px"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${db.products.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?p.stock:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
+function readFile(file){ return new Promise((res,rej)=>{ if(!file)return res(null); const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(new Error('ອ່ານໄຟລ໌ຮູບບໍ່ສຳເລັດ')); r.readAsDataURL(file) }) }
+function compressProductImage(file,maxSize=1400,quality=.78){
+  return new Promise((resolve,reject)=>{
+    if(!file) return resolve(null);
+    if(!file.type || !file.type.startsWith('image/')) return reject(new Error('ໄຟລ໌ທີ່ເລືອກບໍ່ແມ່ນຮູບ'));
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('ອ່ານໄຟລ໌ຮູບບໍ່ສຳເລັດ'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('ເປີດຮູບບໍ່ສຳເລັດ'));
+      img.onload=()=>{
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        const scale=Math.min(1,maxSize/Math.max(w,h));
+        w=Math.max(1,Math.round(w*scale)); h=Math.max(1,Math.round(h*scale));
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function saveDBAndWait(){
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
+  catch(e){ throw new Error('ຂໍ້ມູນຮູບໃຫຍ່ເກີນພື້ນທີ່ Browser'); }
+  await saveDBToCloud(true);
+}
+async function addProductAdmin(){
+  const btn=document.getElementById('addProductBtn');
+  if(btn?.disabled) return;
+  const name=val('pName').trim();
+  const type=val('pType')||'ready';
+  const code=val('pCode')||((typeof nextProductCode==='function')?nextProductCode(type):uid('P'));
+  if(!name) return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
+  try{
+    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງຫຍໍ້ຮູບ ແລະ ບັນທຶກ…'; }
+    const mainFile=document.getElementById('pImage')?.files?.[0];
+    const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
+    if(variantFiles.length>8) throw new Error('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 8 ຮູບ');
+    const main=mainFile?await compressProductImage(mainFile):null;
+    const variants=[];
+    for(let i=0;i<variantFiles.length;i++){
+      if(btn) btn.textContent=`ກຳລັງຫຍໍ້ຮູບ ${i+1}/${variantFiles.length}…`;
+      variants.push(await compressProductImage(variantFiles[i]));
+    }
+    const product={id:uid('P'),name,code,category:val('pCategory'),type,
+      price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,
+      stock:type==='ready'?(+val('pStock')||0):null,
+      sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),
+      colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')};
+    db.products.unshift(product);
+    if(btn) btn.textContent='ກຳລັງບັນທຶກ…';
+    await saveDBAndWait();
+    toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code);
+    render();
+  }catch(e){
+    console.error('Add product failed:',e);
+    toast(e?.message||'ເພີ່ມສິນຄ້າບໍ່ສຳເລັດ','danger');
+  }finally{
+    const current=document.getElementById('addProductBtn');
+    if(current){ current.disabled=false; current.textContent='ເພີ່ມສິນຄ້າ'; }
+  }
+}
 function deleteProduct(id){ if(!confirm('ລຶບສິນຄ້າ?'))return; db.products=db.products.filter(p=>p.id!==id); saveDB(); render() }
 function adminCategories(){ return `<div class="section-title"><h2>ໝວດສິນຄ້າ</h2></div><div class="card" style="padding:18px"><div class="field"><label>ເພີ່ມໝວດໃໝ່</label><input id="newCat" placeholder="ເຊັ່ນ ໝວກ, ເກີບ, ເຄື່ອງປະດັບ"></div><button class="btn sage" onclick="addCategory()">ເພີ່ມໝວດ</button><div class="pill-row">${db.categories.map(c=>`<span class="pill">${c} <button class="btn light small" onclick="removeCategory('${esc(c)}')">×</button></span>`).join('')}</div></div>` }
 function addCategory(){ const c=val('newCat'); if(!c)return; if(!db.categories.includes(c)) db.categories.push(c); saveDB(); render() }
@@ -333,8 +396,43 @@ async function saveShippingBill(id){ const o=db.orders.find(x=>x.id===id); if(!o
 function nextStatus(id){ const o=db.orders.find(x=>x.id===id); const steps=o.type==='ready'?readySteps:preSteps; let idx=stepIndex(o); if(o.status==='ລໍຖ້າກວດສອບການໂອນ') idx=1; if(idx<steps.length-1){ const next=steps[idx+1].replace(' ✅',''); o.status=next; if(next==='ແຈ້ງບິນ' && !o.billNo && !o.billImage){ toast('ຢ່າລືມໃສ່ເລກບິນ/ຮູບບິນໃຫ້ລູກຄ້າເດີ້') } else { toast('ອັບເດດສະຖານະແລ້ວ') } } saveDB(); render() }
 function nextProductCode(type='ready'){ const prefix=type==='preorder'?'PRE':'BB'; let max=0; db.products.forEach(p=>{ const m=String(p.code||'').match(/(\d+)$/); if(m) max=Math.max(max,parseInt(m[1],10)||0) }); return `${prefix}-${String(max+1).padStart(4,'0')}` }
 function updateAutoCode(){ const el=document.getElementById('pCode'); if(!el) return; if(el.dataset.auto==='1'||!el.value.trim()){ el.value=nextProductCode(val('pType')||'ready'); el.dataset.auto='1' } }
-function adminProducts(){ const s=(state.adminProductSearch||'').toLowerCase(); const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s)); return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: ຖ້າບໍ່ແກ້ ລະບົບຈະສ້າງໃຫ້ເອງ</div></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType" onchange="updateAutoCode()"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບເພີ່ມເຕີມ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກຈະສະແດງກ່ອນ ແລະ ຮູບຍ່ອຍຈະໃຊ້ເລື່ອນເບິ່ງລາຍລະອຽດສິນຄ້າ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>ລາຍການສິນຄ້າ</h3><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາສິນຄ້າໃນ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${list.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">ໃກ້ໝົດ</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
-async function addProductAdmin(){ const name=val('pName'); const type=val('pType')||'ready'; const code=val('pCode')||nextProductCode(type); if(!name)return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger'); const main=await readFile(document.getElementById('pImage').files[0]); const variants=[]; for(const f of document.getElementById('pVariants').files){ variants.push(await readFile(f)) } db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock:type==='ready'?(+val('pStock')||0):null,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')}); saveDB(); toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code); render() }
+function adminProducts(){ const s=(state.adminProductSearch||'').toLowerCase(); const list=db.products.filter(p=>!s||[p.name,p.code,p.category,p.type,(p.colors||[]).join(' ')].join(' ').toLowerCase().includes(s)); return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid"><div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode" value="${nextProductCode('ready')}" data-auto="1" oninput="this.dataset.auto='0'"><div class="product-code-help">Auto Code: ຖ້າບໍ່ແກ້ ລະບົບຈະສ້າງໃຫ້ເອງ</div></div><div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType" onchange="updateAutoCode()"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div><div class="field"><label>ລາຄາລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div><div class="field"><label>ຕົ້ນທຶນ (ແອັດມິນເຫັນເທົ່ານັ້ນ)</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພ້ອມສົ່ງ</label><input id="pStock" ${numAttrs()}></div><div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div><div class="field"><label>ຮູບຍ່ອຍ/ຮູບເພີ່ມເຕີມ</label><input id="pVariants" type="file" accept="image/*" multiple><div class="file-mini">ຮູບຫຼັກຈະສະແດງກ່ອນ ແລະ ຮູບຍ່ອຍຈະໃຊ້ເລື່ອນເບິ່ງລາຍລະອຽດສິນຄ້າ</div></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div></div><button id="addProductBtn" class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div><div class="admin-toolbar" style="margin-top:16px"><h3>ລາຍການສິນຄ້າ</h3><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາສິນຄ້າໃນ Admin" value="${esc(state.adminProductSearch||'')}" oninput="state.adminProductSearch=this.value;render()"></div></div><div class="table-wrap"><table class="table"><tr><th>ຮູບ</th><th>ຊື່</th><th>ໝວດ</th><th>ລາຄາ</th><th>ຕົ້ນທຶນ</th><th>Stock</th><th></th></tr>${list.map(p=>`<tr><td><img src="${p.images[0]}" class="preview-img"></td><td><b>${p.name}</b><div class="meta">${p.code}</div></td><td>${p.category}<br>${p.type}</td><td>${money(p.price)}<br><span class="meta">Agent ${money(p.agentPrice)}</span></td><td>${money(p.cost)}</td><td>${p.type==='ready'?`${p.stock} ${Number(p.stock)<=3?'<span class="stock-warn">ໃກ້ໝົດ</span>':''}`:'Pre-order'}</td><td><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></td></tr>`).join('')}</table></div>` }
+async function addProductAdmin(){
+  const btn=document.getElementById('addProductBtn');
+  if(btn?.disabled) return;
+  const name=val('pName').trim();
+  const type=val('pType')||'ready';
+  const code=val('pCode')||((typeof nextProductCode==='function')?nextProductCode(type):uid('P'));
+  if(!name) return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
+  try{
+    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງຫຍໍ້ຮູບ ແລະ ບັນທຶກ…'; }
+    const mainFile=document.getElementById('pImage')?.files?.[0];
+    const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
+    if(variantFiles.length>8) throw new Error('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 8 ຮູບ');
+    const main=mainFile?await compressProductImage(mainFile):null;
+    const variants=[];
+    for(let i=0;i<variantFiles.length;i++){
+      if(btn) btn.textContent=`ກຳລັງຫຍໍ້ຮູບ ${i+1}/${variantFiles.length}…`;
+      variants.push(await compressProductImage(variantFiles[i]));
+    }
+    const product={id:uid('P'),name,code,category:val('pCategory'),type,
+      price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,
+      stock:type==='ready'?(+val('pStock')||0):null,
+      sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),
+      colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')};
+    db.products.unshift(product);
+    if(btn) btn.textContent='ກຳລັງບັນທຶກ…';
+    await saveDBAndWait();
+    toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code);
+    render();
+  }catch(e){
+    console.error('Add product failed:',e);
+    toast(e?.message||'ເພີ່ມສິນຄ້າບໍ່ສຳເລັດ','danger');
+  }finally{
+    const current=document.getElementById('addProductBtn');
+    if(current){ current.disabled=false; current.textContent='ເພີ່ມສິນຄ້າ'; }
+  }
+}
 function exportPacking(){ const rows=[['Order','Date','Role','Customer','Phone','Carrier','Branch','City','Province','Product','Code','Size','Color','Qty','Total','Status','Bill No']]; db.orders.filter(o=>!o.status.includes('ຍົກເລີກ')).forEach(o=>o.items.forEach(i=>rows.push([o.id,new Date(o.createdAt).toLocaleString(),o.role,o.customer.name,o.customer.phone,o.shipping.carrier,o.shipping.branch,o.shipping.city,o.shipping.province,i.name,i.code,i.size,i.color,i.qty,o.total,o.status,o.billNo||'']))); const csv='\ufeff'+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`BaiBoua_Packing_${todayStr()}.csv`; a.click(); URL.revokeObjectURL(a.href); toast('Export ແລ້ວ') }
 
 initCloudDB().finally(()=>render());
