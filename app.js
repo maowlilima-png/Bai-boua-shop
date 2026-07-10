@@ -874,3 +874,223 @@ renderAdmin = function(){
   normalizeNewFields();
   document.getElementById('app').innerHTML=`<div class="screen"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><div class="lotus">🪷</div><div><b>Bai Boua Admin</b><div class="meta">ຫຼັງບ້ານ · ເບິ່ງ ID/ລະຫັດລູກຄ້າ ແລະ ຕົວແທນໄດ້</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuBtn('dashboard','Dashboard')}${adminMenuBtn('orders','ອໍເດີ້')}${adminMenuBtn('products','ສິນຄ້າ')}${adminMenuBtn('categories','ໝວດ')}${adminMenuBtn('customers','ລູກຄ້າ')}${adminMenuBtn('agents','ຕົວແທນ')}${adminMenuBtn('reports','ລາຍງານ')}${adminMenuBtn('promo','ໂປຣໂມຊັ່ນ')}</aside><section>${adminPage()}</section></main></div>`;
 };
+/* v22: auto-sync across devices + stock separated by size */
+(function(){
+  function parseSizeStockV22(text){
+    const out={};
+    String(text||'').split(',').forEach(part=>{
+      const m=part.trim().match(/^(.+?)\s*[:=]\s*(\d+)$/);
+      if(!m) return;
+      const size=m[1].trim();
+      if(size) out[size]=Math.max(0,parseInt(m[2],10)||0);
+    });
+    return out;
+  }
+  function sizeStockTotalV22(p){
+    if(p && p.sizeStock && typeof p.sizeStock==='object'){
+      return Object.values(p.sizeStock).reduce((s,n)=>s+(Number(n)||0),0);
+    }
+    return Number(p?.stock)||0;
+  }
+  function sizeAvailableV22(p,size){
+    if(!p || p.type!=='ready') return Infinity;
+    if(p.sizeStock && Object.prototype.hasOwnProperty.call(p.sizeStock,size)) return Number(p.sizeStock[size])||0;
+    return Number(p.stock)||0;
+  }
+  function normalizeSizeStockV22(){
+    (db.products||[]).forEach(p=>{
+      if(p.sizeStock && typeof p.sizeStock==='object'){
+        Object.keys(p.sizeStock).forEach(k=>p.sizeStock[k]=Math.max(0,Number(p.sizeStock[k])||0));
+        p.stock=sizeStockTotalV22(p);
+        const keys=Object.keys(p.sizeStock);
+        if(keys.length) p.sizes=[...new Set([...(p.sizes||[]),...keys])];
+      }
+    });
+  }
+  window.parseSizeStockV22=parseSizeStockV22;
+  window.sizeAvailableV22=sizeAvailableV22;
+
+  normalizeSizeStockV22();
+
+  const adminProductsV21=adminProducts;
+  adminProducts=function(){
+    let html=adminProductsV21();
+    const marker='<div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="S,M,L"></div>';
+    const extra=marker+'<div class="field"><label>Stock ແຍກຕາມໄຊ້</label><input id="pSizeStock" placeholder="S:5, M:8, L:3"><div class="file-mini" style="display:block!important">ຕົວຢ່າງ S:5, M:8, L:3 · ຍອດ Stock ລວມຈະຄຳນວນໃຫ້ເອງ</div></div>';
+    if(html.includes(marker)) html=html.replace(marker,extra);
+    return html;
+  };
+
+  const addProductAdminV21=addProductAdmin;
+  addProductAdmin=async function(){
+    const sizeText=val('pSizeStock');
+    const sizeStock=parseSizeStockV22(sizeText);
+    const sizeKeys=Object.keys(sizeStock);
+    if(sizeText.trim() && !sizeKeys.length) return toast('ຮູບແບບ Stock ໄຊ້ບໍ່ຖືກ · ໃຊ້ S:5, M:8, L:3','danger');
+    const nameBefore=val('pName').trim();
+    const codeBefore=val('pCode').trim();
+    const stockEl=document.getElementById('pStock');
+    if(sizeKeys.length && stockEl) stockEl.value=String(Object.values(sizeStock).reduce((s,n)=>s+n,0));
+    const sizesEl=document.getElementById('pSizes');
+    if(sizeKeys.length && sizesEl && !sizesEl.value.trim()) sizesEl.value=sizeKeys.join(',');
+    await addProductAdminV21();
+    if(sizeKeys.length){
+      const p=(db.products||[]).find(x=>(codeBefore&&x.code===codeBefore)||(x.name===nameBefore));
+      if(p){
+        p.sizeStock=sizeStock;
+        p.sizes=[...new Set([...(p.sizes||[]),...sizeKeys])];
+        p.stock=sizeStockTotalV22(p);
+        saveDB();
+        render();
+      }
+    }
+  };
+
+  window.updateSelectedSizeStockV22=function(id){
+    const p=(db.products||[]).find(x=>x.id===id);
+    const size=val('selSize');
+    const el=document.getElementById('selectedSizeStockV22');
+    if(!p||!el) return;
+    if(p.type!=='ready'){ el.textContent='ສິນຄ້າພຣີອໍເດີ້'; return; }
+    const n=sizeAvailableV22(p,size);
+    el.textContent=`ໄຊ້ ${size} ເຫຼືອ ${n} ຊິ້ນ`;
+  };
+
+  openProduct=function(id){
+    const p=(db.products||[]).find(x=>x.id===id); if(!p)return;
+    const price=state.role==='agent'?p.agentPrice:p.price;
+    const images=productGalleryImages(p);
+    const firstImg=(images[0] || (p.images&&p.images[0]) || '');
+    const sizes=(p.sizes&&p.sizes.length?p.sizes:['Free size']);
+    const sizeOptions=sizes.map(s=>{
+      const left=sizeAvailableV22(p,s);
+      const disabled=p.type==='ready'&&left<=0;
+      return `<option value="${esc(s)}" ${disabled?'disabled':''}>${esc(s)}${p.type==='ready'?` · ເຫຼືອ ${left}`:''}</option>`;
+    }).join('');
+    const firstEnabled=sizes.find(s=>sizeAvailableV22(p,s)>0)||sizes[0];
+    showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div>
+      <div class="modal-body product-detail">
+        <div class="product-gallery">
+          <div id="productGalleryStage" class="gallery-stage" onscroll="syncProductGalleryFromScroll()">
+            ${images.map((src,idx)=>`<div class="gallery-slide"><img class="big-img" src="${src}" alt="${esc(p.name)} image ${idx+1}"></div>`).join('') || `<div class="gallery-slide"><img class="big-img" src="${firstImg}" alt="${esc(p.name)}"></div>`}
+          </div>
+          ${images.length>1?`<div class="thumb-row">${images.map((src,idx)=>`<button type="button" class="thumb-item ${idx===0?'selected':''}" data-gallery-thumb onclick="pickProductGalleryImage(${idx})"><img class="preview-img" src="${src}" alt="${esc(p.name)} ${idx+1}"></button>`).join('')}</div>`:''}
+        </div>
+        <div class="product-info-panel">
+          <span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span>
+          <h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div>
+          <div class="price">${state.role==='agent'?`<span class="oldprice">${money(p.price)}</span>`:''}${money(price)}</div>
+          <div class="form-grid compact-product-form">
+            <div class="field"><label>ໄຊ້</label><select id="selSize" onchange="updateSelectedSizeStockV22('${p.id}')">${sizeOptions}</select></div>
+            <div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div>
+          </div>
+          <div id="selectedSizeStockV22" class="notice">${p.type==='ready'?`ໄຊ້ ${firstEnabled} ເຫຼືອ ${sizeAvailableV22(p,firstEnabled)} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້'}</div>
+          <div class="actions product-modal-actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div>
+        </div>
+      </div>`);
+    setTimeout(()=>{
+      const sel=document.getElementById('selSize');
+      if(sel){ sel.value=firstEnabled; updateSelectedSizeStockV22(id); }
+      setProductGalleryIndex(0,false);
+    },0);
+  };
+
+  addToCart=function(id){
+    const p=(db.products||[]).find(x=>x.id===id); if(!p)return;
+    const qty=Math.max(1,parseInt(val('selQty')||'1',10));
+    const size=val('selSize');
+    const available=sizeAvailableV22(p,size);
+    const already=state.cart.filter(i=>i.productId===id&&i.size===size).reduce((s,i)=>s+(Number(i.qty)||0),0);
+    if(p.type==='ready' && already+qty>available) return toast(`ໄຊ້ ${size} ເຫຼືອພຽງ ${available} ຊິ້ນ`,'danger');
+    const price=state.role==='agent'?p.agentPrice:p.price;
+    const stage=document.getElementById('productGalleryStage');
+    const currentIndex=parseInt(stage?.dataset.currentIndex||'0',10)||0;
+    const images=productGalleryImages(p);
+    const selectedImage=images[currentIndex]||(p.images&&p.images[0])||'';
+    const existing=state.cart.find(i=>i.productId===id&&i.size===size);
+    if(existing) existing.qty+=qty;
+    else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost:p.cost,qty,size,color:'',image:selectedImage});
+    closeModal(); toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ'); state.tab='cart'; render();
+  };
+
+  restockOrder=function(order){
+    for(const item of (order.items||[])){
+      const p=(db.products||[]).find(x=>x.id===item.productId);
+      if(!p||p.type!=='ready') continue;
+      if(p.sizeStock&&Object.prototype.hasOwnProperty.call(p.sizeStock,item.size)){
+        p.sizeStock[item.size]=(Number(p.sizeStock[item.size])||0)+(Number(item.qty)||0);
+        p.stock=sizeStockTotalV22(p);
+      }else if(typeof p.stock==='number') p.stock+=(Number(item.qty)||0);
+    }
+  };
+
+  placeOrder=function(){
+    if(!validateCheckout()) return;
+    for(const item of state.cart){
+      const p=(db.products||[]).find(x=>x.id===item.productId);
+      if(!p) return toast('ບໍ່ພົບສິນຄ້າໃນລະບົບ','danger');
+      const available=sizeAvailableV22(p,item.size);
+      if(p.type==='ready'&&available<item.qty) return toast(`${p.name} · ໄຊ້ ${item.size} ເຫຼືອ ${available} ຊິ້ນ`,'danger');
+    }
+    for(const item of state.cart){
+      const p=(db.products||[]).find(x=>x.id===item.productId);
+      if(p.type!=='ready') continue;
+      if(p.sizeStock&&Object.prototype.hasOwnProperty.call(p.sizeStock,item.size)){
+        p.sizeStock[item.size]=Math.max(0,(Number(p.sizeStock[item.size])||0)-item.qty);
+        p.stock=sizeStockTotalV22(p);
+      }else p.stock=Math.max(0,(Number(p.stock)||0)-item.qty);
+    }
+    const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0);
+    const cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0);
+    const hasPre=state.cart.some(i=>i.type==='preorder');
+    const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'ລໍຖ້າຍອດໂອນ',agentTargetCounted:false,createdAt:Date.now(),adminNewAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')},billNo:'',billImage:''};
+    db.orders.unshift(order); saveDB(); state.cart=[]; state.paymentOrderId=order.id; state.tab='orders';
+    toast('ສ້າງອໍເດີ້ແລ້ວ · Stock ຕັດຕາມໄຊ້ແລ້ວ'); render(); openPayment(order.id);
+  };
+
+  const productCardV21=productCard;
+  productCard=function(p){
+    if(p.sizeStock&&typeof p.sizeStock==='object') p.stock=sizeStockTotalV22(p);
+    return productCardV21(p).replace(/ · \s*$/,'');
+  };
+
+  let lastCloudUpdatedV22='';
+  let realtimePendingRenderV22=false;
+  let lastOrderCountV22=(db.orders||[]).length;
+  async function pollCloudV22(){
+    if(cloudSaving) return;
+    try{
+      const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=value,updated_at`,{headers:supabaseHeaders(),cache:'no-store'});
+      if(!res.ok) return;
+      const rows=await res.json();
+      if(!rows?.length||!rows[0].value) return;
+      const stamp=String(rows[0].updated_at||'');
+      if(stamp&&stamp!==lastCloudUpdatedV22){
+        lastCloudUpdatedV22=stamp;
+        const remote=removeSeedRecords(rows[0].value);
+        const remoteText=JSON.stringify(remote);
+        const localText=JSON.stringify(db);
+        if(remoteText!==localText){
+          const beforeOrders=(db.orders||[]).length;
+          db=remote;
+          normalizeSizeStockV22();
+          localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+          if(state.user){
+            const arr=state.role==='customer'?db.users:state.role==='agent'?db.agents:null;
+            if(arr){ const fresh=arr.find(x=>x.id===state.user.id); if(fresh) state.user=fresh; }
+          }
+          realtimePendingRenderV22=true;
+          const afterOrders=(db.orders||[]).length;
+          if(state.role==='admin'&&afterOrders>beforeOrders) toast('ມີອໍເດີ້ໃໝ່ເຂົ້າມາ');
+          lastOrderCountV22=afterOrders;
+        }
+      }
+      const active=document.activeElement;
+      const editing=active&&['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
+      const modalOpen=document.getElementById('modal')?.classList.contains('show');
+      if(realtimePendingRenderV22&&!editing&&!modalOpen){ realtimePendingRenderV22=false; render(); }
+    }catch(e){ console.warn('Realtime poll failed:',e?.message||e); }
+  }
+  setInterval(pollCloudV22,2000);
+  setTimeout(pollCloudV22,1200);
+})();
