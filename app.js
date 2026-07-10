@@ -39,6 +39,9 @@ function removeSeedRecords(d){
 const SUPABASE_REST_URL = "https://mdaeizsxtiexvamltvfo.supabase.co/rest/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kYWVpenN4dGlleHZhbWx0dmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzMyMzksImV4cCI6MjA5MzkwOTIzOX0.lAw23mf9jrjZPeoKXSCJ0wei50xvcuzTqrlby6igWGw";
 const SUPABASE_STATE_ID = "main";
+const SUPABASE_STORAGE_BUCKET = "product-images";
+const SUPABASE_STORAGE_OBJECT_URL = "https://mdaeizsxtiexvamltvfo.supabase.co/storage/v1/object";
+const SUPABASE_STORAGE_PUBLIC_URL = "https://mdaeizsxtiexvamltvfo.supabase.co/storage/v1/object/public";
 let cloudReady = false;
 let cloudSaving = false;
 let pendingCloudSave = false;
@@ -304,10 +307,66 @@ function compressProductImage(file,maxSize=1400,quality=.78){
     reader.readAsDataURL(file);
   });
 }
+function safeFileName(name='image.jpg'){
+  const ext=(name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
+  const base=name.replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,45) || 'image';
+  return `${base}.${ext}`;
+}
+function canvasImageBlob(file,maxSize=1800,quality=.84){
+  return new Promise((resolve)=>{
+    if(!file || !file.type.startsWith('image/')) return resolve(file);
+    const reader=new FileReader();
+    reader.onerror=()=>resolve(file);
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>resolve(file);
+      img.onload=()=>{
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        const scale=Math.min(1,maxSize/Math.max(w,h));
+        if(scale===1 && file.size<=2_500_000) return resolve(file);
+        w=Math.max(1,Math.round(w*scale)); h=Math.max(1,Math.round(h*scale));
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h);
+        canvas.toBlob(blob=>resolve(blob||file),'image/jpeg',quality);
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadProductImage(file,index=0){
+  if(!file) return '';
+  const blob=await canvasImageBlob(file);
+  const ext=blob.type==='image/png'?'png':'jpg';
+  const stamp=`${Date.now()}-${Math.random().toString(36).slice(2,10)}-${index}`;
+  const path=`products/${stamp}-${safeFileName(file.name).replace(/\.[^.]+$/,'.'+ext)}`;
+  const res=await fetch(`${SUPABASE_STORAGE_OBJECT_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`,{
+    method:'POST',
+    headers:{
+      apikey:SUPABASE_ANON_KEY,
+      Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type':blob.type||'application/octet-stream',
+      'x-upsert':'false'
+    },
+    body:blob
+  });
+  if(!res.ok){
+    let msg=await res.text();
+    throw new Error(`ອັບໂຫຼດຮູບບໍ່ສຳເລັດ: ${msg.slice(0,160)}`);
+  }
+  return `${SUPABASE_STORAGE_PUBLIC_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`;
+}
 async function saveDBAndWait(){
   try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
-  catch(e){ throw new Error('ຂໍ້ມູນຮູບໃຫຍ່ເກີນພື້ນທີ່ Browser'); }
-  await saveDBToCloud(true);
+  catch(e){ console.warn('Local cache full; cloud save will continue.',e); }
+  const res=await fetch(`${SUPABASE_REST_URL}/app_state`,{
+    method:'POST',
+    headers:supabaseHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),
+    body:JSON.stringify({id:SUPABASE_STATE_ID,value:db,updated_at:new Date().toISOString()})
+  });
+  if(!res.ok) throw new Error(`ບັນທຶກຂຶ້ນ Supabase ບໍ່ສຳເລັດ: ${(await res.text()).slice(0,160)}`);
+  cloudReady=true;
 }
 async function addProductAdmin(){
   const btn=document.getElementById('addProductBtn');
@@ -316,28 +375,31 @@ async function addProductAdmin(){
   const type=val('pType')||'ready';
   const code=val('pCode')||((typeof nextProductCode==='function')?nextProductCode(type):uid('P'));
   if(!name) return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
+  const mainFile=document.getElementById('pImage')?.files?.[0];
+  const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
+  if(!mainFile) return toast('ເລືອກຮູບຫຼັກກ່ອນ','danger');
+  if(variantFiles.length>10) return toast('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 10 ຮູບ','danger');
+  let product=null;
   try{
-    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງຫຍໍ້ຮູບ ແລະ ບັນທຶກ…'; }
-    const mainFile=document.getElementById('pImage')?.files?.[0];
-    const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
-    if(variantFiles.length>8) throw new Error('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 8 ຮູບ');
-    const main=mainFile?await compressProductImage(mainFile):null;
+    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງອັບໂຫຼດຮູບຫຼັກ…'; }
+    const main=await uploadProductImage(mainFile,0);
     const variants=[];
     for(let i=0;i<variantFiles.length;i++){
-      if(btn) btn.textContent=`ກຳລັງຫຍໍ້ຮູບ ${i+1}/${variantFiles.length}…`;
-      variants.push(await compressProductImage(variantFiles[i]));
+      if(btn) btn.textContent=`ກຳລັງອັບໂຫຼດຮູບ ${i+1}/${variantFiles.length}…`;
+      variants.push(await uploadProductImage(variantFiles[i],i+1));
     }
-    const product={id:uid('P'),name,code,category:val('pCategory'),type,
+    product={id:uid('P'),name,code,category:val('pCategory'),type,
       price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,
       stock:type==='ready'?(+val('pStock')||0):null,
       sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),
-      colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')};
+      colors:[],images:[main],variantImages:variants,detail:val('pDetail')};
     db.products.unshift(product);
-    if(btn) btn.textContent='ກຳລັງບັນທຶກ…';
+    if(btn) btn.textContent='ກຳລັງບັນທຶກສິນຄ້າ…';
     await saveDBAndWait();
     toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code);
     render();
   }catch(e){
+    if(product) db.products=db.products.filter(p=>p.id!==product.id);
     console.error('Add product failed:',e);
     toast(e?.message||'ເພີ່ມສິນຄ້າບໍ່ສຳເລັດ','danger');
   }finally{
@@ -404,28 +466,31 @@ async function addProductAdmin(){
   const type=val('pType')||'ready';
   const code=val('pCode')||((typeof nextProductCode==='function')?nextProductCode(type):uid('P'));
   if(!name) return toast('ກອກຊື່ສິນຄ້າກ່ອນ','danger');
+  const mainFile=document.getElementById('pImage')?.files?.[0];
+  const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
+  if(!mainFile) return toast('ເລືອກຮູບຫຼັກກ່ອນ','danger');
+  if(variantFiles.length>10) return toast('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 10 ຮູບ','danger');
+  let product=null;
   try{
-    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງຫຍໍ້ຮູບ ແລະ ບັນທຶກ…'; }
-    const mainFile=document.getElementById('pImage')?.files?.[0];
-    const variantFiles=[...(document.getElementById('pVariants')?.files||[])];
-    if(variantFiles.length>8) throw new Error('ຮູບເພີ່ມເຕີມໃສ່ໄດ້ສູງສຸດ 8 ຮູບ');
-    const main=mainFile?await compressProductImage(mainFile):null;
+    if(btn){ btn.disabled=true; btn.textContent='ກຳລັງອັບໂຫຼດຮູບຫຼັກ…'; }
+    const main=await uploadProductImage(mainFile,0);
     const variants=[];
     for(let i=0;i<variantFiles.length;i++){
-      if(btn) btn.textContent=`ກຳລັງຫຍໍ້ຮູບ ${i+1}/${variantFiles.length}…`;
-      variants.push(await compressProductImage(variantFiles[i]));
+      if(btn) btn.textContent=`ກຳລັງອັບໂຫຼດຮູບ ${i+1}/${variantFiles.length}…`;
+      variants.push(await uploadProductImage(variantFiles[i],i+1));
     }
-    const product={id:uid('P'),name,code,category:val('pCategory'),type,
+    product={id:uid('P'),name,code,category:val('pCategory'),type,
       price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,
       stock:type==='ready'?(+val('pStock')||0):null,
       sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),
-      colors:[],images:[main||productSVG(name,'rose')],variantImages:variants,detail:val('pDetail')};
+      colors:[],images:[main],variantImages:variants,detail:val('pDetail')};
     db.products.unshift(product);
-    if(btn) btn.textContent='ກຳລັງບັນທຶກ…';
+    if(btn) btn.textContent='ກຳລັງບັນທຶກສິນຄ້າ…';
     await saveDBAndWait();
     toast('ເພີ່ມສິນຄ້າແລ້ວ · Code '+code);
     render();
   }catch(e){
+    if(product) db.products=db.products.filter(p=>p.id!==product.id);
     console.error('Add product failed:',e);
     toast(e?.message||'ເພີ່ມສິນຄ້າບໍ່ສຳເລັດ','danger');
   }finally{
