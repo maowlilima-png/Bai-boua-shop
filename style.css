@@ -354,3 +354,26 @@ select { max-width: 100%; }
 .variant-choice-v25.selected{border-color:var(--dusty);box-shadow:0 0 0 3px rgba(196,150,161,.15)}.variant-choice-v25 img{grid-area:img;width:58px;height:58px;object-fit:cover;border-radius:12px}.variant-choice-v25 span{grid-area:name;font-weight:900}.variant-choice-v25 b{grid-area:price;color:var(--bronze)}.variant-choice-v25 small{grid-area:stock;color:#81776a}
 @media(max-width:950px){.variant-admin-row-v25{grid-template-columns:repeat(2,minmax(0,1fr))}.variant-remove-v25{grid-column:1/-1}.variant-choice-grid-v25{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.variant-admin-row-v25{grid-template-columns:1fr}.variant-choice-grid-v25{grid-template-columns:1fr}.variant-choice-v25{grid-template-columns:68px 1fr}.variant-choice-v25 img{width:68px;height:68px}}
+
+/* v26 optional option controls and product action hierarchy */
+.option-toggle-card-v26{padding:14px;border:1px solid var(--line);border-radius:20px;background:#fffaf6}
+.switch-line-v26{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.switch-line-v26 input{width:22px;height:22px;margin-top:2px;accent-color:var(--dusty)}
+.switch-line-v26 span{display:grid;gap:3px}
+.switch-line-v26 small{color:#81776a;line-height:1.45}
+.option-fields-v26{margin-top:12px}
+.option-fields-v26[hidden]{display:none!important}
+.primary-product-actions-v26{display:grid!important;grid-template-columns:1.35fr .65fr;gap:10px;margin-top:8px}
+.primary-product-actions-v26 .btn{width:100%;min-height:50px}
+.image-save-actions-v26{display:flex;justify-content:center;gap:16px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.image-quiet-btn-v26{border:0;background:transparent;color:#8a8073;font-size:12px;font-weight:800;padding:7px 8px;border-radius:10px;box-shadow:none}
+.image-quiet-btn-v26:hover{background:#f6eee8;color:var(--deep)}
+.variant-choice-v25{cursor:pointer}
+.variant-choice-v25 img{transition:transform .18s ease}
+.variant-choice-v25:hover img,.variant-choice-v25.selected img{transform:scale(1.06)}
+@media(max-width:540px){
+  .primary-product-actions-v26{grid-template-columns:1.25fr .75fr}
+  .primary-product-actions-v26 .btn{font-size:14px;padding:12px 8px}
+  .image-save-actions-v26{gap:8px;justify-content:flex-end}
+  .image-quiet-btn-v26{font-size:11px;padding:6px}
+}
