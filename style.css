@@ -336,3 +336,11 @@ select { max-width: 100%; }
  .admin-product-actions{grid-template-columns:1fr;gap:6px}
  .admin-product-actions .btn{font-size:12px;padding:9px 8px}
 }
+
+
+/* Product image save/share controls */
+.image-save-actions-v24{display:grid!important;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+.image-save-actions-v24 .btn{width:100%;min-height:46px}
+@media (max-width:420px){
+  .image-save-actions-v24{grid-template-columns:1fr}
+}

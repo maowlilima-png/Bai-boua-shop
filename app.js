@@ -982,6 +982,78 @@ renderAdmin = function(){
     el.textContent=`ໄຊ້ ${size} ເຫຼືອ ${n} ຊິ້ນ`;
   };
 
+  function safeImageFileNameV24(name,index=1){
+    const base=String(name||'product').trim().replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,'-');
+    return `${base||'product'}-${index}.jpg`;
+  }
+
+  function currentGalleryImageV24(){
+    const stage=document.getElementById('productGalleryStage');
+    const slides=stage?[...stage.querySelectorAll('.gallery-slide img')]:[];
+    const index=Math.max(0,parseInt(stage?.dataset.currentIndex||'0',10)||0);
+    return {url:slides[index]?.src||slides[0]?.src||'',index};
+  }
+
+  async function imageUrlToFileV24(url,fileName){
+    const res=await fetch(url,{mode:'cors',cache:'no-store'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob=await res.blob();
+    const type=blob.type&&blob.type.startsWith('image/')?blob.type:'image/jpeg';
+    const ext=type.includes('png')?'.png':type.includes('webp')?'.webp':'.jpg';
+    const clean=fileName.replace(/\.(jpg|jpeg|png|webp)$/i,'')+ext;
+    return new File([blob],clean,{type});
+  }
+
+  window.saveCurrentProductImageV24=async function(productId){
+    const p=(db.products||[]).find(x=>x.id===productId); if(!p)return;
+    const {url,index}=currentGalleryImageV24();
+    if(!url) return toast('ບໍ່ພົບຮູບສິນຄ້າ','danger');
+    const btn=document.getElementById('saveProductImageBtnV24');
+    const old=btn?.textContent;
+    if(btn){btn.disabled=true;btn.textContent='ກຳລັງກຽມຮູບ…';}
+    try{
+      const file=await imageUrlToFileV24(url,safeImageFileNameV24(p.name,index+1));
+      const objectUrl=URL.createObjectURL(file);
+      const a=document.createElement('a');
+      a.href=objectUrl;
+      a.download=file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),3000);
+      toast('ກົດບັນທຶກຮູບແລ້ວ');
+    }catch(err){
+      console.warn('Image download fallback:',err);
+      const w=window.open(url,'_blank');
+      if(w) toast('ເປີດຮູບແລ້ວ · ໃນ iPhone ໃຫ້ກົດຄ້າງແລ້ວເລືອກ “Save to Photos”');
+      else toast('Browser ບລັອກໜ້າຕ່າງຮູບ · ລອງກົດອີກຄັ້ງ','danger');
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=old||'ບັນທຶກຮູບ';}
+    }
+  };
+
+  window.shareCurrentProductImageV24=async function(productId){
+    const p=(db.products||[]).find(x=>x.id===productId); if(!p)return;
+    const {url,index}=currentGalleryImageV24();
+    if(!url) return toast('ບໍ່ພົບຮູບສິນຄ້າ','danger');
+    try{
+      const file=await imageUrlToFileV24(url,safeImageFileNameV24(p.name,index+1));
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+        await navigator.share({title:p.name,text:`${p.name} · ${money(state.role==='agent'?p.agentPrice:p.price)}`,files:[file]});
+      }else if(navigator.share){
+        await navigator.share({title:p.name,text:p.name,url});
+      }else{
+        await navigator.clipboard.writeText(url);
+        toast('ຄັດລອກລິ້ງຮູບແລ້ວ');
+      }
+    }catch(err){
+      if(err?.name!=='AbortError'){
+        console.warn('Share image error:',err);
+        toast('ແຊຣ໌ຮູບບໍ່ສຳເລັດ','danger');
+      }
+    }
+  };
+
   openProduct=function(id){
     const p=(db.products||[]).find(x=>x.id===id); if(!p)return;
     const price=state.role==='agent'?p.agentPrice:p.price;
@@ -1011,6 +1083,7 @@ renderAdmin = function(){
             <div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div>
           </div>
           <div id="selectedSizeStockV22" class="notice">${p.type==='ready'?`ໄຊ້ ${firstEnabled} ເຫຼືອ ${sizeAvailableV22(p,firstEnabled)} ຊິ້ນ`:'ພຣີອໍເດີ້: ລໍຖ້າເຄື່ອງ 14-18 ມື້'}</div>
+          <div class="actions image-save-actions-v24"><button id="saveProductImageBtnV24" class="btn sage" onclick="saveCurrentProductImageV24('${p.id}')">⬇ ບັນທຶກຮູບ</button><button class="btn light" onclick="shareCurrentProductImageV24('${p.id}')">↗ ແຊຣ໌ຮູບ</button></div>
           <div class="actions product-modal-actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div>
         </div>
       </div>`);
