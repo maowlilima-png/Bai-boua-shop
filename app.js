@@ -1094,3 +1094,79 @@ renderAdmin = function(){
   setInterval(pollCloudV22,2000);
   setTimeout(pollCloudV22,1200);
 })();
+
+
+/* v23: show and edit each agent's weekly target in Admin (keeps v22 2-second cloud sync) */
+function agentTargetStatsV23(agent){
+  const target=Math.max(1, Number(agent?.weekTarget)||7);
+  const done=Math.max(0, Number(agent?.weekOrders)||0);
+  const left=Math.max(0,target-done);
+  const percent=Math.min(100,Math.round((done/target)*100));
+  return {target,done,left,percent};
+}
+
+function saveAgentTargetV23(id){
+  const agent=(db.agents||[]).find(a=>a.id===id);
+  const input=document.getElementById('agentTarget_'+id);
+  if(!agent||!input) return;
+  const target=Math.max(1,parseInt(input.value,10)||7);
+  agent.weekTarget=target;
+  agent.targetUpdatedAt=Date.now();
+  if(state.user && state.role==='agent' && state.user.id===agent.id){
+    state.user.weekTarget=target;
+  }
+  saveDB();
+  toast('ບັນທຶກເປົ້າຕົວແທນແລ້ວ');
+  render();
+}
+
+userTable = function(type){
+  const arr = type === 'customer' ? (db.users || []) : (db.agents || []);
+  const isAgent = type === 'agent';
+  const title = isAgent ? 'ຈັດການຕົວແທນ' : 'ຈັດການລູກຄ້າ';
+  const totalUsers = arr.length;
+  const activeAgents = isAgent ? arr.filter(a => a.active !== false).length : 0;
+  const note = isAgent
+    ? `ຕົວແທນທັງໝົດ ${totalUsers} · ເປີດໃຊ້ ${activeAgents} · ປິດໃຊ້ ${totalUsers-activeAgents} · ເປົ້າຈະອັບເດດເອງປະມານທຸກ 2 ວິນາທີ`
+    : `ລູກຄ້າທັງໝົດ ${totalUsers} · ເບິ່ງ ID / ລະຫັດ / ອໍເດີ້ ໄດ້`;
+
+  return `<div class="section-title"><h2>${title}</h2></div>
+    <div class="admin-glow-panel">
+      <h3>${isAgent ? 'Agent Center' : 'Customer Center'}</h3>
+      <div class="meta">${note}</div>
+    </div>
+    <div class="notice password-notice-v21"><b>ໝາຍເຫດ:</b> ${isAgent?'ເປົ້າຈະນັບສະເພາະອໍເດີ້ທີ່ Admin ອະນຸມັດການໂອນແລ້ວ. ສາມາດແກ້ຈຳນວນເປົ້າໄດ້ໃນຕາຕະລາງນີ້.':'ລະຫັດນີ້ໂຊว์ສະເພາະໃນໜ້າ Admin ເທົ່ານັ້ນ.'}</div>
+    <div class="table-wrap elevated-table admin-user-table-v21"><table class="table">
+      <tr><th>ID</th><th>ຊື່</th><th>ເບີ</th><th>ລະຫັດ</th>${isAgent?'<th>ເປົ້າອາທິດ</th>':''}<th>ອໍເດີ້</th><th>ຍອດລວມ</th><th>ສະຖານະ</th><th></th></tr>
+      ${arr.map(u=>{
+        const orders = (db.orders || []).filter(o => o.userId === u.id && o.role === type);
+        const total = orders.reduce((s,o)=>s+(+o.total||0),0);
+        const inactive = isAgent && u.active === false;
+        const goal = isAgent ? agentTargetStatsV23(u) : null;
+        return `<tr class="${inactive?'row-muted':''}">
+          <td><b>${esc(u.id)}</b></td>
+          <td>${esc(u.name)}</td>
+          <td>${esc(u.phone)}</td>
+          <td>${passwordCellV21(u)}</td>
+          ${isAgent?`<td style="min-width:210px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <b>${goal.done}/${goal.target}</b>
+              <span class="meta">${goal.left>0?`ເຫຼືອ ${goal.left}`:'ຮອດເປົ້າແລ້ວ'}</span>
+            </div>
+            <div style="height:8px;background:#f3ece3;border-radius:999px;overflow:hidden;margin:7px 0 9px"><div style="width:${goal.percent}%;height:100%;background:linear-gradient(90deg,var(--dusty),var(--sage));border-radius:999px"></div></div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="agentTarget_${esc(u.id)}" type="number" min="1" value="${goal.target}" style="width:76px;padding:8px 9px;border-radius:12px;border:1px solid var(--line);background:#fffaf6">
+              <button class="btn sage small" onclick="saveAgentTargetV23('${esc(u.id)}')">ບັນທຶກເປົ້າ</button>
+            </div>
+          </td>`:''}
+          <td>${orders.length}</td>
+          <td><b>${money(total)}</b></td>
+          <td>${isAgent?`<span class="status-pill ${u.active===false?'off':''}">${u.active===false?'ປິດໃຊ້':'ເປີດໃຊ້'}</span>`:`<span class="status-pill">ເປີດໃຊ້</span>`}</td>
+          <td><div class="actions">
+            <button class="btn light small" onclick="viewUserOrders('${esc(u.id)}','${type}')">ເບິ່ງອໍເດີ້</button>
+            ${isAgent?`<button class="btn ${u.active===false?'sage':'danger'} small" onclick="toggleAgent('${esc(u.id)}')">${u.active===false?'ເປີດ ID':'ປິດ ID'}</button>`:`<button class="btn danger small" onclick="deleteCustomer('${esc(u.id)}')">ລຶບ ID</button>`}
+          </div></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="${isAgent?9:8}"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}
+    </table></div>`;
+};
