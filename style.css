@@ -377,3 +377,15 @@ select { max-width: 100%; }
   .image-save-actions-v26{gap:8px;justify-content:flex-end}
   .image-quiet-btn-v26{font-size:11px;padding:6px}
 }
+
+
+/* V27: product closed/sold-out state */
+.admin-product-card.admin-product-paused{filter:grayscale(.85);opacity:.68;background:#ececec!important}
+.product-admin-status{display:inline-flex;width:max-content;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900;margin:6px 0}
+.product-admin-status.on{background:#e8f1e7;color:#56765d}
+.product-admin-status.off{background:#e6e6e6;color:#666}
+.product-unavailable-v27{filter:grayscale(1);opacity:.66;cursor:not-allowed}
+.product-unavailable-v27 .product-img{position:relative}
+.product-lock-overlay-v27{position:absolute;inset:0;display:grid;place-items:center;background:rgba(50,50,50,.28);z-index:3}
+.product-lock-overlay-v27 span{background:rgba(70,70,70,.88);color:#fff;padding:9px 14px;border-radius:999px;font-weight:900;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.product-unavailable-v27 button:disabled{background:#999!important;color:#fff!important;cursor:not-allowed;box-shadow:none}
