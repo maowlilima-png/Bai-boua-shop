@@ -389,3 +389,56 @@ select { max-width: 100%; }
 .product-lock-overlay-v27{position:absolute;inset:0;display:grid;place-items:center;background:rgba(50,50,50,.28);z-index:3}
 .product-lock-overlay-v27 span{background:rgba(70,70,70,.88);color:#fff;padding:9px 14px;border-radius:999px;font-weight:900;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .product-unavailable-v27 button:disabled{background:#999!important;color:#fff!important;cursor:not-allowed;box-shadow:none}
+
+
+/* V28: polished agent pricing */
+.product-price-row-v28{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:7px;
+  line-height:1.15;
+}
+.price-start-label-v28{
+  font-size:.72em;
+  font-weight:800;
+  color:#8b8173;
+}
+.customer-price-old-v28{
+  color:#aaa094;
+  font-size:.72em;
+  font-weight:800;
+  text-decoration:line-through;
+  text-decoration-thickness:1.5px;
+  text-decoration-color:#a79b8d;
+}
+.customer-price-v28{
+  color:var(--bronze);
+  font-weight:950;
+}
+.agent-price-v28{
+  color:var(--bronze);
+  font-weight:1000;
+  letter-spacing:-.2px;
+}
+.variant-price-v28{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.variant-old-v28{
+  color:#aaa094;
+  font-size:.78em;
+  text-decoration:line-through;
+  font-weight:700;
+}
+.variant-agent-v28{
+  color:var(--bronze);
+  font-weight:950;
+}
+@media(max-width:720px){
+  .product-price-row-v28{gap:5px}
+  .customer-price-old-v28{font-size:.68em}
+  .agent-price-v28,.customer-price-v28{font-size:.96em}
+}
