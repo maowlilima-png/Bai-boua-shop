@@ -1269,3 +1269,115 @@ userTable = function(type){
       }).join('') || `<tr><td colspan="${isAgent?9:8}"><div class="empty">ຍັງບໍ່ມີຂໍ້ມູນ</div></td></tr>`}
     </table></div>`;
 };
+
+/* v25: product variants with separate image, customer price, agent price and stock */
+function variantsV25(p){ return Array.isArray(p?.variantOptions)?p.variantOptions.filter(v=>v&&v.name):[] }
+function activeVariantV25(p){ const id=document.getElementById('selectedVariantIdV25')?.value; return variantsV25(p).find(v=>v.id===id)||variantsV25(p)[0]||null }
+function variantPriceV25(p,v){ return state.role==='agent'?(Number(v?.agentPrice)||Number(p.agentPrice)||0):(Number(v?.price)||Number(p.price)||0) }
+function variantStockV25(p,v){ return p.type==='preorder'?Infinity:Math.max(0,Number(v?.stock)||0) }
+function productDisplayPriceV25(p){ const vs=variantsV25(p); if(!vs.length) return state.role==='agent'?Number(p.agentPrice)||0:Number(p.price)||0; return Math.min(...vs.map(v=>variantPriceV25(p,v))) }
+
+function addVariantRowV25(data={}){
+  const wrap=document.getElementById('variantRowsV25'); if(!wrap)return;
+  const key='VROW'+Date.now()+Math.random().toString(36).slice(2,7);
+  wrap.insertAdjacentHTML('beforeend',`<div class="variant-admin-row-v25" data-variant-row>
+    <div class="field"><label>ຊື່ຕົວເລືອກ</label><input data-v-name value="${esc(data.name||'')}" placeholder="ເຊັ່ນ ເຊັດ 2 ເສັ້ນ"></div>
+    <div class="field"><label>ລາຄາລູກຄ້າ</label><input data-v-price ${numAttrs()} value="${Number(data.price)||''}"></div>
+    <div class="field"><label>ລາຄາຕົວແທນ</label><input data-v-agent ${numAttrs()} value="${Number(data.agentPrice)||''}"></div>
+    <div class="field"><label>ຕົ້ນທຶນ</label><input data-v-cost ${numAttrs()} value="${Number(data.cost)||''}"></div>
+    <div class="field"><label>Stock</label><input data-v-stock ${numAttrs()} value="${Number(data.stock)||0}"></div>
+    <div class="field"><label>ຮູບຕົວເລືອກ</label><input data-v-image type="file" accept="image/*">${data.image?`<img src="${data.image}" class="variant-admin-preview-v25"><input data-v-old-image type="hidden" value="${data.image}">`:''}</div>
+    <button type="button" class="btn danger small variant-remove-v25" onclick="this.closest('[data-variant-row]').remove()">ລຶບຕົວເລືອກ</button>
+  </div>`)
+}
+
+function variantSectionHTMLV25(existing=[]){
+  return `<div class="variant-builder-v25" style="grid-column:1/-1"><div class="section-title" style="margin:8px 0"><h3>ຕົວເລືອກສິນຄ້າ / ລາຄາແຍກ</h3><button type="button" class="btn sage small" onclick="addVariantRowV25()">＋ ເພີ່ມຕົວເລືອກ</button></div><div class="meta">ເຊັ່ນ: ເຊັດ 2 ເສັ້ນ 45,000 ₭ / ເສັ້ນດຽວ 25,000 ₭</div><div id="variantRowsV25"></div></div>`
+}
+
+async function readVariantRowsV25(btn){
+  const rows=[...document.querySelectorAll('#variantRowsV25 [data-variant-row]')];
+  const out=[];
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i], name=row.querySelector('[data-v-name]')?.value.trim(); if(!name)continue;
+    const file=row.querySelector('[data-v-image]')?.files?.[0];
+    let image=row.querySelector('[data-v-old-image]')?.value||'';
+    if(file){ if(btn)btn.textContent=`ກຳລັງອັບຮູບຕົວເລືອກ ${i+1}/${rows.length}…`; image=await uploadProductImage(file,20+i) }
+    out.push({id:row.dataset.variantId||uid('VAR'),name,price:+row.querySelector('[data-v-price]')?.value||0,agentPrice:+row.querySelector('[data-v-agent]')?.value||0,cost:+row.querySelector('[data-v-cost]')?.value||0,stock:+row.querySelector('[data-v-stock]')?.value||0,image})
+  }
+  return out
+}
+
+adminProducts=function(){
+  const list=db.products||[];
+  return `<div class="section-title"><h2>ເພີ່ມ/ຈັດການສິນຄ້າ</h2></div><div class="card" style="padding:18px"><h3>ເພີ່ມສິນຄ້າໃໝ່</h3><div class="form-grid">
+  <div class="field"><label>ຊື່ສິນຄ້າ</label><input id="pName"></div><div class="field"><label>Code/ເລກສິນຄ້າ</label><input id="pCode"></div>
+  <div class="field"><label>ໝວດ</label><select id="pCategory">${db.categories.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="pType"><option value="ready">ພ້ອມສົ່ງ</option><option value="preorder">ພຣີອໍເດີ້</option></select></div>
+  <div class="field"><label>ລາຄາພື້ນຖານລູກຄ້າ</label><input id="pPrice" ${numAttrs()}></div><div class="field"><label>ລາຄາພື້ນຖານຕົວແທນ</label><input id="pAgentPrice" ${numAttrs()}></div>
+  <div class="field"><label>ຕົ້ນທຶນພື້ນຖານ</label><input id="pCost" ${numAttrs()}></div><div class="field"><label>Stock ພື້ນຖານ</label><input id="pStock" ${numAttrs()}></div>
+  <div class="field"><label>ໄຊ້ (ຄັ່ນດ້ວຍ ,)</label><input id="pSizes" placeholder="Free size"></div><div class="field"><label>ຮູບຫຼັກ</label><input id="pImage" type="file" accept="image/*"></div>
+  <div class="field"><label>ຮູບຍ່ອຍ/ຮູບເພີ່ມເຕີມ</label><input id="pVariants" type="file" accept="image/*" multiple></div>
+  <div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="pDetail" rows="3"></textarea></div>${variantSectionHTMLV25()}
+  </div><button id="addProductBtn" class="btn rose" onclick="addProductAdmin()">ເພີ່ມສິນຄ້າ</button></div>
+  <div class="admin-product-grid" style="margin-top:16px">${list.map(p=>`<article class="admin-product-card"><img src="${p.images?.[0]||''}" class="admin-product-image"><div class="admin-product-content"><div class="admin-product-title">${p.name}</div><div class="meta">${p.code} · ${p.category}</div><div class="admin-product-price">${variantsV25(p).length?`ເລີ່ມ ${money(productDisplayPriceV25(p))}`:money(p.price)}</div><div class="meta">${variantsV25(p).length?`${variantsV25(p).length} ຕົວເລືອກ`:`Agent ${money(p.agentPrice)}`}</div><div class="admin-product-actions"><button class="btn light small" onclick="openEditProduct('${p.id}')">ແກ້ໄຂ</button><button class="btn danger small" onclick="deleteProduct('${p.id}')">ລຶບ</button></div></div></article>`).join('')||'<div class="empty">ບໍ່ພົບສິນຄ້າ</div>'}</div>`
+}
+
+addProductAdmin=async function(){
+  const btn=document.getElementById('addProductBtn'); if(btn){btn.disabled=true;btn.textContent='ກຳລັງບັນທຶກ…'}
+  try{
+    const name=val('pName').trim(), code=val('pCode').trim(); if(!name||!code)throw new Error('ກະລຸນາໃສ່ຊື່ ແລະ Code');
+    const mainFile=document.getElementById('pImage')?.files?.[0]; const extra=[...(document.getElementById('pVariants')?.files||[])];
+    let main=''; if(mainFile){btn.textContent='ກຳລັງອັບຮູບຫຼັກ…';main=await uploadProductImage(mainFile,0)}
+    const gallery=[]; for(let i=0;i<extra.length;i++){btn.textContent=`ກຳລັງອັບຮູບ ${i+1}/${extra.length}…`;gallery.push(await uploadProductImage(extra[i],i+1))}
+    const variantOptions=await readVariantRowsV25(btn); if(!main)main=variantOptions.find(v=>v.image)?.image||productSVG('Product','cream');
+    const type=val('pType'); const stock=variantOptions.length?variantOptions.reduce((s,v)=>s+(Number(v.stock)||0),0):(type==='ready'?(+val('pStock')||0):null);
+    db.products.unshift({id:uid('P'),name,code,category:val('pCategory'),type,price:+val('pPrice')||0,agentPrice:+val('pAgentPrice')||0,cost:+val('pCost')||0,stock,sizes:(val('pSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean),colors:[],images:[main],variantImages:gallery,variantOptions,detail:val('pDetail')});
+    await saveDB();toast('ເພີ່ມສິນຄ້າແລ້ວ');render()
+  }catch(e){toast(e.message||'ເພີ່ມສິນຄ້າບໍ່ສຳເລັດ','danger')}finally{const b=document.getElementById('addProductBtn');if(b){b.disabled=false;b.textContent='ເພີ່ມສິນຄ້າ'}}
+}
+
+openEditProduct=function(id){
+  const p=db.products.find(x=>x.id===id);if(!p)return;
+  showModal(`<div class="modal-head"><b>ແກ້ໄຂສິນຄ້າ</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="form-grid">
+  <div class="field"><label>ຊື່</label><input id="eName" value="${esc(p.name)}"></div><div class="field"><label>Code</label><input id="eCode" value="${esc(p.code)}"></div>
+  <div class="field"><label>ໝວດ</label><select id="eCategory">${db.categories.map(c=>`<option ${c===p.category?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>ປະເພດ</label><select id="eType"><option value="ready" ${p.type==='ready'?'selected':''}>ພ້ອມສົ່ງ</option><option value="preorder" ${p.type==='preorder'?'selected':''}>ພຣີອໍເດີ້</option></select></div>
+  <div class="field"><label>ລາຄາພື້ນຖານ</label><input id="ePrice" ${numAttrs()} value="${Number(p.price)||0}"></div><div class="field"><label>ລາຄາຕົວແທນພື້ນຖານ</label><input id="eAgentPrice" ${numAttrs()} value="${Number(p.agentPrice)||0}"></div>
+  <div class="field"><label>ຕົ້ນທຶນ</label><input id="eCost" ${numAttrs()} value="${Number(p.cost)||0}"></div><div class="field"><label>ໄຊ້</label><input id="eSizes" value="${esc((p.sizes||[]).join(','))}"></div>
+  <div class="field"><label>ປ່ຽນຮູບຫຼັກ</label><input id="eImage" type="file" accept="image/*"></div><div class="field" style="grid-column:1/-1"><label>ລາຍລະອຽດ</label><textarea id="eDetail" rows="3">${esc(p.detail||'')}</textarea></div>${variantSectionHTMLV25(variantsV25(p))}
+  </div><button id="saveEditProductBtn" class="btn rose full" onclick="saveEditProduct('${p.id}')">ບັນທຶກການແກ້ໄຂ</button></div>`);
+  setTimeout(()=>{variantsV25(p).forEach(v=>{addVariantRowV25(v);const rows=document.querySelectorAll('#variantRowsV25 [data-variant-row]');rows[rows.length-1].dataset.variantId=v.id})},0)
+}
+
+saveEditProduct=async function(id){
+  const p=db.products.find(x=>x.id===id),btn=document.getElementById('saveEditProductBtn');if(!p)return;if(btn){btn.disabled=true;btn.textContent='ກຳລັງບັນທຶກ…'}
+  try{const file=document.getElementById('eImage')?.files?.[0];if(file){btn.textContent='ກຳລັງອັບຮູບ…';p.images=[await uploadProductImage(file,0)]}p.name=val('eName').trim()||p.name;p.code=val('eCode').trim()||p.code;p.category=val('eCategory');p.type=val('eType');p.price=+val('ePrice')||0;p.agentPrice=+val('eAgentPrice')||0;p.cost=+val('eCost')||0;p.sizes=(val('eSizes')||'Free size').split(',').map(x=>x.trim()).filter(Boolean);p.detail=val('eDetail');p.variantOptions=await readVariantRowsV25(btn);if(p.variantOptions.length)p.stock=p.variantOptions.reduce((s,v)=>s+(Number(v.stock)||0),0);await saveDB();closeModal();toast('ບັນທຶກການແກ້ໄຂແລ້ວ');render()}catch(e){toast(e.message||'ບັນທຶກບໍ່ສຳເລັດ','danger')}finally{if(btn){btn.disabled=false;btn.textContent='ບັນທຶກການແກ້ໄຂ'}}
+}
+
+productCard=function(p){
+  const vs=variantsV25(p), out=p.type==='ready'&&(vs.length?vs.every(v=>variantStockV25(p,v)<=0):Number(p.stock)<=0); const price=productDisplayPriceV25(p);
+  return `<div class="product-card ${out?'disabled':''}"><div class="product-img"><img src="${p.images?.[0]||vs[0]?.image||''}"><span class="badge ${p.type==='preorder'?'pre':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><button class="heart ${isWish(p.id)?'on':''}" onclick="event.stopPropagation();toggleWish('${p.id}')">♡</button></div><div class="product-body"><div class="product-title">${p.name}</div><div class="meta">Code: ${p.code} · ${p.category}</div><div class="price">${vs.length?'ເລີ່ມ ':''}${state.role==='agent'&& !vs.length?`<span class="oldprice">${money(p.price)}</span> `:''}${money(price)}</div><div class="meta">${vs.length?`${vs.length} ຕົວເລືອກ`:p.type==='ready'?`Stock: ${p.stock}`:'ລໍຖ້າ 14-18 ມື້'}</div><div class="actions"><button class="btn rose small" ${out?'disabled':''} onclick="openProduct('${p.id}')">ເບິ່ງ/ສັ່ງ</button></div></div></div>`
+}
+
+function selectVariantV25(pid,vid){
+  const p=db.products.find(x=>x.id===pid),v=variantsV25(p).find(x=>x.id===vid);if(!p||!v)return;
+  document.getElementById('selectedVariantIdV25').value=vid;document.querySelectorAll('[data-variant-choice]').forEach(el=>el.classList.toggle('selected',el.dataset.variantChoice===vid));
+  const price=document.getElementById('productPriceV25');if(price)price.innerHTML=state.role==='agent'&&v.price!==v.agentPrice?`<span class="oldprice">${money(v.price)}</span> ${money(v.agentPrice)}`:money(variantPriceV25(p,v));
+  const stock=document.getElementById('variantStockNoticeV25');if(stock)stock.textContent=p.type==='ready'?`Stock ຕົວເລືອກນີ້: ${variantStockV25(p,v)} ຊິ້ນ`:'ສິນຄ້າພຣີອໍເດີ້';
+  if(v.image){const images=productGalleryImages(p);const idx=images.indexOf(v.image);if(idx>=0)setProductGalleryIndex(idx,true)}
+}
+
+openProduct=function(id){
+  const p=db.products.find(x=>x.id===id);if(!p)return;const vs=variantsV25(p),images=[...new Set([...productGalleryImages(p),...vs.map(v=>v.image).filter(Boolean)])],first=vs[0];
+  showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail"><div class="product-gallery"><div id="productGalleryStage" class="gallery-stage">${images.map(src=>`<div class="gallery-slide"><img class="big-img" src="${src}"></div>`).join('')}</div><div class="thumb-row">${images.map((src,i)=>`<button class="thumb-item ${i===0?'selected':''}" data-gallery-thumb onclick="pickProductGalleryImage(${i})"><img class="preview-img" src="${src}"></button>`).join('')}</div></div><div class="product-info-panel"><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div><div id="productPriceV25" class="price">${first?(state.role==='agent'&&first.price!==first.agentPrice?`<span class="oldprice">${money(first.price)}</span> ${money(first.agentPrice)}`:money(variantPriceV25(p,first))):money(productDisplayPriceV25(p))}</div>${vs.length?`<input id="selectedVariantIdV25" type="hidden" value="${first.id}"><div class="variant-choice-grid-v25">${vs.map((v,i)=>`<button type="button" class="variant-choice-v25 ${i===0?'selected':''}" data-variant-choice="${v.id}" onclick="selectVariantV25('${p.id}','${v.id}')">${v.image?`<img src="${v.image}">`:''}<span>${esc(v.name)}</span><b>${money(variantPriceV25(p,v))}</b>${p.type==='ready'?`<small>Stock ${variantStockV25(p,v)}</small>`:''}</button>`).join('')}</div>`:''}<div class="form-grid compact-product-form"><div class="field"><label>ໄຊ້</label><select id="selSize">${(p.sizes||['Free size']).map(s=>`<option>${s}</option>`).join('')}</select></div><div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div id="variantStockNoticeV25" class="notice">${first&&p.type==='ready'?`Stock ຕົວເລືອກນີ້: ${variantStockV25(p,first)} ຊິ້ນ`:p.type==='ready'?`Stock: ${p.stock}`:'ສິນຄ້າພຣີອໍເດີ້'}</div><div class="actions image-save-actions-v24"><button class="btn sage" onclick="saveCurrentProductImageV24('${p.id}')">⬇ ບັນທຶກຮູບ</button><button class="btn light" onclick="shareCurrentProductImageV24('${p.id}')">↗ ແຊຣ໌ຮູບ</button></div><div class="actions"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div></div></div>`);setTimeout(()=>setProductGalleryIndex(0,false),0)
+}
+
+addToCart=function(id){
+  const p=db.products.find(x=>x.id===id),v=activeVariantV25(p),qty=Math.max(1,parseInt(val('selQty')||'1'));if(p.type==='ready'&&v&&variantStockV25(p,v)<qty)return toast('Stock ຕົວເລືອກນີ້ບໍ່ພໍ','danger');if(p.type==='ready'&&!v&&Number(p.stock)<qty)return toast('Stock ບໍ່ພໍ','danger');
+  const size=val('selSize'),price=v?variantPriceV25(p,v):(state.role==='agent'?p.agentPrice:p.price),cost=v?Number(v.cost)||0:Number(p.cost)||0,image=v?.image||p.images?.[0]||'';const existing=state.cart.find(i=>i.productId===id&&i.size===size&&i.variantId===(v?.id||''));if(existing)existing.qty+=qty;else state.cart.push({productId:id,name:p.name,code:p.code,type:p.type,price,cost,qty,size,color:'',variantId:v?.id||'',variantName:v?.name||'',image});closeModal();toast('ເພີ່ມເຂົ້າກະຕ້າແລ້ວ');state.tab='cart';render()
+}
+
+renderCart=function(){if(!state.cart.length)return `<div class="empty">ກະຕ້າຍັງວ່າງ</div>`;const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0);return `<div class="section-title"><h2>ກະຕ້າ</h2><button class="btn light" onclick="state.cart=[];render()">ລ້າງກະຕ້າ</button></div><div class="two-col"><div><div class="cart-list">${state.cart.map((i,idx)=>`<div class="line-item"><img class="thumb" src="${i.image}"><div><b>${i.name}</b><div class="meta">${i.variantName?`${i.variantName} · `:''}ໄຊ້ ${i.size}</div><div>${money(i.price)} × ${i.qty}</div></div><div class="actions"><button class="btn light small" onclick="state.cart[${idx}].qty=Math.max(1,state.cart[${idx}].qty-1);render()">−</button><button class="btn light small" onclick="state.cart[${idx}].qty++;render()">＋</button><button class="btn danger small" onclick="state.cart.splice(${idx},1);render()">ລຶບ</button></div></div>`).join('')}</div>${checkoutForm()}</div><aside class="summary"><h3>ຍອດລວມ</h3><div class="summary-row"><span>ລາຄາສິນຄ້າ</span><b>${money(total)}</b></div><button class="btn rose full" onclick="placeOrder()">ຢືນຢັນອໍເດີ້</button></aside></div>`}
+
+restockOrder=function(order){for(const item of order.items){const p=db.products.find(x=>x.id===item.productId);if(!p||p.type!=='ready')continue;const v=variantsV25(p).find(x=>x.id===item.variantId);if(v){v.stock=(Number(v.stock)||0)+(Number(item.qty)||0);p.stock=variantsV25(p).reduce((s,x)=>s+(Number(x.stock)||0),0)}else if(p.sizeStock&&Object.prototype.hasOwnProperty.call(p.sizeStock,item.size)){p.sizeStock[item.size]=(Number(p.sizeStock[item.size])||0)+(Number(item.qty)||0);p.stock=sizeStockTotalV22(p)}else p.stock=(Number(p.stock)||0)+(Number(item.qty)||0)}}
+
+placeOrder=function(){if(!validateCheckout())return;for(const item of state.cart){const p=db.products.find(x=>x.id===item.productId),v=variantsV25(p).find(x=>x.id===item.variantId);if(p.type==='ready'&&v&&variantStockV25(p,v)<item.qty)return toast(`${p.name} · ${v.name} Stock ບໍ່ພໍ`,'danger');if(p.type==='ready'&&!v&&Number(p.stock)<item.qty)return toast(`${p.name} Stock ບໍ່ພໍ`,'danger')}for(const item of state.cart){const p=db.products.find(x=>x.id===item.productId),v=variantsV25(p).find(x=>x.id===item.variantId);if(p.type!=='ready')continue;if(v){v.stock=Math.max(0,(Number(v.stock)||0)-item.qty);p.stock=variantsV25(p).reduce((s,x)=>s+(Number(x.stock)||0),0)}else if(p.sizeStock&&Object.prototype.hasOwnProperty.call(p.sizeStock,item.size)){p.sizeStock[item.size]=Math.max(0,(Number(p.sizeStock[item.size])||0)-item.qty);p.stock=sizeStockTotalV22(p)}else p.stock=Math.max(0,(Number(p.stock)||0)-item.qty)}const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0),cost=state.cart.reduce((s,i)=>s+(i.cost||0)*i.qty,0),hasPre=state.cart.some(i=>i.type==='preorder');const order={id:uid('ORD'),role:state.role,userId:state.user.id,userName:state.user.name,userPhone:state.user.phone,items:JSON.parse(JSON.stringify(state.cart)),total,cost,profit:total-cost,type:hasPre?'preorder':'ready',status:'ລໍຖ້າຍອດໂອນ',agentTargetCounted:false,createdAt:Date.now(),expiresAt:Date.now()+25*60*1000,customer:{name:val('customerName'),phone:val('customerPhone')},sender:state.role==='agent'?{name:val('senderName'),phone:val('senderPhone')}:null,shipping:{carrier:val('carrier'),branch:val('branch'),city:val('city'),province:val('province'),note:val('note')}};db.orders.unshift(order);saveDB();state.cart=[];state.paymentOrderId=order.id;state.tab='orders';toast('ສ້າງອໍເດີ້ແລ້ວ');render();openPayment(order.id)}
