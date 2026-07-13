@@ -1646,3 +1646,122 @@ openProduct=function(id){
   const vs=variantsV25(p),images=[...new Set([...productGalleryImages(p),...vs.map(v=>v.image).filter(Boolean)])],first=vs[0],optionEnabled=productOptionEnabledV26(p),mins=variantMinPricesV28(p);
   showModal(`<div class="modal-head"><b>${p.name}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body product-detail"><div class="product-gallery"><div id="productGalleryStage" class="gallery-stage">${images.map(src=>`<div class="gallery-slide"><img class="big-img" src="${src}"></div>`).join('')}</div><div class="thumb-row">${images.map((src,i)=>`<button class="thumb-item ${i===0?'selected':''}" data-gallery-thumb onclick="pickProductGalleryImage(${i})"><img class="preview-img" src="${src}"></button>`).join('')}</div></div><div class="product-info-panel"><span class="type-badge ${p.type==='ready'?'ready':''}">${p.type==='ready'?'ພ້ອມສົ່ງ':'ພຣີອໍເດີ້'}</span><h2>${p.name}</h2><div class="meta">Code: ${p.code} · ${p.category}</div><div id="productPriceV25" class="price">${first?variantPriceMarkupV28(p,first):agentPriceMarkupV28(mins.customer,mins.agent,'')}</div>${vs.length?`<input id="selectedVariantIdV25" type="hidden" value="${first.id}"><div class="variant-choice-grid-v25">${vs.map((v,i)=>`<button type="button" class="variant-choice-v25 ${i===0?'selected':''}" data-variant-choice="${v.id}" onclick="selectVariantV26('${p.id}','${v.id}')">${v.image?`<img src="${v.image}" alt="${esc(v.name)}">`:''}<span>${esc(v.name)}</span><div class="variant-agent-price-v28">${state.role==='agent'?`<del>${money(v.price)}</del><b>${money(v.agentPrice||v.price)}</b>`:`<b>${money(v.price)}</b>`}</div>${p.type==='ready'?`<small>Stock ${variantStockV25(p,v)}</small>`:''}</button>`).join('')}</div>`:''}<div class="form-grid compact-product-form">${optionEnabled?`<div class="field"><label>${esc(productOptionLabelV26(p))}</label><select id="selSize">${p.sizes.map(s=>`<option>${s}</option>`).join('')}</select></div>`:''}<div class="field"><label>ຈຳນວນ</label><input id="selQty" ${numAttrs()} value="1"></div></div><div id="variantStockNoticeV25" class="notice">${first&&p.type==='ready'?`Stock ຕົວເລືອກນີ້: ${variantStockV25(p,first)} ຊິ້ນ`:p.type==='ready'?`Stock: ${p.stock}`:'ສິນຄ້າພຣີອໍເດີ້'}</div><div class="actions primary-product-actions-v26"><button class="btn rose" onclick="addToCart('${p.id}')">ເພີ່ມເຂົ້າກະຕ້າ</button><button class="btn light" onclick="toggleWish('${p.id}')">♡ ຖືກໃຈ</button></div><div class="image-save-actions-v26"><button class="image-quiet-btn-v26" onclick="saveCurrentProductImageV24('${p.id}')">⬇ ບັນທຶກຮູບ</button><button class="image-quiet-btn-v26" onclick="shareCurrentProductImageV24('${p.id}')">↗ ແຊຣ໌ຮູບ</button></div></div></div>`);setTimeout(()=>setProductGalleryIndex(0,false),0);
 };
+
+/* V29: automatic weekly target reset + permanent weekly history */
+function weekStartMondayV29(input=Date.now()){
+  const d=new Date(input);
+  d.setHours(0,0,0,0);
+  const day=(d.getDay()+6)%7;
+  d.setDate(d.getDate()-day);
+  return d;
+}
+function weekKeyV29(input=Date.now()){
+  const d=weekStartMondayV29(input);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function weekRangeFromKeyV29(key){
+  const start=new Date(`${key}T00:00:00`);
+  const end=new Date(start); end.setDate(end.getDate()+7);
+  return {start:start.getTime(),end:end.getTime()};
+}
+function approvedAgentOrdersInRangeV29(agentId,start,end){
+  return (db.orders||[]).filter(o=>o.role==='agent'&&o.userId===agentId&&o.agentTargetCounted&&
+    !String(o.status||'').includes('ຍົກເລີກ')&&o.status!=='ສະລິບບໍ່ຖືກຕ້ອງ'&&
+    Number(o.approvedAt||o.createdAt)>=start&&Number(o.approvedAt||o.createdAt)<end);
+}
+function weeklyStatsV29(agent,key){
+  const {start,end}=weekRangeFromKeyV29(key);
+  const orders=approvedAgentOrdersInRangeV29(agent.id,start,end);
+  return {
+    orders:orders.length,
+    sales:orders.reduce((s,o)=>s+(Number(o.total)||0),0),
+    profit:orders.reduce((s,o)=>s+(Number(o.profit)||0),0),
+    items:orders.reduce((s,o)=>s+(o.items||[]).reduce((a,i)=>a+(Number(i.qty)||0),0),0)
+  };
+}
+function archiveAgentWeekV29(agent,key){
+  if(!key)return false;
+  agent.weeklyHistory=Array.isArray(agent.weeklyHistory)?agent.weeklyHistory:[];
+  if(agent.weeklyHistory.some(h=>h.weekKey===key))return false;
+  const stats=weeklyStatsV29(agent,key);
+  const {start,end}=weekRangeFromKeyV29(key);
+  const target=Math.max(1,Number(agent.weekTarget)||7);
+  agent.weeklyHistory.unshift({
+    weekKey:key,startAt:start,endAt:end-1,target,
+    orders:stats.orders,sales:stats.sales,profit:stats.profit,items:stats.items,
+    reached:stats.orders>=target,archivedAt:Date.now()
+  });
+  agent.weeklyHistory=agent.weeklyHistory.slice(0,104);
+  return true;
+}
+let weeklyRotationBusyV29=false;
+function ensureWeeklyRotationV29(){
+  if(weeklyRotationBusyV29||!db||!Array.isArray(db.agents))return false;
+  weeklyRotationBusyV29=true;
+  let changed=false;
+  const currentKey=weekKeyV29();
+  try{
+    for(const agent of db.agents){
+      agent.weekTarget=Math.max(1,Number(agent.weekTarget)||7);
+      agent.weeklyHistory=Array.isArray(agent.weeklyHistory)?agent.weeklyHistory:[];
+      if(!agent.currentWeekKey){
+        agent.currentWeekKey=currentKey;
+        agent.weekOrders=weeklyStatsV29(agent,currentKey).orders;
+        changed=true;
+      }else if(agent.currentWeekKey!==currentKey){
+        if(archiveAgentWeekV29(agent,agent.currentWeekKey))changed=true;
+        agent.currentWeekKey=currentKey;
+        agent.weekOrders=weeklyStatsV29(agent,currentKey).orders;
+        agent.weekResetAt=Date.now();
+        changed=true;
+      }else{
+        const correct=weeklyStatsV29(agent,currentKey).orders;
+        if(Number(agent.weekOrders||0)!==correct){agent.weekOrders=correct;changed=true;}
+      }
+    }
+    if(state?.role==='agent'&&state.user){
+      const live=db.agents.find(a=>a.id===state.user.id);
+      if(live){
+        state.user.weekOrders=live.weekOrders;
+        state.user.weekTarget=live.weekTarget;
+        state.user.currentWeekKey=live.currentWeekKey;
+        state.user.weeklyHistory=live.weeklyHistory;
+      }
+    }
+    if(changed)saveDB();
+  }finally{weeklyRotationBusyV29=false;}
+  return changed;
+}
+function formatWeekV29(h){
+  const s=new Date(h.startAt),e=new Date(h.endAt);
+  return `${s.toLocaleDateString()} – ${e.toLocaleDateString()}`;
+}
+function agentWeeklyHistoryHTMLV29(agent){
+  const history=(agent.weeklyHistory||[]).slice(0,12);
+  if(!history.length)return '<div class="empty">ປະຫວັດອາທິດຈະສະແດງຫຼັງຈາກເຂົ້າອາທິດໃໝ່</div>';
+  return `<div class="table-wrap"><table class="table"><tr><th>ອາທິດ</th><th>ອໍເດີ້</th><th>ຊິ້ນ</th><th>ຍອດຂາຍ</th><th>ຜົນເປົ້າ</th></tr>${history.map(h=>`<tr><td>${formatWeekV29(h)}</td><td><b>${h.orders}/${h.target}</b></td><td>${h.items}</td><td>${money(h.sales)}</td><td><span class="type-badge ${h.reached?'ready':''}">${h.reached?'ຮອດເປົ້າ':'ຍັງບໍ່ຮອດ'}</span></td></tr>`).join('')}</table></div>`;
+}
+const renderAgentReportV29Base=renderAgentReport;
+renderAgentReport=function(){
+  ensureWeeklyRotationV29();
+  if(state.role!=='agent')return renderAgentReportV29Base();
+  const agent=db.agents.find(a=>a.id===state.user.id)||state.user;
+  const current=weeklyStatsV29(agent,weekKeyV29());
+  const target=Math.max(1,Number(agent.weekTarget)||7);
+  const all=approvedAgentOrdersInRangeV29(agent.id,0,Number.MAX_SAFE_INTEGER);
+  const allStats={orders:all.length,sales:all.reduce((s,o)=>s+(Number(o.total)||0),0),items:all.reduce((s,o)=>s+(o.items||[]).reduce((a,i)=>a+(Number(i.qty)||0),0),0)};
+  const extra=`<div class="card" style="padding:18px;margin-bottom:16px"><div class="section-title"><h2>ສະຫຼຸບເປົ້າອັດຕະໂນມັດ</h2><span class="pill">ລີເຊັດທຸກວັນຈັນ 00:00</span></div><div class="stats"><div class="stat">ອາທິດນີ້<b>${current.orders}/${target}</b><div class="meta">${current.items} ຊິ້ນ · ${money(current.sales)}</div></div><div class="stat">ຕະຫຼອດໄປ<b>${allStats.orders}</b><div class="meta">${allStats.items} ຊິ້ນ · ${money(allStats.sales)}</div></div></div><div class="notice">ເມື່ອເຂົ້າອາທິດໃໝ່ ເປົ້າຈະເລີ່ມຈາກ 0 ອັດຕະໂນມັດ ແຕ່ອໍເດີ້ ແລະປະຫວັດເກົ່າຈະບໍ່ຖືກລຶບ.</div><h3>ປະຫວັດອາທິດ</h3>${agentWeeklyHistoryHTMLV29(agent)}</div>`;
+  return extra+renderAgentReportV29Base();
+};
+const agentNoticeV29Base=agentNotice;
+agentNotice=function(){ensureWeeklyRotationV29();return agentNoticeV29Base();};
+const approveSlipV29Base=approveSlip;
+approveSlip=function(id){
+  const result=approveSlipV29Base(id);
+  ensureWeeklyRotationV29();
+  return result;
+};
+const renderV29Base=render;
+render=function(){ensureWeeklyRotationV29();return renderV29Base();};
+setTimeout(()=>ensureWeeklyRotationV29(),800);
+setInterval(()=>ensureWeeklyRotationV29(),60*1000);
