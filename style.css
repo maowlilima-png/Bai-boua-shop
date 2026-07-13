@@ -391,54 +391,28 @@ select { max-width: 100%; }
 .product-unavailable-v27 button:disabled{background:#999!important;color:#fff!important;cursor:not-allowed;box-shadow:none}
 
 
-/* V28: polished agent pricing */
-.product-price-row-v28{
-  display:flex;
-  align-items:baseline;
-  flex-wrap:wrap;
-  gap:7px;
-  line-height:1.15;
-}
-.price-start-label-v28{
-  font-size:.72em;
-  font-weight:800;
-  color:#8b8173;
-}
-.customer-price-old-v28{
-  color:#aaa094;
-  font-size:.72em;
-  font-weight:800;
-  text-decoration:line-through;
-  text-decoration-thickness:1.5px;
-  text-decoration-color:#a79b8d;
-}
-.customer-price-v28{
-  color:var(--bronze);
-  font-weight:950;
-}
-.agent-price-v28{
-  color:var(--bronze);
-  font-weight:1000;
-  letter-spacing:-.2px;
-}
-.variant-price-v28{
-  display:flex;
-  align-items:baseline;
-  flex-wrap:wrap;
-  gap:6px;
-}
-.variant-old-v28{
-  color:#aaa094;
-  font-size:.78em;
-  text-decoration:line-through;
-  font-weight:700;
-}
-.variant-agent-v28{
-  color:var(--bronze);
-  font-weight:950;
-}
+/* V28: agent price hierarchy and clearer variant editing */
+.agent-price-block-v28{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price-leading-v28{font-size:12px;color:#8a8073;font-weight:800}
+.customer-price-old-v28{font-size:13px;color:#a79c8e;text-decoration:line-through;text-decoration-thickness:1.5px}
+.agent-price-main-v28{font-size:1.18em;color:var(--dusty);font-weight:950}
+.agent-price-badge-v28{display:inline-flex;padding:4px 8px;border-radius:999px;background:#f4e4e8;color:#9e6170;font-size:10px;font-weight:900}
+.variant-agent-price-v28{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.variant-agent-price-v28 del{font-size:11px;color:#a79c8e}
+.variant-agent-price-v28 b{color:var(--dusty);font-size:14px}
+.edit-product-modal-v28{padding-bottom:92px}
+.edit-variant-summary-v28{display:grid;gap:5px;padding:13px 15px;border-radius:18px;background:#f2e8ef;border:1px solid #ead3da;margin-top:4px}
+.edit-variant-summary-v28>div{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.edit-variant-summary-v28 span{padding:4px 9px;border-radius:999px;background:#fff;color:#9e6170;font-size:12px;font-weight:900}
+.edit-variant-summary-v28 small{color:#766b5d;line-height:1.45}
+.edit-product-modal-v28 .variant-builder-v25{border-style:solid;background:#fff;border-color:#dfcbd2;box-shadow:0 10px 24px rgba(81,75,61,.05)}
+.edit-product-modal-v28 .variant-admin-row-v25{box-shadow:0 8px 18px rgba(81,75,61,.05)}
+.sticky-save-v28{position:sticky;bottom:10px;z-index:4;margin-top:16px;box-shadow:0 14px 32px rgba(196,150,161,.28)}
 @media(max-width:720px){
-  .product-price-row-v28{gap:5px}
-  .customer-price-old-v28{font-size:.68em}
-  .agent-price-v28,.customer-price-v28{font-size:.96em}
+  .agent-price-block-v28{gap:5px}
+  .customer-price-old-v28{font-size:11px}
+  .agent-price-main-v28{font-size:17px}
+  .agent-price-badge-v28{font-size:9px;padding:3px 6px}
+  .edit-variant-summary-v28>div{align-items:flex-start}
+  .edit-product-modal-v28{padding-bottom:78px}
 }
