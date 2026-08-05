@@ -416,3 +416,50 @@ select { max-width: 100%; }
   .edit-variant-summary-v28>div{align-items:flex-start}
   .edit-product-modal-v28{padding-bottom:78px}
 }
+
+/* V31 clean login / register layout */
+.auth-v31 .login-card-v31{max-width:500px;padding:30px;border-radius:32px}
+.auth-heading-v31{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.auth-heading-v31 h2{margin:0 0 3px;font-size:26px;color:var(--deep)}
+.auth-heading-v31 p{margin:0;color:#8b8072;font-size:14px}
+.auth-icon-v31{width:52px;height:52px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(145deg,#f8e8ec,#f3eee7);font-size:23px;box-shadow:inset 0 0 0 1px rgba(196,150,161,.18)}
+.auth-login-btn-v31{margin-top:8px;min-height:50px}
+.auth-divider-v31{display:flex;align-items:center;gap:12px;margin:18px 0;color:#a39789;font-size:12px}
+.auth-divider-v31:before,.auth-divider-v31:after{content:"";height:1px;background:var(--line);flex:1}
+.auth-register-btn-v31{min-height:48px;border-color:#d8c6cb!important;color:#9e6170!important;background:#fffafb!important}
+.auth-register-btn-v31:hover{background:#fff3f6!important}
+.admin-entry-v31{display:block;margin:15px auto 0;padding:5px 8px;background:transparent;color:#a39789;font-size:11px;text-decoration:underline;text-underline-offset:3px;box-shadow:none}
+.admin-entry-v31:hover{color:#6f6659}
+.register-modal-v31{width:min(440px,100%);margin:auto;text-align:left;padding:24px}
+.register-modal-v31 h2{text-align:center;margin:8px 0 4px}
+.register-modal-v31>p{text-align:center;margin:0 0 18px}
+.register-icon-v31{width:60px;height:60px;margin:0 auto;display:grid;place-items:center;border-radius:22px;background:#f7e9ed;font-size:28px}
+.register-submit-v31{margin-top:16px;min-height:50px}
+@media(max-width:540px){.auth-v31 .login-card-v31{padding:20px}.auth-heading-v31 h2{font-size:22px}.register-modal-v31{padding:18px}}
+
+/* V32 desktop auth alignment: keep branding and login together */
+@media (min-width: 951px){
+  .auth-v31.login-wrap{
+    grid-template-columns:minmax(420px,500px) minmax(360px,460px);
+    justify-content:center;
+    align-content:center;
+    column-gap:56px;
+    padding:42px clamp(28px,5vw,72px);
+  }
+  .auth-v31 .hero{
+    grid-column:2;
+    grid-row:1;
+    align-self:center;
+    max-width:460px;
+  }
+  .auth-v31 .login-card-v31{
+    grid-column:1;
+    grid-row:1;
+    width:100%;
+    justify-self:end;
+    align-self:center;
+  }
+  .auth-v31 .brand-title{
+    font-size:clamp(62px,6vw,88px);
+  }
+}
