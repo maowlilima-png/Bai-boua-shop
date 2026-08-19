@@ -59,23 +59,48 @@ function loadLocalDB(){
   try{let d=removeSeedRecords(JSON.parse(raw)); localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); return d}
   catch(e){let d=removeSeedRecords(defaultData()); localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); return d}
 }
+async function supabaseStateRequest(){
+  const url=`${SUPABASE_REST_URL}/app_state?select=data,updated_at&id=eq.${encodeURIComponent(SUPABASE_STATE_ID)}`;
+  const attempts=[
+    {apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,Accept:'application/json'},
+    {apikey:SUPABASE_ANON_KEY,Accept:'application/json'}
+  ];
+  let lastErr='';
+  for(const headers of attempts){
+    try{
+      const res=await fetch(url,{headers,cache:'no-store'});
+      if(res.ok) return res;
+      lastErr=`HTTP ${res.status}: ${await res.text()}`;
+    }catch(err){ lastErr=err?.message||String(err); }
+  }
+  throw new Error(lastErr||'Supabase request failed');
+}
+
+function hasUsableCloudState(data){
+  return !!(data && typeof data==='object' && !Array.isArray(data) &&
+    (Array.isArray(data.products)||Array.isArray(data.orders)||Array.isArray(data.users)||Array.isArray(data.agents)));
+}
+
 async function initCloudDB(){
   try{
-    const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=data`,{headers:supabaseHeaders()});
-    if(!res.ok) throw new Error(await res.text());
+    const res=await supabaseStateRequest();
     const rows=await res.json();
-    if(rows && rows.length && rows[0].data){
-      db=removeSeedRecords(rows[0].data);
+    const remote=rows?.[0]?.data;
+    if(hasUsableCloudState(remote)){
+      db=removeSeedRecords(remote);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
     }else{
+      // A freshly created app_state row is often just {}. Never replace the
+      // browser's working shop data with an empty object; seed cloud from local.
+      console.info('Supabase app_state is empty; seeding it from local data.');
       await saveDBToCloud(true);
     }
     cloudReady=true;
-    console.log("Bai Boua Supabase connected");
+    console.log('Bai Boua Supabase connected');
   }catch(e){
     cloudReady=false;
-    console.warn("Supabase sync off, using localStorage only:", e.message||e);
-    setTimeout(()=>{try{toast('ຍັງເຊື່ອມ Supabase ບໍ່ໄດ້: ກວດຕາຕະລາງ app_state ໃນຖານຂໍ້ມູນ','danger')}catch(_){}},700);
+    console.warn('Supabase sync off, using localStorage only:', e.message||e);
+    setTimeout(()=>{try{toast('Supabase ຍັງເຊື່ອມບໍ່ສຳເລັດ — ເວັບຈະໃຊ້ຂໍ້ມູນໃນເຄື່ອງໄປກ່ອນ','danger')}catch(_){}},700);
   }
 }
 async function saveDBToCloud(force=false){
