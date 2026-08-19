@@ -1992,7 +1992,13 @@ renderLogin=function(){
   function generatedConsignmentV32(o){
     const c=o.customer||{}, sh=o.shipping||{};
     const lines=[];
-    lines.push(`${c.name||''}${c.phone?` ${c.phone}`:''}`.trim());
+    const depositorName=(o.depositorName||'').trim();
+    const depositorPhone=(o.depositorPhone||'').trim();
+    if(depositorName||depositorPhone){
+      lines.push(`${depositorName}${depositorPhone?` ${depositorPhone}`:''}`.trim());
+    } else {
+      lines.push(`${c.name||''}${c.phone?` ${c.phone}`:''}`.trim());
+    }
     if(o.receiverName||o.receiverPhone){
       lines.push(`ຜູ້ຮັບ : ${o.receiverName||c.name||''}${o.receiverPhone?` ${o.receiverPhone}`:''}`.trim());
     } else if(c.name||c.phone){
@@ -2142,6 +2148,8 @@ renderLogin=function(){
         <div class="field"><label>ສະຖານະ</label><select id="moStatusV33">${WORK_V33.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div>
         <div class="field"><label>ຊື່ລູກຄ້າ</label><input id="moNameV33" placeholder="ເຊັ່ນ Mali"></div>
         <div class="field"><label>ເບີໂທ</label><input id="moPhoneV33" placeholder="020 / 030..."></div>
+        <div class="field"><label>ຊື່ຜູ້ຝາກ</label><input id="moDepositorNameV44" value="Mali" placeholder="ເຊັ່ນ Mali"></div>
+        <div class="field"><label>ເບີຜູ້ຝາກ</label><input id="moDepositorPhoneV44" value="99809749" placeholder="ເບີຜູ້ຝາກ"></div>
         <div class="field"><label>ຂົນສົ່ງ / ບ່ອນຝາກ</label><input id="moCarrierV33" placeholder="ANS / HAL / ອື່ນໆ"></div>
         <div class="field"><label>ສາຂາ / ບ້ານ</label><input id="moBranchV33" placeholder="ສາຂາ ຫຼື ບ້ານ"></div>
       </div>
@@ -2248,7 +2256,7 @@ renderLogin=function(){
   window.adminReadyOrdersV36=function(){ return page('ready'); };
   window.setReadyStatusV36=function(id,status){ const o=db.orders.find(x=>x.id===id); if(!o)return; o.readyStatus=status; if(status==='packed'||status==='ready_ship')o.packingState='packed'; if(status==='shipped'||status==='done'){o.packingState='shipped';o.shippedAt=o.shippedAt||Date.now();} saveDB();toast('ອັບເດດສະຖານະເຄື່ອງພ້ອມສົ່ງແລ້ວ');render(); };
   window.openReadyOrderV36=function(){
-    showModal(`<div class="modal-head"><div><b>＋ ຈົດອໍເດີ້ ເຄື່ອງພ້ອມສົ່ງ</b><div class="meta">ຈົດລູກຄ້າ · ຮູບສິນຄ້າ · ລາຄາ · ຍອດໂອນ · ຍອດຄ້າງ</div></div><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body manual-order-v33"><div class="form-grid"><div class="field"><label>ວັນທີອໍເດີ້</label><input id="roDateV36" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>ສະຖານະ</label><select id="roStatusV36">${READY_STATUSES_V36.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div><div class="field"><label>ຊື່ລູກຄ້າ</label><input id="roNameV36" placeholder="ເຊັ່ນ Mali"></div><div class="field"><label>ເບີໂທ</label><input id="roPhoneV36" placeholder="020 / 030..."></div><div class="field"><label>ຂົນສົ່ງ / ບ່ອນຝາກ</label><input id="roCarrierV36" placeholder="ANS / HAL / ອື່ນໆ"></div><div class="field"><label>ສາຂາ / ບ້ານ</label><input id="roBranchV36" placeholder="ສາຂາ ຫຼື ບ້ານ"></div></div><div class="card manual-items-v33"><div class="section-title" style="margin-top:0"><div><h3>ສິນຄ້າພ້ອມສົ່ງ</h3><div class="meta">ເພີ່ມຮູບ + ຈຳນວນ + ລາຄາ</div></div><button class="btn light small" onclick="addReadyItemV36()">＋ ເພີ່ມລາຍການ</button></div><div id="roItemsV36"></div></div><div class="manual-summary-v34"><div class="sum-box"><span>ຍອດລວມ (ຄຳນວນເອງ)</span><b id="roTotalV36">0 ₭</b></div><div class="sum-box"><span>ຍອດໂອນ (ພິມເອງ)</span><input id="roPaidV36" type="number" min="0" value="0" oninput="recalcReadyV36()"></div><div class="sum-box balance-v34 owing"><span>ຍອດຄ້າງ (ຄຳນວນເອງ)</span><b id="roBalanceV36">0 ₭</b></div></div><div class="field"><label>ໝາຍເຫດ / ຂໍ້ມູນຝາກ</label><textarea id="roNoteV36" rows="4"></textarea></div><button class="btn sage full" onclick="saveReadyOrderV36()">ບັນທຶກອໍເດີ້ພ້ອມສົ່ງ</button></div>`); addReadyItemV36();
+    showModal(`<div class="modal-head"><div><b>＋ ຈົດອໍເດີ້ ເຄື່ອງພ້ອມສົ່ງ</b><div class="meta">ຈົດລູກຄ້າ · ຮູບສິນຄ້າ · ລາຄາ · ຍອດໂອນ · ຍອດຄ້າງ</div></div><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body manual-order-v33"><div class="form-grid"><div class="field"><label>ວັນທີອໍເດີ້</label><input id="roDateV36" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>ສະຖານະ</label><select id="roStatusV36">${READY_STATUSES_V36.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div><div class="field"><label>ຊື່ລູກຄ້າ</label><input id="roNameV36" placeholder="ເຊັ່ນ Mali"></div><div class="field"><label>ເບີໂທ</label><input id="roPhoneV36" placeholder="020 / 030..."></div><div class="field"><label>ຊື່ຜູ້ຝາກ</label><input id="roDepositorNameV44" value="Mali" placeholder="ເຊັ່ນ Mali"></div><div class="field"><label>ເບີຜູ້ຝາກ</label><input id="roDepositorPhoneV44" value="99809749" placeholder="ເບີຜູ້ຝາກ"></div><div class="field"><label>ຂົນສົ່ງ / ບ່ອນຝາກ</label><input id="roCarrierV36" placeholder="ANS / HAL / ອື່ນໆ"></div><div class="field"><label>ສາຂາ / ບ້ານ</label><input id="roBranchV36" placeholder="ສາຂາ ຫຼື ບ້ານ"></div></div><div class="card manual-items-v33"><div class="section-title" style="margin-top:0"><div><h3>ສິນຄ້າພ້ອມສົ່ງ</h3><div class="meta">ເພີ່ມຮູບ + ຈຳນວນ + ລາຄາ</div></div><button class="btn light small" onclick="addReadyItemV36()">＋ ເພີ່ມລາຍການ</button></div><div id="roItemsV36"></div></div><div class="manual-summary-v34"><div class="sum-box"><span>ຍອດລວມ (ຄຳນວນເອງ)</span><b id="roTotalV36">0 ₭</b></div><div class="sum-box"><span>ຍອດໂອນ (ພິມເອງ)</span><input id="roPaidV36" type="number" min="0" value="0" oninput="recalcReadyV36()"></div><div class="sum-box balance-v34 owing"><span>ຍອດຄ້າງ (ຄຳນວນເອງ)</span><b id="roBalanceV36">0 ₭</b></div></div><div class="field"><label>ໝາຍເຫດ / ຂໍ້ມູນຝາກ</label><textarea id="roNoteV36" rows="4"></textarea></div><button class="btn sage full" onclick="saveReadyOrderV36()">ບັນທຶກອໍເດີ້ພ້ອມສົ່ງ</button></div>`); addReadyItemV36();
   };
   window.addReadyItemV36=function(){ const wrap=document.getElementById('roItemsV36');if(!wrap)return;const d=document.createElement('div');d.className='manual-item-row-v34 ready-item-v36';d.dataset.image='';d.innerHTML=`<label class="manual-img-v34"><span>＋ ເພີ່ມຮູບ</span><input type="file" accept="image/*" onchange="previewReadyImageV36(this)"></label><input class="roNameV36" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="roQtyV36" type="number" min="1" value="1" oninput="recalcReadyV36()"><input class="roPriceV36" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ" oninput="recalcReadyV36()"><div class="money-preview-v34 roSubV36">0 ₭<small>1 × 0 ₭</small></div><button class="btn danger small" type="button" onclick="this.parentElement.remove();recalcReadyV36()">✕</button>`;wrap.appendChild(d);recalcReadyV36(); };
   window.previewReadyImageV36=function(input){const row=input.closest('.ready-item-v36');if(!row)return;const f=input.files?.[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{const max=700,sc=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);const data=c.toDataURL('image/jpeg',.76);row.dataset.image=data;row.querySelector('.manual-img-v34').innerHTML=`<img src="${data}"><input type="file" accept="image/*" onchange="previewReadyImageV36(this)">`;};img.src=e.target.result;};rd.readAsDataURL(f);};
@@ -2584,7 +2592,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
       id:String(o.id),order_type:o.type==='ready'?'ready':'preorder',order_date:o.orderDate||new Date(o.createdAt||Date.now()).toISOString().slice(0,10),
       customer_name:o.customer?.name||'',customer_phone:o.customer?.phone||'',carrier:o.shipping?.carrier||'',branch:o.shipping?.branch||'',note:o.shipping?.note||'',
       total:Number(o.total)||0,paid:Number(o.paid)||0,status:o.status||'',work_status:o.workStatus||null,ready_status:o.readyStatus||null,packing_state:o.packingState||'new',
-      created_at_ms:Number(o.createdAt)||Date.now(),completed_at_ms:o.completedAt?Number(o.completedAt):null,payload:{consignText:o.consignText||'',manual:true,role:o.role||'customer'}
+      created_at_ms:Number(o.createdAt)||Date.now(),completed_at_ms:o.completedAt?Number(o.completedAt):null,payload:{consignText:o.consignText||'',manual:true,role:o.role||'customer',depositorName:o.depositorName||'',depositorPhone:o.depositorPhone||''}
     };
   }
   function itemRows(o){ return (o.items||[]).map((i,idx)=>({
@@ -2605,7 +2613,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
   function fromRows(r,items){
     const p=(r.payload&&typeof r.payload==='object')?r.payload:{};
     return {id:r.id,_sqlV40:true,manual:true,role:p.role||'customer',type:r.order_type==='ready'?'ready':'preorder',orderDate:r.order_date,
-      createdAt:Number(r.created_at_ms)||Date.now(),customer:{name:r.customer_name||'',phone:r.customer_phone||''},
+      createdAt:Number(r.created_at_ms)||Date.now(),customer:{name:r.customer_name||'',phone:r.customer_phone||''},depositorName:p.depositorName||'',depositorPhone:p.depositorPhone||'',
       shipping:{carrier:r.carrier||'',branch:r.branch||'',city:'',province:'',note:r.note||''},
       items:(items||[]).map(i=>{const q=i.payload&&typeof i.payload==='object'?i.payload:{};return{id:i.id,name:i.name||'',code:i.code||'',image:i.image_url||'',qty:Number(i.qty)||1,price:Number(i.price)||0,cost:Number(q.cost)||0,size:q.size||'',color:q.color||'',type:i.item_type||r.order_type};}),
       total:Number(r.total)||0,paid:Number(r.paid)||0,balance:Math.max(0,(Number(r.total)||0)-(Number(r.paid)||0)),cost:0,profit:Number(r.total)||0,
@@ -2771,7 +2779,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
     const date=document.getElementById('moDateV33')?.value||new Date().toISOString().slice(0,10);
     const now=Date.now();
     const o={id:`BB-${now}`,manual:true,role:'customer',type:'preorder',createdAt:new Date(`${date}T12:00:00`).getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,
-      customer:{name,phone},shipping:{carrier:document.getElementById('moCarrierV33')?.value.trim()||'',branch:document.getElementById('moBranchV33')?.value.trim()||'',city:'',province:'',note:document.getElementById('moNoteV33')?.value.trim()||''},
+      customer:{name,phone},depositorName:document.getElementById('moDepositorNameV44')?.value.trim()||'Mali',depositorPhone:document.getElementById('moDepositorPhoneV44')?.value.trim()||'99809749',shipping:{carrier:document.getElementById('moCarrierV33')?.value.trim()||'',branch:document.getElementById('moBranchV33')?.value.trim()||'',city:'',province:'',note:document.getElementById('moNoteV33')?.value.trim()||''},
       items,total,paid,balance:Math.max(0,total-paid),cost:0,profit:total,status:'Pre-order admin',workStatus:document.getElementById('moStatusV33')?.value||'not_ordered',packingState:'new',consignText:''};
     db.orders=(db.orders||[]).filter(x=>x.id!==o.id); db.orders.unshift(o); localStore(); closeModal(); setPageForOrder(o); render();
     toast('ບັນທຶກ Pre-order ໃນໜ້າແລ້ວ · ກຳລັງສົ່ງ SQL…');
@@ -2788,7 +2796,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
     const total=items.reduce((s,i)=>s+i.price*i.qty,0), paid=toNum(document.getElementById('roPaidV36')?.value);
     const date=document.getElementById('roDateV36')?.value||new Date().toISOString().slice(0,10), now=Date.now();
     const o={id:`BR-${now}`,manual:true,role:'customer',type:'ready',createdAt:new Date(`${date}T12:00:00`).getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,
-      customer:{name,phone},shipping:{carrier:document.getElementById('roCarrierV36')?.value.trim()||'',branch:document.getElementById('roBranchV36')?.value.trim()||'',city:'',province:'',note:document.getElementById('roNoteV36')?.value.trim()||''},
+      customer:{name,phone},depositorName:document.getElementById('roDepositorNameV44')?.value.trim()||'Mali',depositorPhone:document.getElementById('roDepositorPhoneV44')?.value.trim()||'99809749',shipping:{carrier:document.getElementById('roCarrierV36')?.value.trim()||'',branch:document.getElementById('roBranchV36')?.value.trim()||'',city:'',province:'',note:document.getElementById('roNoteV36')?.value.trim()||''},
       items,total,paid,balance:Math.max(0,total-paid),cost:0,profit:total,status:'Ready admin',readyStatus:document.getElementById('roStatusV36')?.value||'waiting_pack',packingState:'new',consignText:''};
     db.orders=(db.orders||[]).filter(x=>x.id!==o.id); db.orders.unshift(o); localStore(); closeModal(); setPageForOrder(o); render();
     toast('ບັນທຶກພ້ອມສົ່ງໃນໜ້າແລ້ວ · ກຳລັງສົ່ງ SQL…');
@@ -2809,7 +2817,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
 window.BaiBouaV43Status=function(){
   const all=Array.isArray(db?.orders)?db.orders:[];
   return {
-    version:'43.0',
+    version:'44.0',
     total:all.length,
     preorder:all.filter(o=>o.type==='preorder').length,
     ready:all.filter(o=>o.type==='ready').length,
@@ -2817,3 +2825,5 @@ window.BaiBouaV43Status=function(){
     lastSqlError:window.__bbLastSqlLoadErrorV42||window.__bbLastSqlErrorV41||''
   };
 };
+
+/* V44: depositor/sender fields for shipping label; stored inside SQL payload JSON. */
