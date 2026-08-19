@@ -2694,3 +2694,91 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
   }
   setTimeout(archiveOldV40,4000); setInterval(archiveOldV40,60*60*1000);
 })();
+
+/* ============================================================
+   Bai Boua Admin V41 — direct SQL save fix
+   - Manual Pre-order / Ready orders save directly to SQL.
+   - They no longer call app_state save first.
+   - SQL errors are shown visibly instead of reporting false success.
+   ============================================================ */
+(function(){
+  const toNum=v=>Math.max(0,Number(String(v??'').replace(/[^0-9.]/g,''))||0);
+  function localStore(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }catch(e){ console.warn(e); } }
+  function sqlErrMessage(e){ return String(e?.message||e||'Unknown SQL error').replace(/\s+/g,' ').slice(0,180); }
+  function setPageForOrder(o){
+    if(o.type==='ready'){
+      state.adminTab='readyorders'; state.readyDate=o.orderDate||''; state.readyWorkStatus='all'; state.readySearch=''; state.readyPageV39=1;
+    }else{
+      state.adminTab='packing'; state.packDate=o.orderDate||''; state.packWorkStatus='all'; state.packSearch=''; state.packPageV39=1;
+    }
+  }
+  async function persistNewV41(o,label){
+    window.__bbLocalDirtyUntilV392=Date.now()+60000;
+    try{
+      await window.saveOrderToSqlV40(o);
+      o._sqlV40=true;
+      o._localUpdatedAt=Date.now();
+      localStore();
+      toast(`${label} · SQL ✓`);
+      // Keep it visible immediately; SQL refresh follows after save.
+      setPageForOrder(o); render();
+      await window.loadSqlOrdersV40(true);
+      window.__bbLocalDirtyUntilV392=Date.now()+5000;
+      return true;
+    }catch(e){
+      console.error('V41 SQL SAVE ERROR',e);
+      // Never delete the local order when SQL fails.
+      localStore(); setPageForOrder(o); render();
+      toast(`SQL ERROR: ${sqlErrMessage(e)}`,'danger');
+      window.__bbLastSqlErrorV41=sqlErrMessage(e);
+      return false;
+    }
+  }
+
+  // Replace all older stacked wrappers with one deterministic save path.
+  window.saveManualOrderV33=function(){
+    const name=document.getElementById('moNameV33')?.value.trim()||'';
+    const phone=document.getElementById('moPhoneV33')?.value.trim()||'';
+    if(!name) return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');
+    const rows=[...document.querySelectorAll('.manual-item-row-v34')],items=[];
+    const base=Date.now();
+    rows.forEach((r,idx)=>{
+      const nm=r.querySelector('.moNameV34')?.value.trim()||'';
+      const qty=Math.max(1,Number(r.querySelector('.moQtyV34')?.value)||1);
+      const price=toNum(r.querySelector('.moPriceV34')?.value);
+      const image=r.dataset.image||'';
+      if(nm||price||image) items.push({id:`MAN-${base}-${idx}`,name:nm||`ສິນຄ້າ ${idx+1}`,code:'PRE-ORDER',image,price,cost:0,qty,size:'',color:'',type:'preorder'});
+    });
+    if(!items.length) return toast('ກະລຸນາເພີ່ມສິນຄ້າຢ່າງໜ້ອຍ 1 ລາຍການ','danger');
+    const total=items.reduce((s,i)=>s+i.price*i.qty,0);
+    const paid=toNum(document.getElementById('moPaidV34')?.value);
+    const date=document.getElementById('moDateV33')?.value||new Date().toISOString().slice(0,10);
+    const now=Date.now();
+    const o={id:`BB-${now}`,manual:true,role:'customer',type:'preorder',createdAt:new Date(`${date}T12:00:00`).getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,
+      customer:{name,phone},shipping:{carrier:document.getElementById('moCarrierV33')?.value.trim()||'',branch:document.getElementById('moBranchV33')?.value.trim()||'',city:'',province:'',note:document.getElementById('moNoteV33')?.value.trim()||''},
+      items,total,paid,balance:Math.max(0,total-paid),cost:0,profit:total,status:'Pre-order admin',workStatus:document.getElementById('moStatusV33')?.value||'not_ordered',packingState:'new',consignText:''};
+    db.orders=(db.orders||[]).filter(x=>x.id!==o.id); db.orders.unshift(o); localStore(); closeModal(); setPageForOrder(o); render();
+    toast('ບັນທຶກ Pre-order ໃນໜ້າແລ້ວ · ກຳລັງສົ່ງ SQL…');
+    persistNewV41(o,'ບັນທຶກ Pre-order ແລ້ວ');
+  };
+
+  window.saveReadyOrderV36=function(){
+    const name=document.getElementById('roNameV36')?.value.trim()||'';
+    const phone=document.getElementById('roPhoneV36')?.value.trim()||'';
+    if(!name) return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');
+    const base=Date.now();
+    const items=[...document.querySelectorAll('.ready-item-v36')].map((r,idx)=>({id:`READY-${base}-${idx}`,name:r.querySelector('.roNameV36')?.value.trim()||`ສິນຄ້າ ${idx+1}`,code:'READY',image:r.dataset.image||'',price:toNum(r.querySelector('.roPriceV36')?.value),cost:0,qty:Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),size:'',color:'',type:'ready'})).filter(i=>i.name||i.price||i.image);
+    if(!items.length) return toast('ກະລຸນາເພີ່ມສິນຄ້າ','danger');
+    const total=items.reduce((s,i)=>s+i.price*i.qty,0), paid=toNum(document.getElementById('roPaidV36')?.value);
+    const date=document.getElementById('roDateV36')?.value||new Date().toISOString().slice(0,10), now=Date.now();
+    const o={id:`BR-${now}`,manual:true,role:'customer',type:'ready',createdAt:new Date(`${date}T12:00:00`).getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,
+      customer:{name,phone},shipping:{carrier:document.getElementById('roCarrierV36')?.value.trim()||'',branch:document.getElementById('roBranchV36')?.value.trim()||'',city:'',province:'',note:document.getElementById('roNoteV36')?.value.trim()||''},
+      items,total,paid,balance:Math.max(0,total-paid),cost:0,profit:total,status:'Ready admin',readyStatus:document.getElementById('roStatusV36')?.value||'waiting_pack',packingState:'new',consignText:''};
+    db.orders=(db.orders||[]).filter(x=>x.id!==o.id); db.orders.unshift(o); localStore(); closeModal(); setPageForOrder(o); render();
+    toast('ບັນທຶກພ້ອມສົ່ງໃນໜ້າແລ້ວ · ກຳລັງສົ່ງ SQL…');
+    persistNewV41(o,'ບັນທຶກພ້ອມສົ່ງແລ້ວ');
+  };
+
+  // Debug helper: type BaiBouaV41Status() in browser console if needed.
+  window.BaiBouaV41Status=()=>({version:'41.0',orders:(db.orders||[]).length,sqlOrders:(db.orders||[]).filter(o=>o._sqlV40).length,lastSqlError:window.__bbLastSqlErrorV41||'',cloudReady});
+})();
