@@ -2550,3 +2550,147 @@ window.saveAdminOrderGuaranteedV394 = async function(order){
 
 /* V39.3 diagnostics */
 window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloudSave,orders:(db.orders||[]).length,lastDirtyUntil:window.__bbLocalDirtyUntilV392||0};};
+
+
+/* ============================================================
+   Bai Boua Admin V40 — SQL-backed admin orders
+   Manual Pre-order / Ready Stock are stored as separate rows in
+   Supabase instead of inside app_state JSON.
+   ============================================================ */
+(function(){
+  const ORDER_TABLE='admin_orders_v40';
+  const ITEM_TABLE='admin_order_items_v40';
+  let syncing=false;
+  let lastSqlSignature='';
+
+  function h(extra={}){ return Object.assign({
+    apikey:SUPABASE_ANON_KEY,
+    Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+    'Content-Type':'application/json'
+  },extra); }
+  async function req(path,opt={}){
+    const res=await fetch(`${SUPABASE_REST_URL}/${path}`,Object.assign({cache:'no-store'},opt,{headers:h(opt.headers||{})}));
+    if(!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0,220)}`);
+    const t=await res.text(); return t?JSON.parse(t):null;
+  }
+  function orderRow(o){
+    return {
+      id:String(o.id),order_type:o.type==='ready'?'ready':'preorder',order_date:o.orderDate||new Date(o.createdAt||Date.now()).toISOString().slice(0,10),
+      customer_name:o.customer?.name||'',customer_phone:o.customer?.phone||'',carrier:o.shipping?.carrier||'',branch:o.shipping?.branch||'',note:o.shipping?.note||'',
+      total:Number(o.total)||0,paid:Number(o.paid)||0,status:o.status||'',work_status:o.workStatus||null,ready_status:o.readyStatus||null,packing_state:o.packingState||'new',
+      created_at_ms:Number(o.createdAt)||Date.now(),completed_at_ms:o.completedAt?Number(o.completedAt):null,payload:{consignText:o.consignText||'',manual:true,role:o.role||'customer'}
+    };
+  }
+  function itemRows(o){ return (o.items||[]).map((i,idx)=>({
+      id:String(i.id||`${o.id}-I${idx+1}`),order_id:String(o.id),name:i.name||'',code:i.code||'',image_url:i.image||'',qty:Math.max(1,Number(i.qty)||1),price:Number(i.price)||0,item_type:i.type||o.type||'preorder',payload:{size:i.size||'',color:i.color||'',cost:Number(i.cost)||0}
+  })); }
+
+  window.saveOrderToSqlV40=async function(o){
+    if(!o||!o.id) throw new Error('Missing order id');
+    const row=orderRow(o);
+    await req(ORDER_TABLE,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(row)});
+    await req(`${ITEM_TABLE}?order_id=eq.${encodeURIComponent(o.id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    const items=itemRows(o);
+    if(items.length) await req(ITEM_TABLE,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(items)});
+    o._sqlV40=true;
+    return true;
+  };
+
+  function fromRows(r,items){
+    const p=(r.payload&&typeof r.payload==='object')?r.payload:{};
+    return {id:r.id,_sqlV40:true,manual:true,role:p.role||'customer',type:r.order_type==='ready'?'ready':'preorder',orderDate:r.order_date,
+      createdAt:Number(r.created_at_ms)||Date.now(),customer:{name:r.customer_name||'',phone:r.customer_phone||''},
+      shipping:{carrier:r.carrier||'',branch:r.branch||'',city:'',province:'',note:r.note||''},
+      items:(items||[]).map(i=>{const q=i.payload&&typeof i.payload==='object'?i.payload:{};return{id:i.id,name:i.name||'',code:i.code||'',image:i.image_url||'',qty:Number(i.qty)||1,price:Number(i.price)||0,cost:Number(q.cost)||0,size:q.size||'',color:q.color||'',type:i.item_type||r.order_type};}),
+      total:Number(r.total)||0,paid:Number(r.paid)||0,balance:Math.max(0,(Number(r.total)||0)-(Number(r.paid)||0)),cost:0,profit:Number(r.total)||0,
+      status:r.status||'',workStatus:r.work_status||undefined,readyStatus:r.ready_status||undefined,packingState:r.packing_state||'new',completedAt:r.completed_at_ms?Number(r.completed_at_ms):undefined,
+      consignText:p.consignText||'',adminNewAt:Number(r.created_at_ms)||Date.now(),_localUpdatedAt:new Date(r.updated_at||0).getTime()||Date.now()};
+  }
+
+  window.loadSqlOrdersV40=async function(forceRender=false){
+    if(syncing)return; syncing=true;
+    try{
+      const rows=await req(`${ORDER_TABLE}?archived_at=is.null&select=*&order=created_at_ms.desc&limit=1000`);
+      const ids=(rows||[]).map(r=>r.id);
+      let items=[];
+      if(ids.length){
+        // Pull active items in one request. PostgREST in() syntax.
+        const inside=ids.map(x=>`\"${String(x).replace(/\"/g,'')}\"`).join(',');
+        items=await req(`${ITEM_TABLE}?select=*&order_id=in.(${encodeURIComponent(inside)})`);
+      }
+      const by={}; for(const i of (items||[]))(by[i.order_id]||(by[i.order_id]=[])).push(i);
+      const sql=(rows||[]).map(r=>fromRows(r,by[r.id]||[]));
+      const sig=JSON.stringify(sql.map(o=>[o.id,o._localUpdatedAt,o.workStatus,o.readyStatus,o.total,o.paid,o.items.length]));
+      const nonSql=(db.orders||[]).filter(o=>!o._sqlV40 && !((o.manual===true)&&(String(o.id||'').startsWith('BM-')||String(o.id||'').startsWith('BR-'))));
+      db.orders=[...sql,...nonSql].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(_){}
+      if(sig!==lastSqlSignature){
+        const changed=lastSqlSignature!==''; lastSqlSignature=sig;
+        const active=document.activeElement, editing=active&&['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
+        const modalOpen=document.getElementById('modal')?.classList.contains('show');
+        if((forceRender||changed)&&!editing&&!modalOpen) render();
+      }
+    }catch(e){ console.warn('V40 SQL order sync:',e.message||e); }
+    finally{syncing=false;}
+  };
+
+  // Wrap the final save handlers. The existing form/UI remains unchanged;
+  // the newly-created manual order is immediately persisted to SQL.
+  const preSave=window.saveManualOrderV33;
+  if(preSave) window.saveManualOrderV33=function(){
+    const before=new Set((db.orders||[]).map(o=>o.id));
+    const ret=preSave.apply(this,arguments);
+    setTimeout(async()=>{
+      const o=(db.orders||[]).find(x=>!before.has(x.id)&&x.type==='preorder'); if(!o)return;
+      try{await saveOrderToSqlV40(o); toast('ບັນທຶກ Pre-order ເຂົ້າ SQL ແລ້ວ ✓'); await loadSqlOrdersV40(true);}
+      catch(e){console.warn(e);toast('SQL ບັນທຶກ Pre-order ບໍ່ສຳເລັດ','danger');}
+    },30); return ret;
+  };
+  const readySave=window.saveReadyOrderV36;
+  if(readySave) window.saveReadyOrderV36=function(){
+    const before=new Set((db.orders||[]).map(o=>o.id));
+    const ret=readySave.apply(this,arguments);
+    setTimeout(async()=>{
+      const o=(db.orders||[]).find(x=>!before.has(x.id)&&x.type==='ready'); if(!o)return;
+      try{await saveOrderToSqlV40(o); toast('ບັນທຶກອໍເດີ້ພ້ອມສົ່ງເຂົ້າ SQL ແລ້ວ ✓'); await loadSqlOrdersV40(true);}
+      catch(e){console.warn(e);toast('SQL ບັນທຶກອໍເດີ້ບໍ່ສຳເລັດ','danger');}
+    },30); return ret;
+  };
+
+  // Persist later status/item edits for SQL-backed manual orders.
+  const oldSaveDbV40=saveDB;
+  let sqlSaveTimerV40=null;
+  saveDB=function(){
+    const ret=oldSaveDbV40.apply(this,arguments);
+    clearTimeout(sqlSaveTimerV40);
+    sqlSaveTimerV40=setTimeout(()=>{
+      for(const o of (db.orders||[]).filter(x=>x._sqlV40)) saveOrderToSqlV40(o).catch(e=>console.warn('V40 background save',e.message||e));
+    },450);
+    return ret;
+  };
+
+  // SQL live sync every 3 seconds — no page reload.
+  setTimeout(()=>loadSqlOrdersV40(true),900);
+  setInterval(()=>loadSqlOrdersV40(false),3000);
+
+  // Archive completed SQL orders after 30 days and remove their images.
+  async function archiveOldV40(){
+    const cutoff=Date.now()-30*24*60*60*1000;
+    const old=(db.orders||[]).filter(o=>o._sqlV40&&o.completedAt&&Number(o.completedAt)<=cutoff);
+    for(const o of old){
+      try{
+        for(const i of (o.items||[])){
+          const url=String(i.image||''); const marker=`/${SUPABASE_STORAGE_BUCKET}/`;
+          if(url.includes(marker)){
+            const path=decodeURIComponent(url.split(marker)[1]||'');
+            if(path) await fetch(`${SUPABASE_STORAGE_OBJECT_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`,{method:'DELETE',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}}).catch(()=>{});
+          }
+        }
+        await req(`${ITEM_TABLE}?order_id=eq.${encodeURIComponent(o.id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({image_url:null})});
+        await req(`${ORDER_TABLE}?id=eq.${encodeURIComponent(o.id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({archived_at:new Date().toISOString()})});
+      }catch(e){console.warn('V40 archive',e.message||e);}
+    }
+    if(old.length) await loadSqlOrdersV40(true);
+  }
+  setTimeout(archiveOldV40,4000); setInterval(archiveOldV40,60*60*1000);
+})();
