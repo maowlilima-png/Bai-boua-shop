@@ -2078,7 +2078,7 @@ renderLogin=function(){
       <section class="consign-card-v32"><div class="consign-title-v32"><div><h3>ຂໍ້ມູນຝາກ / ສຳລັບປິ້ນບິນ</h3><div class="meta">ແກ້ໄຂໄດ້ ແລະກົດ Copy ໄດ້ທັນທີ</div></div><button class="btn sage small" onclick="copyConsignmentV32('${o.id}',true)">📋 ຄັດລອກ</button></div>
       <textarea id="consignTextV32" class="consign-text-v32" rows="8">${safeV32(noteTextV32(o))}</textarea>
       <div class="form-grid"><div class="field"><label>Tracking / ເລກບິນ</label><input id="trackingV32" value="${safeV32(o.trackingNo||'')}" placeholder="ປ້ອນເລກບິນ"></div><div class="field"><label>ໝາຍເຫດແອັດມິນ</label><input id="adminPackNoteV32" value="${safeV32(o.adminPackNote||'')}" placeholder="ຕົວຢ່າງ: ກວດສີແລ້ວ"></div></div>
-      <div class="actions"><button class="btn light" onclick="savePackingTextV32('${o.id}')">💾 ບັນທຶກ</button><button class="btn rose" onclick="markPackedV32('${o.id}')">✓ ຈັດເຄື່ອງຄົບ</button><button class="btn sage" onclick="markShippedV32('${o.id}')">🚚 ສົ່ງແລ້ວ</button></div></section></div>
+      <div class="actions"><button class="btn light" onclick="savePackingTextV32('${o.id}')">💾 ບັນທຶກ</button><button class="btn rose" onclick="markPackedV32('${o.id}')">✓ ຈັດເຄື່ອງຄົບ</button><button class="btn sage" onclick="markShippedV32('${o.id}')">🚚 ສົ່ງແລ້ວ</button><button class="btn danger" onclick="deleteAdminOrderV45('${o.id}')">🗑 ລຶບອໍເດີ້</button></div></section></div>
     </div>`);
   };
 
@@ -2232,7 +2232,7 @@ renderLogin=function(){
   function rowHTML(o, kind){
     const statuses=kind==='ready'?READY_STATUSES_V36:PRE_STATUSES_V36;
     const current=kind==='ready'?o.readyStatus:o.workStatus;
-    return `<article class="order-card-v33 order-kind-v36 ${kind}"><div class="order-top-v33"><div><div class="kind-tag-v36 ${kind}">${kind==='ready'?'⚡ ເຄື່ອງພ້ອມສົ່ງ':'🪷 Pre-order'}</div><button class="customer-link-v33" onclick="openCustomerHistoryV33('${o.id}')">${safe(o.customer?.name||'-')}</button><div class="meta">${safe(o.customer?.phone||'-')} · ${safe(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div></div><div><b>${money(o.total)}</b><div class="payment-mini-v34"><span>ໂອນ <b>${money(Number(o.paid)||0)}</b></span><span>ຄ້າງ <b>${money(Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0)))}</b></span></div></div></div><div class="order-products-v33">${(o.items||[]).map(i=>`<div>${i.image?`<img src="${i.image}" class="click-img-v35" onclick="event.stopPropagation();openQuickImageV35(this.src,'${safe(i.name)}')">`:'<span class="noimg-v33">📦</span>'}<span><b>${safe(i.name)}</b><small>${safe(i.code||'')} · × ${i.qty}</small></span></div>`).join('')}</div><div class="order-actions-v33"><select onchange="${kind==='ready'?'setReadyStatusV36':'setWorkStatusV33'}('${o.id}',this.value)">${statuses.map(x=>`<option value="${x[0]}" ${current===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select><span class="work-pill-v33 ${cls(current)}">${label(statuses,current)}</span><button class="btn light small" onclick="copyConsignmentV32('${o.id}')">📋 Copy</button><button class="btn light small" onclick="addItemToOrderV33('${o.id}')">＋ ເພີ່ມເຄື່ອງ</button><button class="btn rose small" onclick="openPackingOrderV32('${o.id}')">ເປີດ</button></div></article>`;
+    return `<article class="order-card-v33 order-kind-v36 ${kind}"><div class="order-top-v33"><div><div class="kind-tag-v36 ${kind}">${kind==='ready'?'⚡ ເຄື່ອງພ້ອມສົ່ງ':'🪷 Pre-order'}</div><button class="customer-link-v33" onclick="openCustomerHistoryV33('${o.id}')">${safe(o.customer?.name||'-')}</button><div class="meta">${safe(o.customer?.phone||'-')} · ${safe(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div></div><div><b>${money(o.total)}</b><div class="payment-mini-v34"><span>ໂອນ <b>${money(Number(o.paid)||0)}</b></span><span>ຄ້າງ <b>${money(Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0)))}</b></span></div></div></div><div class="order-products-v33">${(o.items||[]).map(i=>`<div>${i.image?`<img src="${i.image}" class="click-img-v35" onclick="event.stopPropagation();openQuickImageV35(this.src,'${safe(i.name)}')">`:'<span class="noimg-v33">📦</span>'}<span><b>${safe(i.name)}</b><small>${safe(i.code||'')} · × ${i.qty}</small></span></div>`).join('')}</div><div class="order-actions-v33"><select onchange="${kind==='ready'?'setReadyStatusV36':'setWorkStatusV33'}('${o.id}',this.value)">${statuses.map(x=>`<option value="${x[0]}" ${current===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select><span class="work-pill-v33 ${cls(current)}">${label(statuses,current)}</span><button class="btn light small" onclick="copyConsignmentV32('${o.id}')">📋 Copy</button><button class="btn light small" onclick="addItemToOrderV33('${o.id}')">＋ ເພີ່ມເຄື່ອງ</button><button class="btn rose small" onclick="openPackingOrderV32('${o.id}')">ເປີດ</button><button class="btn danger small" onclick="deleteAdminOrderV45('${o.id}')">🗑 ລຶບ</button></div></article>`;
   }
   function page(kind){
     ensureTypes();
@@ -2608,6 +2608,48 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
     if(items.length) await req(ITEM_TABLE,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(items)});
     o._sqlV40=true;
     return true;
+  };
+
+
+  // V45: hard delete an admin order from SQL + local UI.
+  // Item rows are deleted first, then the parent order row. Uploaded order
+  // images under product-images/orders/ are removed as well to avoid storage leaks.
+  window.deleteAdminOrderV45=async function(id){
+    const o=(db.orders||[]).find(x=>String(x.id)===String(id));
+    if(!o)return;
+    const who=o.customer?.name||'';
+    if(!confirm(`ລຶບອໍເດີ້ ${id}${who?` · ${who}`:''} ຖາວອນ?\n\nອໍເດີ້ນີ້ຈະຖືກລຶບອອກຈາກ SQL ນຳ.`))return;
+    try{
+      // Remove uploaded order images from Supabase Storage when possible.
+      const marker=`/${SUPABASE_STORAGE_BUCKET}/`;
+      const paths=[...(o.items||[])].map(i=>{
+        const url=String(i.image||'');
+        const at=url.indexOf(marker);
+        return at>=0?decodeURIComponent(url.slice(at+marker.length)):'';
+      }).filter(path=>path.startsWith('orders/'));
+      for(const path of [...new Set(paths)]){
+        try{
+          const r=await fetch(`${SUPABASE_STORAGE_OBJECT_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`,{
+            method:'DELETE',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+          });
+          if(!r.ok) console.warn('V45 image delete',r.status,await r.text());
+        }catch(e){ console.warn('V45 image delete',e); }
+      }
+
+      if(o._sqlV40 || String(id).startsWith('BB-') || String(id).startsWith('BR-') || String(id).startsWith('BM-')){
+        await req(`${ITEM_TABLE}?order_id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+        await req(`${ORDER_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+      }
+      db.orders=(db.orders||[]).filter(x=>String(x.id)!==String(id));
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(_){ }
+      if(document.getElementById('modal')?.classList.contains('show')) closeModal();
+      toast('ລຶບອໍເດີ້ອອກຈາກ SQL ແລ້ວ ✓');
+      render();
+      try{ await loadSqlOrdersV40(true); }catch(_){ }
+    }catch(e){
+      console.error('V45 delete order',e);
+      toast(`ລຶບອໍເດີ້ບໍ່ສຳເລັດ: ${String(e?.message||e).slice(0,120)}`,'danger');
+    }
   };
 
   function fromRows(r,items){
