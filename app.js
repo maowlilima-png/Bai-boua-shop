@@ -2611,14 +2611,24 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
     if(syncing)return; syncing=true;
     try{
       const rows=await req(`${ORDER_TABLE}?archived_at=is.null&select=*&order=created_at_ms.desc&limit=1000`);
-      const ids=(rows||[]).map(r=>r.id);
+      const ids=(rows||[]).map(r=>String(r.id));
       let items=[];
       if(ids.length){
-        // Pull active items in one request. PostgREST in() syntax.
-        const inside=ids.map(x=>`\"${String(x).replace(/\"/g,'')}\"`).join(',');
-        items=await req(`${ITEM_TABLE}?select=*&order_id=in.(${encodeURIComponent(inside)})`);
+        // V42: fetch item rows with a simple SELECT. The previous PostgREST in(...)
+        // filter could fail on some browsers/URL encodings and then prevented ALL
+        // SQL orders from being rendered even though the rows existed in Supabase.
+        try{
+          const allItems=await req(`${ITEM_TABLE}?select=*&limit=10000`);
+          const wanted=new Set(ids);
+          items=(allItems||[]).filter(i=>wanted.has(String(i.order_id)));
+        }catch(itemErr){
+          // Never throw away the order list just because item loading failed.
+          console.warn('V42 SQL item load:',itemErr?.message||itemErr);
+          items=[];
+          window.__bbLastSqlLoadErrorV42=`ITEMS: ${String(itemErr?.message||itemErr).slice(0,160)}`;
+        }
       }
-      const by={}; for(const i of (items||[]))(by[i.order_id]||(by[i.order_id]=[])).push(i);
+      const by={}; for(const i of (items||[]))(by[String(i.order_id)]||(by[String(i.order_id)]=[])).push(i);
       const sql=(rows||[]).map(r=>fromRows(r,by[r.id]||[]));
       const sig=JSON.stringify(sql.map(o=>[o.id,o._localUpdatedAt,o.workStatus,o.readyStatus,o.total,o.paid,o.items.length]));
       const nonSql=(db.orders||[]).filter(o=>!o._sqlV40 && !((o.manual===true)&&(String(o.id||'').startsWith('BM-')||String(o.id||'').startsWith('BR-'))));
@@ -2630,7 +2640,7 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
         const modalOpen=document.getElementById('modal')?.classList.contains('show');
         if((forceRender||changed)&&!editing&&!modalOpen) render();
       }
-    }catch(e){ console.warn('V40 SQL order sync:',e.message||e); }
+    }catch(e){ console.warn('V42 SQL order sync:',e.message||e); window.__bbLastSqlLoadErrorV42=String(e?.message||e).slice(0,180); if(forceRender) toast(`SQL LOAD ERROR: ${window.__bbLastSqlLoadErrorV42}`,'danger'); }
     finally{syncing=false;}
   };
 
@@ -2780,5 +2790,5 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
   };
 
   // Debug helper: type BaiBouaV41Status() in browser console if needed.
-  window.BaiBouaV41Status=()=>({version:'41.0',orders:(db.orders||[]).length,sqlOrders:(db.orders||[]).filter(o=>o._sqlV40).length,lastSqlError:window.__bbLastSqlErrorV41||'',cloudReady});
+  window.BaiBouaV41Status=()=>({version:'42.0',orders:(db.orders||[]).length,sqlOrders:(db.orders||[]).filter(o=>o._sqlV40).length,lastSqlError:window.__bbLastSqlErrorV41||'',lastSqlLoadError:window.__bbLastSqlLoadErrorV42||'',cloudReady});
 })();
