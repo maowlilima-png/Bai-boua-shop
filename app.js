@@ -87,7 +87,21 @@ async function initCloudDB(){
     const rows=await res.json();
     const remote=rows?.[0]?.data;
     if(hasUsableCloudState(remote)){
-      db=removeSeedRecords(remote);
+      // V39.4: merge cloud with current local orders instead of replacing them.
+      // This prevents an in-flight startup fetch from deleting an order the admin just created.
+      const cleanRemote=removeSeedRecords(remote);
+      const localOrders=Array.isArray(db?.orders)?db.orders:[];
+      const remoteOrders=Array.isArray(cleanRemote?.orders)?cleanRemote.orders:[];
+      const merged=new Map();
+      for(const o of remoteOrders) if(o&&o.id) merged.set(o.id,o);
+      for(const o of localOrders){
+        if(!o||!o.id) continue;
+        const r=merged.get(o.id);
+        const lt=Number(o._localUpdatedAt||o.adminNewAt||o.createdAt||0);
+        const rt=Number(r?._localUpdatedAt||r?.adminNewAt||r?.createdAt||0);
+        if(!r || lt>=rt) merged.set(o.id,o);
+      }
+      db={...cleanRemote,orders:[...merged.values()].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0))};
       localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
     }else{
       // A freshly created app_state row is often just {}. Never replace the
@@ -2464,6 +2478,75 @@ renderLogin=function(){
   };
 })();
 
+
+
+/* ============================================================
+   Bai Boua Admin V39.4 — guaranteed admin order persistence
+   ============================================================ */
+window.saveAdminOrderGuaranteedV394 = async function(order){
+  if(!order||!order.id) throw new Error('Missing order');
+  // Keep it locally first.
+  const ix=(db.orders||[]).findIndex(x=>x.id===order.id);
+  if(ix<0) db.orders.unshift(order); else db.orders[ix]=order;
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){console.warn(e);}
+
+  // Read latest cloud state, merge this order by ID, then write back.
+  const get=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${encodeURIComponent(SUPABASE_STATE_ID)}&select=data,updated_at`,{headers:supabaseHeaders(),cache:'no-store'});
+  if(!get.ok) throw new Error(`Cloud read ${get.status}`);
+  const rows=await get.json();
+  const remote=(rows?.[0]?.data&&typeof rows[0].data==='object')?rows[0].data:{};
+  const mergedState={...remote,...db};
+  const map=new Map();
+  for(const o of (Array.isArray(remote.orders)?remote.orders:[])) if(o&&o.id) map.set(o.id,o);
+  for(const o of (Array.isArray(db.orders)?db.orders:[])) if(o&&o.id) map.set(o.id,o);
+  map.set(order.id,order);
+  mergedState.orders=[...map.values()].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+
+  const post=await fetch(`${SUPABASE_REST_URL}/app_state`,{
+    method:'POST',headers:supabaseHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),
+    body:JSON.stringify({id:SUPABASE_STATE_ID,data:mergedState,updated_at:new Date().toISOString()})
+  });
+  if(!post.ok) throw new Error((await post.text()).slice(0,180));
+  db=mergedState;
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+  cloudReady=true;
+  return true;
+};
+
+// Wrap both admin save buttons. Keep the existing UI, but after it creates an
+// order, persist that exact order ID with a cloud read-merge-write cycle.
+(function(){
+  const oldPre=window.saveManualOrderV33;
+  if(oldPre) window.saveManualOrderV33=function(){
+    const before=new Set((db.orders||[]).map(o=>o.id));
+    const result=oldPre.apply(this,arguments);
+    setTimeout(()=>{
+      const order=(db.orders||[]).find(o=>!before.has(o.id) && o.type==='preorder');
+      if(!order) return;
+      window.__bbLocalDirtyUntilV392=Date.now()+30000;
+      saveAdminOrderGuaranteedV394(order).then(()=>{
+        state.adminTab='packing'; state.packDate=order.orderDate||''; state.packWorkStatus='all'; state.packSearch='';
+        window.__bbLocalDirtyUntilV392=Date.now()+3000; render();
+      }).catch(e=>{console.warn('V39.4 preorder save',e);toast('Cloud ບັນທຶກອໍເດີ້ບໍ່ສຳເລັດ','danger');});
+    },0);
+    return result;
+  };
+  const oldReady=window.saveReadyOrderV36;
+  if(oldReady) window.saveReadyOrderV36=function(){
+    const before=new Set((db.orders||[]).map(o=>o.id));
+    const result=oldReady.apply(this,arguments);
+    setTimeout(()=>{
+      const order=(db.orders||[]).find(o=>!before.has(o.id) && o.type==='ready');
+      if(!order) return;
+      window.__bbLocalDirtyUntilV392=Date.now()+30000;
+      saveAdminOrderGuaranteedV394(order).then(()=>{
+        state.adminTab='readyorders'; state.readyDate=order.orderDate||''; state.readyWorkStatus='all'; state.readySearch='';
+        window.__bbLocalDirtyUntilV392=Date.now()+3000; render();
+      }).catch(e=>{console.warn('V39.4 ready save',e);toast('Cloud ບັນທຶກອໍເດີ້ບໍ່ສຳເລັດ','danger');});
+    },0);
+    return result;
+  };
+})();
 
 /* V39.3 diagnostics */
 window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloudSave,orders:(db.orders||[]).length,lastDirtyUntil:window.__bbLocalDirtyUntilV392||0};};
