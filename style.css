@@ -499,3 +499,8 @@ select { max-width: 100%; }
 
 /* V39 performance / pagination */
 .v39-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 8px;padding:12px 14px;background:rgba(255,255,255,.78);border:1px solid rgba(121,101,77,.14);border-radius:16px;flex-wrap:wrap}.v39-pager>div{display:flex;align-items:center;gap:8px}.v39-pager button:disabled{opacity:.45;cursor:not-allowed}.manual-img-v34 img,.click-img-v35{content-visibility:auto}
+
+/* V39.2: red dot for newly arrived orders */
+.admin-menu button{position:relative}
+.new-order-dot-v392{position:absolute;right:13px;top:50%;width:10px;height:10px;border-radius:50%;background:#d84b59;transform:translateY(-50%);box-shadow:0 0 0 3px rgba(216,75,89,.14);animation:bbDotPulse 1.7s ease-in-out infinite}
+@keyframes bbDotPulse{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.18)}}
