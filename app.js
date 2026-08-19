@@ -1214,7 +1214,9 @@ renderAdmin = function(){
           // This prevents a just-created admin order from disappearing when
           // Supabase still has the previous app_state for a few seconds.
           const localOrders=Array.isArray(db.orders)?db.orders:[];
-          const remoteOrders=Array.isArray(remote.orders)?remote.orders:[];
+          // Manual admin orders are SQL-backed from V40 onward. Do not re-import
+          // stale manual copies from app_state during the 3-second legacy poll.
+          const remoteOrders=Array.isArray(remote.orders)?remote.orders.filter(o=>!o?.manual):[];
           const merged=new Map();
           for(const o of remoteOrders) if(o&&o.id) merged.set(o.id,o);
           for(const o of localOrders){
@@ -1826,7 +1828,11 @@ function cleanReadyOnlyV30(){
   db.categories=(db.categories||[]).filter(c=>!['ພຣີອໍເດີ້','Pre-order','Preorder'].includes(String(c).trim()));
   if(!db.categories.includes('ພ້ອມສົ່ງ')) db.categories.push('ພ້ອມສົ່ງ');
   db.products=(db.products||[]).filter(p=>p.type!=='preorder').map(p=>({...p,type:'ready',agentPrice:undefined}));
-  db.orders=(db.orders||[]).filter(o=>o.role!=='agent' && o.type!=='preorder').map(o=>({...o,role:'customer',type:'ready',sender:null}));
+  // V43 FIX: keep manual/SQL Pre-order records. V30 previously deleted every
+  // preorder and also forced every remaining order to type='ready' on each render.
+  // That made a successfully loaded SQL preorder disappear immediately before
+  // the Pre-order page could render it.
+  db.orders=(db.orders||[]).filter(o=>o.role!=='agent').map(o=>({...o,role:'customer',sender:null}));
   if(state.role==='agent'){ state.user=null; state.role='customer'; state.loginRole='customer'; }
   if(state.loginRole==='agent') state.loginRole='customer';
   if(state.filterType==='preorder') state.filterType='all';
@@ -2792,3 +2798,22 @@ window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloud
   // Debug helper: type BaiBouaV41Status() in browser console if needed.
   window.BaiBouaV41Status=()=>({version:'42.0',orders:(db.orders||[]).length,sqlOrders:(db.orders||[]).filter(o=>o._sqlV40).length,lastSqlError:window.__bbLastSqlErrorV41||'',lastSqlLoadError:window.__bbLastSqlLoadErrorV42||'',cloudReady});
 })();
+
+
+/* ============================================================
+   Bai Boua Admin V43 — root-cause fix
+   Root cause: cleanReadyOnlyV30() removed every preorder and forced all
+   surviving orders to ready on every admin render. SQL save/load was working,
+   but renderAdmin() deleted the loaded preorder immediately.
+   ============================================================ */
+window.BaiBouaV43Status=function(){
+  const all=Array.isArray(db?.orders)?db.orders:[];
+  return {
+    version:'43.0',
+    total:all.length,
+    preorder:all.filter(o=>o.type==='preorder').length,
+    ready:all.filter(o=>o.type==='ready').length,
+    sql:all.filter(o=>o._sqlV40).length,
+    lastSqlError:window.__bbLastSqlLoadErrorV42||window.__bbLastSqlErrorV41||''
+  };
+};
