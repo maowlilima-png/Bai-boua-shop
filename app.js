@@ -1196,7 +1196,21 @@ renderAdmin = function(){
         const localText=JSON.stringify(db);
         if(remoteText!==localText){
           const beforeOrders=(db.orders||[]).length;
-          db=remote;
+          // Merge orders by id instead of replacing the whole local list.
+          // This prevents a just-created admin order from disappearing when
+          // Supabase still has the previous app_state for a few seconds.
+          const localOrders=Array.isArray(db.orders)?db.orders:[];
+          const remoteOrders=Array.isArray(remote.orders)?remote.orders:[];
+          const merged=new Map();
+          for(const o of remoteOrders) if(o&&o.id) merged.set(o.id,o);
+          for(const o of localOrders){
+            if(!o||!o.id) continue;
+            const r=merged.get(o.id);
+            const lt=Number(o._localUpdatedAt||o.adminNewAt||0);
+            const rt=Number(r?._localUpdatedAt||r?.adminNewAt||0);
+            if(!r || lt>rt) merged.set(o.id,o);
+          }
+          db={...remote,orders:[...merged.values()].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0))};
           normalizeSizeStockV22();
           localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
           if(state.user){
@@ -2126,7 +2140,13 @@ renderLogin=function(){
     const rows=[...document.querySelectorAll('.manual-item-row-v34')],items=[];
     rows.forEach((r,idx)=>{const nm=r.querySelector('.moNameV34')?.value.trim(),qty=Math.max(1,Number(r.querySelector('.moQtyV34')?.value)||1),price=moneyNumV34(r.querySelector('.moPriceV34')?.value);if(nm||price||r.dataset.image)items.push({id:'MAN-'+Date.now()+'-'+idx,name:nm||`ສິນຄ້າ ${idx+1}`,code:'PRE-ORDER',image:r.dataset.image||'',price,cost:0,qty,size:'',color:'',type:'preorder'});});
     if(!items.length)return toast('ກະລຸນາເພີ່ມສິນຄ້າຢ່າງໜ້ອຍ 1 ລາຍການ','danger'); const pay=recalcManualV34();
-    const date=document.getElementById('moDateV33').value||new Date().toISOString().slice(0,10); const o={id:'BB-'+Date.now().toString().slice(-7),manual:true,role:'customer',type:'preorder',createdAt:new Date(date+'T12:00:00').getTime(),adminNewAt:Date.now(),orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('moCarrierV33').value.trim(),branch:document.getElementById('moBranchV33').value.trim(),city:'',province:'',note:document.getElementById('moNoteV33').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Pre-order admin',workStatus:document.getElementById('moStatusV33').value,packingState:'new',consignText:''}; db.orders.unshift(o); window.__bbLocalDirtyUntilV392=Date.now()+12000; saveDB(); closeModal(); toast('ບັນທຶກ Pre-order ແລ້ວ ✓'); state.packDate=date; state.packWorkStatus='all'; state.packSearch=''; state.packPageV39=1; render();
+    const date=document.getElementById('moDateV33').value||new Date().toISOString().slice(0,10); const now=Date.now(); const o={id:'BB-'+now.toString().slice(-7),manual:true,role:'customer',type:'preorder',createdAt:new Date(date+'T12:00:00').getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('moCarrierV33').value.trim(),branch:document.getElementById('moBranchV33').value.trim(),city:'',province:'',note:document.getElementById('moNoteV33').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Pre-order admin',workStatus:document.getElementById('moStatusV33').value,packingState:'new',consignText:''};
+    db.orders.unshift(o);
+    window.__bbLocalDirtyUntilV392=Date.now()+30000;
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){console.warn(e);}
+    closeModal(); state.packDate=date; state.packWorkStatus='all'; state.packSearch=''; state.packPageV39=1; render();
+    toast('ບັນທຶກ Pre-order ໃນໜ້າເວັບແລ້ວ ✓');
+    saveDBAndWait().then(()=>{window.__bbLocalDirtyUntilV392=Date.now()+3000; toast('ບັນທຶກຂຶ້ນ Cloud ແລ້ວ ✓');}).catch(e=>{console.warn(e); toast('ອໍເດີ້ຢູ່ໃນເຄື່ອງແລ້ວ ແຕ່ Cloud ຍັງບັນທຶກບໍ່ສຳເລັດ','danger');});
   };
   window.setWorkStatusV33=function(id,status){ const o=db.orders.find(x=>x.id===id); if(!o)return; o.workStatus=status; if(status==='packed')o.packingState='packed'; if(status==='done')o.packingState='shipped'; saveDB(); toast('ອັບເດດສະຖານະແລ້ວ'); render(); };
   window.addItemToOrderV33=function(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; showModal(`<div class="modal-head"><b>＋ ເພີ່ມເຄື່ອງໃສ່ ${safeV33(o.customer?.name||o.id)}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><div id="addOneV34" class="manual-item-row-v34"><label class="manual-img-v34"><span>＋ ຮູບ</span><input type="file" accept="image/*" onchange="previewManualImageV34(this)"></label><input class="moNameV34" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="moQtyV34" type="number" min="1" value="1"><input class="moPriceV34" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ"><div></div><div></div></div><button class="btn rose full" onclick="saveAddedItemV33('${id}')">ເພີ່ມເຂົ້າອໍເດີ້</button></div>`); document.getElementById('addOneV34').dataset.image=''; };
@@ -2213,7 +2233,7 @@ renderLogin=function(){
   window.addReadyItemV36=function(){ const wrap=document.getElementById('roItemsV36');if(!wrap)return;const d=document.createElement('div');d.className='manual-item-row-v34 ready-item-v36';d.dataset.image='';d.innerHTML=`<label class="manual-img-v34"><span>＋ ເພີ່ມຮູບ</span><input type="file" accept="image/*" onchange="previewReadyImageV36(this)"></label><input class="roNameV36" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="roQtyV36" type="number" min="1" value="1" oninput="recalcReadyV36()"><input class="roPriceV36" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ" oninput="recalcReadyV36()"><div class="money-preview-v34 roSubV36">0 ₭<small>1 × 0 ₭</small></div><button class="btn danger small" type="button" onclick="this.parentElement.remove();recalcReadyV36()">✕</button>`;wrap.appendChild(d);recalcReadyV36(); };
   window.previewReadyImageV36=function(input){const row=input.closest('.ready-item-v36');if(!row)return;const f=input.files?.[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{const max=700,sc=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);const data=c.toDataURL('image/jpeg',.76);row.dataset.image=data;row.querySelector('.manual-img-v34').innerHTML=`<img src="${data}"><input type="file" accept="image/*" onchange="previewReadyImageV36(this)">`;};img.src=e.target.result;};rd.readAsDataURL(f);};
   window.recalcReadyV36=function(){let total=0;document.querySelectorAll('.ready-item-v36').forEach(r=>{const q=Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),p=mnum(r.querySelector('.roPriceV36')?.value),sub=q*p;total+=sub;const e=r.querySelector('.roSubV36');if(e)e.innerHTML=`${money(sub)}<small>${q} × ${money(p)}</small>`;});const paid=mnum(document.getElementById('roPaidV36')?.value),bal=Math.max(0,total-paid);if(document.getElementById('roTotalV36'))document.getElementById('roTotalV36').textContent=money(total);if(document.getElementById('roBalanceV36'))document.getElementById('roBalanceV36').textContent=money(bal);return{total,paid,balance:bal};};
-  window.saveReadyOrderV36=function(){const name=document.getElementById('roNameV36')?.value.trim(),phone=document.getElementById('roPhoneV36')?.value.trim();if(!name)return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');const items=[...document.querySelectorAll('.ready-item-v36')].map((r,idx)=>({id:'READY-'+Date.now()+'-'+idx,name:r.querySelector('.roNameV36')?.value.trim()||`ສິນຄ້າ ${idx+1}`,code:'READY',image:r.dataset.image||'',price:mnum(r.querySelector('.roPriceV36')?.value),cost:0,qty:Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),size:'',color:'',type:'ready'})).filter(i=>i.name||i.price||i.image);if(!items.length)return toast('ກະລຸນາເພີ່ມສິນຄ້າ','danger');const pay=recalcReadyV36(),date=document.getElementById('roDateV36').value||new Date().toISOString().slice(0,10);const o={id:'BR-'+Date.now().toString().slice(-7),manual:true,role:'customer',type:'ready',createdAt:new Date(date+'T12:00:00').getTime(),adminNewAt:Date.now(),orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('roCarrierV36').value.trim(),branch:document.getElementById('roBranchV36').value.trim(),city:'',province:'',note:document.getElementById('roNoteV36').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Ready admin',readyStatus:document.getElementById('roStatusV36').value,packingState:'new',consignText:''};db.orders.unshift(o);window.__bbLocalDirtyUntilV392=Date.now()+12000;saveDB();closeModal();state.readyDate=date;state.readyWorkStatus='all';state.readySearch='';state.readyPageV39=1;toast('ບັນທຶກອໍເດີ້ພ້ອມສົ່ງແລ້ວ ✓');render();};
+  window.saveReadyOrderV36=function(){const name=document.getElementById('roNameV36')?.value.trim(),phone=document.getElementById('roPhoneV36')?.value.trim();if(!name)return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');const items=[...document.querySelectorAll('.ready-item-v36')].map((r,idx)=>({id:'READY-'+Date.now()+'-'+idx,name:r.querySelector('.roNameV36')?.value.trim()||`ສິນຄ້າ ${idx+1}`,code:'READY',image:r.dataset.image||'',price:mnum(r.querySelector('.roPriceV36')?.value),cost:0,qty:Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),size:'',color:'',type:'ready'})).filter(i=>i.name||i.price||i.image);if(!items.length)return toast('ກະລຸນາເພີ່ມສິນຄ້າ','danger');const pay=recalcReadyV36(),date=document.getElementById('roDateV36').value||new Date().toISOString().slice(0,10);const now=Date.now();const o={id:'BR-'+now.toString().slice(-7),manual:true,role:'customer',type:'ready',createdAt:new Date(date+'T12:00:00').getTime(),adminNewAt:now,_localUpdatedAt:now,orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('roCarrierV36').value.trim(),branch:document.getElementById('roBranchV36').value.trim(),city:'',province:'',note:document.getElementById('roNoteV36').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Ready admin',readyStatus:document.getElementById('roStatusV36').value,packingState:'new',consignText:''};db.orders.unshift(o);window.__bbLocalDirtyUntilV392=Date.now()+30000;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){console.warn(e);}closeModal();state.readyDate=date;state.readyWorkStatus='all';state.readySearch='';state.readyPageV39=1;toast('ບັນທຶກອໍເດີ້ພ້ອມສົ່ງໃນໜ້າເວັບແລ້ວ ✓');render();saveDBAndWait().then(()=>{window.__bbLocalDirtyUntilV392=Date.now()+3000;toast('ບັນທຶກຂຶ້ນ Cloud ແລ້ວ ✓');}).catch(e=>{console.warn(e);toast('ອໍເດີ້ຢູ່ໃນເຄື່ອງແລ້ວ ແຕ່ Cloud ຍັງບັນທຶກບໍ່ສຳເລັດ','danger');});};
   const oldAdminPageV36=adminPage;
   adminPage=function(){ if(state.adminTab==='readyorders')return adminReadyOrdersV36(); return oldAdminPageV36(); };
 })();
@@ -2380,8 +2400,10 @@ renderLogin=function(){
   }
   const basePacking=window.adminPackingV32;
   const baseReady=window.adminReadyOrdersV36;
-  if(basePacking) window.adminPackingV32=function(){ return paginateAdminPage('preorder',basePacking); };
-  if(baseReady) window.adminReadyOrdersV36=function(){ return paginateAdminPage('ready',baseReady); };
+  // V39.3: use the stable order renderer directly. The earlier temporary-db
+  // pagination could hide a newly saved order before the next cloud cycle.
+  if(basePacking) window.adminPackingV32=function(){ return basePacking(); };
+  if(baseReady) window.adminReadyOrdersV36=function(){ return baseReady(); };
 
   // Reset to page 1 when filters/search change by observing state between renders.
   const oldRenderV39=render;
@@ -2437,7 +2459,11 @@ renderLogin=function(){
   // overwrite it while the POST is still propagating.
   const oldSave=saveDB;
   saveDB=function(){
-    window.__bbLocalDirtyUntilV392=Date.now()+12000;
+    window.__bbLocalDirtyUntilV392=Date.now()+30000;
     return oldSave.apply(this,arguments);
   };
 })();
+
+
+/* V39.3 diagnostics */
+window.BaiBouaCloudStatus=function(){return {cloudReady,cloudSaving,pendingCloudSave,orders:(db.orders||[]).length,lastDirtyUntil:window.__bbLocalDirtyUntilV392||0};};
