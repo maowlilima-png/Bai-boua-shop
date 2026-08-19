@@ -61,11 +61,11 @@ function loadLocalDB(){
 }
 async function initCloudDB(){
   try{
-    const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=value`,{headers:supabaseHeaders()});
+    const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=data`,{headers:supabaseHeaders()});
     if(!res.ok) throw new Error(await res.text());
     const rows=await res.json();
-    if(rows && rows.length && rows[0].value){
-      db=removeSeedRecords(rows[0].value);
+    if(rows && rows.length && rows[0].data){
+      db=removeSeedRecords(rows[0].data);
       localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
     }else{
       await saveDBToCloud(true);
@@ -85,7 +85,7 @@ async function saveDBToCloud(force=false){
     const res=await fetch(`${SUPABASE_REST_URL}/app_state`,{
       method:'POST',
       headers:supabaseHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),
-      body:JSON.stringify({id:SUPABASE_STATE_ID,value:db,updated_at:new Date().toISOString()})
+      body:JSON.stringify({id:SUPABASE_STATE_ID,data:db,updated_at:new Date().toISOString()})
     });
     if(!res.ok) throw new Error(await res.text());
     cloudReady=true;
@@ -363,7 +363,7 @@ async function saveDBAndWait(){
   const res=await fetch(`${SUPABASE_REST_URL}/app_state`,{
     method:'POST',
     headers:supabaseHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),
-    body:JSON.stringify({id:SUPABASE_STATE_ID,value:db,updated_at:new Date().toISOString()})
+    body:JSON.stringify({id:SUPABASE_STATE_ID,data:db,updated_at:new Date().toISOString()})
   });
   if(!res.ok) throw new Error(`ບັນທຶກຂຶ້ນ Supabase ບໍ່ສຳເລັດ: ${(await res.text()).slice(0,160)}`);
   cloudReady=true;
@@ -1159,14 +1159,14 @@ renderAdmin = function(){
   async function pollCloudV22(){
     if(cloudSaving) return;
     try{
-      const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=value,updated_at`,{headers:supabaseHeaders(),cache:'no-store'});
+      const res=await fetch(`${SUPABASE_REST_URL}/app_state?id=eq.${SUPABASE_STATE_ID}&select=data,updated_at`,{headers:supabaseHeaders(),cache:'no-store'});
       if(!res.ok) return;
       const rows=await res.json();
-      if(!rows?.length||!rows[0].value) return;
+      if(!rows?.length||!rows[0].data) return;
       const stamp=String(rows[0].updated_at||'');
       if(stamp&&stamp!==lastCloudUpdatedV22){
         lastCloudUpdatedV22=stamp;
-        const remote=removeSeedRecords(rows[0].value);
+        const remote=removeSeedRecords(rows[0].data);
         const remoteText=JSON.stringify(remote);
         const localText=JSON.stringify(db);
         if(remoteText!==localText){
@@ -1905,3 +1905,468 @@ renderLogin=function(){
     </div>
   </div>`;
 };
+
+/* V32 ADMIN PACKING + SHIPPING + COPYABLE CONSIGNMENT NOTE */
+(function(){
+  function safeV32(v){ return esc(String(v ?? '')); }
+  function activeOrdersV32(){
+    return (db.orders||[]).filter(o=>!String(o.status||'').includes('ຍົກເລີກ'));
+  }
+  function itemQtyV32(o){ return (o.items||[]).reduce((s,i)=>s+(Number(i.qty)||0),0); }
+  function firstImgV32(o){ return o.items?.[0]?.image || ''; }
+  function packingStateV32(o){
+    if(o.packingState) return o.packingState;
+    if(String(o.status||'').includes('ຈັດສົ່ງ') || o.trackingNo) return 'shipped';
+    return 'new';
+  }
+  function packingLabelV32(o){
+    const s=packingStateV32(o);
+    if(s==='packed') return 'ພ້ອມສົ່ງ';
+    if(s==='shipped') return 'ສົ່ງແລ້ວ';
+    if(s==='packing') return 'ກຳລັງຈັດ';
+    return 'ລໍຖ້າຈັດ';
+  }
+  function packingClassV32(o){
+    const s=packingStateV32(o);
+    return s==='shipped'?'is-shipped':s==='packed'?'is-packed':s==='packing'?'is-packing':'is-new';
+  }
+  function generatedConsignmentV32(o){
+    const c=o.customer||{}, sh=o.shipping||{};
+    const lines=[];
+    lines.push(`${c.name||''}${c.phone?` ${c.phone}`:''}`.trim());
+    if(o.receiverName||o.receiverPhone){
+      lines.push(`ຜູ້ຮັບ : ${o.receiverName||c.name||''}${o.receiverPhone?` ${o.receiverPhone}`:''}`.trim());
+    } else if(c.name||c.phone){
+      lines.push(`ຜູ້ຮັບ : ${c.name||''}${c.phone?` ${c.phone}`:''}`.trim());
+    }
+    const address=[sh.carrier,sh.branch,sh.city,sh.province].filter(Boolean).join(' ');
+    if(address) lines.push(address);
+    if(sh.note) lines.push(sh.note);
+    return lines.filter(Boolean).join('\n');
+  }
+  function noteTextV32(o){ return o.consignText || generatedConsignmentV32(o); }
+  function adminMenuV32(){
+    return `${adminMenuBtn('dashboard','🏠 Dashboard')}${adminMenuBtn('orders','🧾 ອໍເດີ້')}${adminMenuBtn('packing','🪷 Pre-order')}${adminMenuBtn('readyorders','⚡ ເຄື່ອງພ້ອມສົ່ງ')}${adminMenuBtn('shipping','🚚 ຈັດສົ່ງ')}${adminMenuBtn('products','🛍️ ສິນຄ້າ')}${adminMenuBtn('categories','🗂️ ໝວດ')}${adminMenuBtn('customers','👤 ລູກຄ້າ')}${adminMenuBtn('reports','📊 ລາຍງານ')}${adminMenuBtn('promo','✨ ໂປຣໂມຊັ່ນ')}`;
+  }
+
+  renderAdmin=function(){
+    cleanReadyOnlyV30();
+    document.getElementById('app').innerHTML=`<div class="screen admin-v32"><div class="topbar"><div class="topbar-inner"><div class="brand-mini"><img class="admin-logo-v35" src="assets/bai-boua-logo.jpeg" alt="Bai Boua"><div><b>Bai Boua Admin</b><div class="meta">Pre-order · Packing · Shipping</div></div></div><div class="nav"><button onclick="logout()">ອອກຈາກລະບົບ</button></div></div></div><main class="main admin-layout"><aside class="admin-menu">${adminMenuV32()}</aside><section class="admin-content-v32">${adminPage()}</section></main></div>`;
+  };
+
+  const adminPageBeforeV32=adminPage;
+  adminPage=function(){
+    if(state.adminTab==='packing') return adminPackingV32();
+    if(state.adminTab==='shipping') return adminShippingV32();
+    return adminPageBeforeV32();
+  };
+
+  adminDashboard=function(){
+    const orders=activeOrdersV32();
+    const counts={
+      new:orders.filter(o=>packingStateV32(o)==='new').length,
+      packing:orders.filter(o=>packingStateV32(o)==='packing').length,
+      packed:orders.filter(o=>packingStateV32(o)==='packed').length,
+      shipped:orders.filter(o=>packingStateV32(o)==='shipped').length
+    };
+    const today=adminStats('today');
+    return `<div class="section-title"><div><h2>Dashboard</h2><div class="meta">ສະຫຼຸບວຽກຮ້ານມື້ນີ້</div></div></div>
+    <div class="stats admin-kpis-v32">
+      <button class="stat kpi-btn-v32" onclick="state.adminTab='orders';render()"><span>🧾 ອໍເດີ້ທັງໝົດ</span><b>${orders.length}</b></button>
+      <button class="stat kpi-btn-v32" onclick="state.adminTab='packing';state.packFilter='new';render()"><span>📥 ລໍຖ້າຈັດ</span><b>${counts.new}</b></button>
+      <button class="stat kpi-btn-v32" onclick="state.adminTab='packing';state.packFilter='packed';render()"><span>📦 ພ້ອມສົ່ງ</span><b>${counts.packed}</b></button>
+      <button class="stat kpi-btn-v32" onclick="state.adminTab='shipping';render()"><span>🚚 ສົ່ງແລ້ວ</span><b>${counts.shipped}</b></button>
+    </div>
+    <div class="card admin-today-v32"><div><span class="meta">ຍອດຂາຍມື້ນີ້</span><strong>${money(today.revenue)}</strong></div><div><span class="meta">ກຳໄລມື້ນີ້</span><strong>${money(today.profit)}</strong></div></div>
+    <div class="card" style="padding:18px;margin-top:16px"><div class="section-title" style="margin-top:0"><h3>ອໍເດີ້ລ່າສຸດ</h3><button class="btn light small" onclick="state.adminTab='packing';render()">ໄປຈັດເຄື່ອງ</button></div>${orders.slice(0,6).map(o=>`<div class="dash-order-v32"><div class="dash-thumb-v32">${firstImgV32(o)?`<img src="${firstImgV32(o)}">`:'📦'}</div><div><b>${safeV32(o.customer?.name||o.id)}</b><div class="meta">${o.id} · ${itemQtyV32(o)} ຊິ້ນ</div></div><span class="pack-badge-v32 ${packingClassV32(o)}">${packingLabelV32(o)}</span><b>${money(o.total)}</b></div>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້</div>'}</div>`;
+  };
+
+  function packFilterButtonsV32(){
+    const f=state.packFilter||'all';
+    const btn=(v,t)=>`<button class="${f===v?'active':''}" onclick="state.packFilter='${v}';render()">${t}</button>`;
+    return `<div class="pack-tabs-v32">${btn('all','ທັງໝົດ')}${btn('new','ລໍຖ້າຈັດ')}${btn('packing','ກຳລັງຈັດ')}${btn('packed','ພ້ອມສົ່ງ')}${btn('shipped','ສົ່ງແລ້ວ')}</div>`;
+  }
+  function filteredPackingV32(){
+    const f=state.packFilter||'all', q=(state.packSearch||'').trim().toLowerCase();
+    return activeOrdersV32().filter(o=>(f==='all'||packingStateV32(o)===f) && (!q||[o.id,o.customer?.name,o.customer?.phone,o.shipping?.branch,o.shipping?.city,o.shipping?.province].join(' ').toLowerCase().includes(q)));
+  }
+  window.openQuickImageV35=function(src,name=''){ if(!src)return; showModal(`<div class="modal-head"><div><b>🖼️ ${safeV32(name||'ຮູບສິນຄ້າ')}</b><div class="meta">ກົດ ✕ ເພື່ອປິດ</div></div><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body quick-image-wrap-v35"><img src="${src}" alt="${safeV32(name)}"></div>`); };
+
+  function productMiniV32(i){
+    return `<div class="pack-item-v32"><div class="pack-product-img-v32">${i.image?`<img src="${i.image}" class="click-img-v35" onclick="event.stopPropagation();openQuickImageV35(this.src,'${safeV32(i.name)}')">`:'📦'}</div><div><b>${safeV32(i.name)}</b><div class="meta">${safeV32(i.code||'')}${i.size?` · ${safeV32(i.size)}`:''}${i.color?` · ${safeV32(i.color)}`:''}</div></div><strong>× ${Number(i.qty)||0}</strong></div>`;
+  }
+
+  window.adminPackingV32=function(){
+    const list=filteredPackingV32();
+    return `<div class="section-title"><div><h2>📦 ຈັດເຄື່ອງ</h2><div class="meta">ຈັດແບບຕາຕະລາງ ແຕ່ເປີດເບິ່ງລາຍການໃນອໍເດີ້ໄດ້</div></div></div>
+    <div class="pack-toolbar-v32"><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຫາຊື່ / ເບີ / Order" value="${safeV32(state.packSearch||'')}" oninput="state.packSearch=this.value;render()"></div>${packFilterButtonsV32()}</div>
+    <div class="pack-count-v32">ພົບ ${list.length} ອໍເດີ້</div>
+    <div class="packing-board-v32">${list.map(o=>`<article class="packing-row-v32" onclick="openPackingOrderV32('${o.id}')"><div class="pack-check-v32 ${packingStateV32(o)!=='new'?'done':''}">${packingStateV32(o)==='shipped'?'✓':packingStateV32(o)==='packed'?'✓':'○'}</div><div class="pack-order-v32"><b>${safeV32(o.customer?.name||'-')}</b><span>${safeV32(o.id)}</span></div><div class="pack-photos-v32">${(o.items||[]).slice(0,3).map(i=>i.image?`<img src="${i.image}" title="${safeV32(i.name)}">`:'').join('')}${(o.items||[]).length>3?`<em>+${o.items.length-3}</em>`:''}</div><div class="pack-qty-v32"><b>${itemQtyV32(o)}</b><span>ຊິ້ນ</span></div><div class="pack-phone-v32"><span>${safeV32(o.customer?.phone||'-')}</span><small>${safeV32([o.shipping?.city,o.shipping?.province].filter(Boolean).join(' · '))}</small></div><div><span class="pack-badge-v32 ${packingClassV32(o)}">${packingLabelV32(o)}</span></div><div class="pack-total-v32">${money(o.total)}</div><button class="btn light small" onclick="event.stopPropagation();copyConsignmentV32('${o.id}')">📋 Copy</button></article>`).join('')||'<div class="empty">ບໍ່ພົບອໍເດີ້</div>'}</div>`;
+  };
+
+  window.openPackingOrderV32=function(id){
+    const o=db.orders.find(x=>x.id===id); if(!o)return;
+    if(!o.packingState) o.packingState='packing';
+    saveDB();
+    showModal(`<div class="modal-head"><div><b>📦 ${safeV32(o.id)}</b><div class="meta">${safeV32(o.customer?.name||'')} · ${safeV32(o.customer?.phone||'')}</div></div><button class="btn light small" onclick="closeModal();render()">✕</button></div><div class="modal-body packing-modal-v32">
+      <div class="packing-modal-grid-v32"><section><h3>ລາຍການສິນຄ້າ</h3><div class="pack-items-list-v32">${(o.items||[]).map(productMiniV32).join('')}</div><div class="summary-row"><span>ລວມ ${itemQtyV32(o)} ຊິ້ນ</span><b>${money(o.total)}</b></div></section>
+      <section class="consign-card-v32"><div class="consign-title-v32"><div><h3>ຂໍ້ມູນຝາກ / ສຳລັບປິ້ນບິນ</h3><div class="meta">ແກ້ໄຂໄດ້ ແລະກົດ Copy ໄດ້ທັນທີ</div></div><button class="btn sage small" onclick="copyConsignmentV32('${o.id}',true)">📋 ຄັດລອກ</button></div>
+      <textarea id="consignTextV32" class="consign-text-v32" rows="8">${safeV32(noteTextV32(o))}</textarea>
+      <div class="form-grid"><div class="field"><label>Tracking / ເລກບິນ</label><input id="trackingV32" value="${safeV32(o.trackingNo||'')}" placeholder="ປ້ອນເລກບິນ"></div><div class="field"><label>ໝາຍເຫດແອັດມິນ</label><input id="adminPackNoteV32" value="${safeV32(o.adminPackNote||'')}" placeholder="ຕົວຢ່າງ: ກວດສີແລ້ວ"></div></div>
+      <div class="actions"><button class="btn light" onclick="savePackingTextV32('${o.id}')">💾 ບັນທຶກ</button><button class="btn rose" onclick="markPackedV32('${o.id}')">✓ ຈັດເຄື່ອງຄົບ</button><button class="btn sage" onclick="markShippedV32('${o.id}')">🚚 ສົ່ງແລ້ວ</button></div></section></div>
+    </div>`);
+  };
+
+  window.savePackingTextV32=function(id,quiet=false){
+    const o=db.orders.find(x=>x.id===id); if(!o)return;
+    const t=document.getElementById('consignTextV32'); if(t)o.consignText=t.value.trim();
+    const tr=document.getElementById('trackingV32'); if(tr)o.trackingNo=tr.value.trim();
+    const n=document.getElementById('adminPackNoteV32'); if(n)o.adminPackNote=n.value.trim();
+    saveDB(); if(!quiet)toast('ບັນທຶກຂໍ້ມູນແລ້ວ');
+  };
+  window.copyConsignmentV32=async function(id,fromModal=false){
+    const o=db.orders.find(x=>x.id===id); if(!o)return;
+    let text=noteTextV32(o);
+    const t=document.getElementById('consignTextV32'); if(fromModal&&t){text=t.value; o.consignText=text; savePackingTextV32(id,true);}
+    try{ await navigator.clipboard.writeText(text); toast('ຄັດລອກຂໍ້ມູນຝາກແລ້ວ ✓'); }
+    catch(e){
+      const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('ຄັດລອກຂໍ້ມູນຝາກແລ້ວ ✓');
+    }
+  };
+  window.markPackedV32=function(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; savePackingTextV32(id,true); o.packingState='packed'; o.packedAt=Date.now(); saveDB(); toast('ຈັດເຄື່ອງຄົບ · ຍ້າຍໄປພ້ອມສົ່ງແລ້ວ'); closeModal(); render(); };
+  window.markShippedV32=function(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; savePackingTextV32(id,true); o.packingState='shipped'; o.shippedAt=Date.now(); if(!String(o.status||'').includes('ຈັດສົ່ງ'))o.status='ຈັດສົ່ງແລ້ວ'; saveDB(); toast('ບັນທຶກວ່າສົ່ງແລ້ວ ✓'); closeModal(); render(); };
+
+  window.adminShippingV32=function(){
+    const orders=activeOrdersV32().filter(o=>['packed','shipped'].includes(packingStateV32(o)));
+    return `<div class="section-title"><div><h2>🚚 ຈັດສົ່ງ</h2><div class="meta">ອໍເດີ້ທີ່ຈັດເຄື່ອງຄົບ ແລະ ລໍຖ້າສົ່ງ</div></div></div><div class="shipping-list-v32">${orders.map(o=>`<article class="shipping-card-v32"><div class="ship-main-v32"><div class="dash-thumb-v32">${firstImgV32(o)?`<img src="${firstImgV32(o)}">`:'📦'}</div><div><b>${safeV32(o.customer?.name||'-')}</b><div class="meta">${safeV32(o.id)} · ${itemQtyV32(o)} ຊິ້ນ</div><div>${safeV32(o.customer?.phone||'')}</div></div></div><div class="ship-address-v32"><b>${safeV32(o.shipping?.carrier||'ຂົນສົ່ງ')}</b><div>${safeV32([o.shipping?.branch,o.shipping?.city,o.shipping?.province].filter(Boolean).join(' · ')||'-')}</div><small>${safeV32(o.adminPackNote||'')}</small></div><div class="ship-track-v32"><span class="pack-badge-v32 ${packingClassV32(o)}">${packingLabelV32(o)}</span><b>${safeV32(o.trackingNo||'ຍັງບໍ່ມີເລກບິນ')}</b></div><div class="actions"><button class="btn light small" onclick="copyConsignmentV32('${o.id}')">📋 Copy</button><button class="btn rose small" onclick="openPackingOrderV32('${o.id}')">ເປີດ</button>${packingStateV32(o)!=='shipped'?`<button class="btn sage small" onclick="quickShipV32('${o.id}')">✓ ສົ່ງແລ້ວ</button>`:''}</div></article>`).join('')||'<div class="empty">ຍັງບໍ່ມີອໍເດີ້ພ້ອມສົ່ງ</div>'}</div>`;
+  };
+  window.quickShipV32=function(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; o.packingState='shipped';o.shippedAt=Date.now();o.status='ຈັດສົ່ງແລ້ວ';saveDB();toast('ອັບເດດເປັນສົ່ງແລ້ວ');render(); };
+})();
+
+/* V33 MANUAL ORDERS + DATE VIEW + SHOP WORKFLOW STATUS + CUSTOMER HISTORY SEARCH */
+(function(){
+  const WORK_V33=[
+    ['not_ordered','ຍັງບໍ່ທັນສັ່ງ'],['incoming','ເຄື່ອງກຳລັງມາ'],['arrived','ຮອດແລ້ວ'],['notified','ແຈ້ງເຄື່ອງ'],['packed','ແພັກແລ້ວ'],
+    ['done','ຮຽບຮ້ອຍ'],['problem','ມີບັນຫາ'],['missing_info','ບໍ່ແຈ້ງຍອດໂອນ/ບ່ອນຝາກ'],['wait_more','ລໍຖ້າເຄື່ອງມາເພີ່ມ']
+  ];
+  const labelV33=s=>WORK_V33.find(x=>x[0]===s)?.[1]||'ເຄື່ອງກຳລັງມາ';
+  const clsV33=s=>['problem','missing_info'].includes(s)?'bad':(['done','packed'].includes(s)?'good':(['arrived','notified'].includes(s)?'mid':(s==='not_ordered'?'draft':'wait')));
+  const safeV33=v=>esc(String(v??''));
+  const orderDateV33=o=>new Date(o.createdAt||Date.now()).toISOString().slice(0,10);
+  const itemQtyV33=o=>(o.items||[]).reduce((s,i)=>s+(Number(i.qty)||0),0);
+  function normalizeV33(){
+    (db.orders||[]).forEach(o=>{
+      if(!o.workStatus){
+        if(o.packingState==='shipped'||String(o.status||'').includes('ຈັດສົ່ງ'))o.workStatus='done';
+        else if(o.packingState==='packed')o.workStatus='packed';
+        else o.workStatus='incoming';
+      }
+      if(!o.orderDate)o.orderDate=orderDateV33(o);
+    });
+  }
+  function moneyNumV34(v){ return Math.max(0,Number(String(v??'').replace(/[^0-9.]/g,''))||0); }
+  function compressImageV34(file,cb){
+    if(!file){cb('');return;} const reader=new FileReader();
+    reader.onload=e=>{ const img=new Image(); img.onload=()=>{ const max=700, scale=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(img.width*scale)); c.height=Math.max(1,Math.round(img.height*scale)); c.getContext('2d').drawImage(img,0,0,c.width,c.height); cb(c.toDataURL('image/jpeg',.76)); }; img.onerror=()=>cb(String(e.target.result||'')); img.src=e.target.result; }; reader.readAsDataURL(file);
+  }
+  window.previewManualImageV34=function(input){ const row=input.closest('.manual-item-row-v34'); if(!row)return; compressImageV34(input.files?.[0],data=>{ row.dataset.image=data; const box=row.querySelector('.manual-img-v34'); box.innerHTML=`${data?`<img src="${data}">`:'<span>＋ ຮູບ</span>'}<input type="file" accept="image/*" onchange="previewManualImageV34(this)">`; }); };
+  window.recalcManualV34=function(){
+    let total=0; document.querySelectorAll('.manual-item-row-v34').forEach(r=>{ const q=Math.max(1,Number(r.querySelector('.moQtyV34')?.value)||1), p=moneyNumV34(r.querySelector('.moPriceV34')?.value); const sub=q*p; total+=sub; const el=r.querySelector('.moSubV34'); if(el)el.innerHTML=`${money(sub)}<small>${q} × ${money(p)}</small>`; });
+    const paid=moneyNumV34(document.getElementById('moPaidV34')?.value), bal=Math.max(0,total-paid); const t=document.getElementById('moTotalV34'),b=document.getElementById('moBalanceV34'); if(t)t.textContent=money(total); if(b){b.textContent=money(bal); const box=b.closest('.balance-v34'); if(box){box.classList.toggle('clear',bal===0);box.classList.toggle('owing',bal>0);}} return {total,paid,balance:bal};
+  };
+  window.openManualOrderV33=function(){
+    normalizeV33();
+    showModal(`<div class="modal-head"><div><b>＋ ຈົດອໍເດີ້ Pre-order</b><div class="meta">ຈົດລູກຄ້າ · ຮູບສິນຄ້າ · ລາຄາ · ຍອດໂອນ · ຍອດຄ້າງ</div></div><button class="btn light small" onclick="closeModal()">✕</button></div>
+    <div class="modal-body manual-order-v33">
+      <div class="form-grid">
+        <div class="field"><label>ວັນທີອໍເດີ້</label><input id="moDateV33" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="field"><label>ສະຖານະ</label><select id="moStatusV33">${WORK_V33.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div>
+        <div class="field"><label>ຊື່ລູກຄ້າ</label><input id="moNameV33" placeholder="ເຊັ່ນ Mali"></div>
+        <div class="field"><label>ເບີໂທ</label><input id="moPhoneV33" placeholder="020 / 030..."></div>
+        <div class="field"><label>ຂົນສົ່ງ / ບ່ອນຝາກ</label><input id="moCarrierV33" placeholder="ANS / HAL / ອື່ນໆ"></div>
+        <div class="field"><label>ສາຂາ / ບ້ານ</label><input id="moBranchV33" placeholder="ສາຂາ ຫຼື ບ້ານ"></div>
+      </div>
+      <div class="card manual-items-v33"><div class="section-title" style="margin-top:0"><div><h3>ສິນຄ້າ Pre-order</h3><div class="meta">ເພີ່ມຮູບ ແລະ ພິມລາຄາແຕ່ລະລາຍການໄດ້ເລີຍ</div></div><button class="btn light small" onclick="addManualItemRowV33()">＋ ເພີ່ມລາຍການ</button></div><div id="moItemsV33"></div></div>
+      <div class="manual-summary-v34"><div class="sum-box"><span>ຍອດລວມ (ຄຳນວນເອງ)</span><b id="moTotalV34">0 ₭</b></div><div class="sum-box"><span>ຍອດໂອນ (ພິມເອງ)</span><input id="moPaidV34" type="number" min="0" value="0" oninput="recalcManualV34()" placeholder="0"></div><div class="sum-box balance-v34 owing"><span>ຍອດຄ້າງ (ຄຳນວນເອງ)</span><b id="moBalanceV34">0 ₭</b></div></div>
+      <div class="field"><label>ໝາຍເຫດ / ຂໍ້ມູນຝາກ</label><textarea id="moNoteV33" rows="4" placeholder="ຂໍ້ມູນຝາກ ຫຼື ໝາຍເຫດຂອງອໍເດີ້"></textarea></div>
+      <button class="btn rose full" onclick="saveManualOrderV33()">ບັນທຶກອໍເດີ້</button>
+    </div>`); addManualItemRowV33();
+  };
+  window.addManualItemRowV33=function(){
+    const wrap=document.getElementById('moItemsV33'); if(!wrap)return; const div=document.createElement('div'); div.className='manual-item-row-v34'; div.dataset.image='';
+    div.innerHTML=`<label class="manual-img-v34"><span>＋ ເພີ່ມຮູບ</span><input type="file" accept="image/*" onchange="previewManualImageV34(this)"></label><input class="moNameV34" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="moQtyV34" type="number" min="1" value="1" title="ຈຳນວນ" oninput="recalcManualV34()"><input class="moPriceV34" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ" oninput="recalcManualV34()"><div class="money-preview-v34 moSubV34">0 ₭<small>1 × 0 ₭</small></div><button class="btn danger small" type="button" onclick="this.parentElement.remove();recalcManualV34()">✕</button>`; wrap.appendChild(div); recalcManualV34();
+  };
+  window.saveManualOrderV33=function(){
+    const name=document.getElementById('moNameV33')?.value.trim(), phone=document.getElementById('moPhoneV33')?.value.trim(); if(!name)return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');
+    const rows=[...document.querySelectorAll('.manual-item-row-v34')],items=[];
+    rows.forEach((r,idx)=>{const nm=r.querySelector('.moNameV34')?.value.trim(),qty=Math.max(1,Number(r.querySelector('.moQtyV34')?.value)||1),price=moneyNumV34(r.querySelector('.moPriceV34')?.value);if(nm||price||r.dataset.image)items.push({id:'MAN-'+Date.now()+'-'+idx,name:nm||`ສິນຄ້າ ${idx+1}`,code:'PRE-ORDER',image:r.dataset.image||'',price,cost:0,qty,size:'',color:'',type:'preorder'});});
+    if(!items.length)return toast('ກະລຸນາເພີ່ມສິນຄ້າຢ່າງໜ້ອຍ 1 ລາຍການ','danger'); const pay=recalcManualV34();
+    const date=document.getElementById('moDateV33').value||new Date().toISOString().slice(0,10); const o={id:'BB-'+Date.now().toString().slice(-7),manual:true,role:'customer',type:'preorder',createdAt:new Date(date+'T12:00:00').getTime(),orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('moCarrierV33').value.trim(),branch:document.getElementById('moBranchV33').value.trim(),city:'',province:'',note:document.getElementById('moNoteV33').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Pre-order admin',workStatus:document.getElementById('moStatusV33').value,packingState:'new',consignText:''}; db.orders.unshift(o); saveDB(); closeModal(); toast('ບັນທຶກ Pre-order ແລ້ວ ✓'); state.packDate=date; render();
+  };
+  window.setWorkStatusV33=function(id,status){ const o=db.orders.find(x=>x.id===id); if(!o)return; o.workStatus=status; if(status==='packed')o.packingState='packed'; if(status==='done')o.packingState='shipped'; saveDB(); toast('ອັບເດດສະຖານະແລ້ວ'); render(); };
+  window.addItemToOrderV33=function(id){ const o=db.orders.find(x=>x.id===id); if(!o)return; showModal(`<div class="modal-head"><b>＋ ເພີ່ມເຄື່ອງໃສ່ ${safeV33(o.customer?.name||o.id)}</b><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><div id="addOneV34" class="manual-item-row-v34"><label class="manual-img-v34"><span>＋ ຮູບ</span><input type="file" accept="image/*" onchange="previewManualImageV34(this)"></label><input class="moNameV34" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="moQtyV34" type="number" min="1" value="1"><input class="moPriceV34" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ"><div></div><div></div></div><button class="btn rose full" onclick="saveAddedItemV33('${id}')">ເພີ່ມເຂົ້າອໍເດີ້</button></div>`); document.getElementById('addOneV34').dataset.image=''; };
+  window.saveAddedItemV33=function(id){ const o=db.orders.find(x=>x.id===id),r=document.getElementById('addOneV34'); if(!o||!r)return; const name=r.querySelector('.moNameV34')?.value.trim(),qty=Math.max(1,Number(r.querySelector('.moQtyV34')?.value)||1),price=moneyNumV34(r.querySelector('.moPriceV34')?.value); if(!name&&!price&&!r.dataset.image)return toast('ກະລຸນາໃສ່ຂໍ້ມູນສິນຄ້າ','danger'); o.items=o.items||[]; o.items.push({id:'MAN-'+Date.now(),name:name||'ສິນຄ້າ Pre-order',code:'PRE-ORDER',image:r.dataset.image||'',price,cost:0,qty,size:'',color:'',type:'preorder'}); o.total=o.items.reduce((s,i)=>s+(Number(i.price)||0)*(Number(i.qty)||0),0); o.paid=Number(o.paid)||0;o.balance=Math.max(0,o.total-o.paid);o.profit=o.total;o.workStatus='wait_more'; saveDB();closeModal();toast('ເພີ່ມເຄື່ອງແລ້ວ · ຍອດລວມອັບເດດອັດຕະໂນມັດ');render(); };
+  window.openCustomerHistoryV33=function(id){
+    const o=db.orders.find(x=>x.id===id); if(!o)return; const phone=o.customer?.phone||'', name=(o.customer?.name||'').toLowerCase();
+    const all=(db.orders||[]).filter(x=>(phone&&x.customer?.phone===phone)||(!phone&&String(x.customer?.name||'').toLowerCase()===name)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    showModal(`<div class="modal-head"><div><b>👤 ${safeV33(o.customer?.name||'-')}</b><div class="meta">${safeV33(phone)} · ພົບ ${all.length} ອໍເດີ້</div></div><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="history-v33">${all.map(x=>`<article><div><b>${safeV33(x.id)}</b><div class="meta">${new Date(x.createdAt||Date.now()).toLocaleDateString()} · ${itemQtyV33(x)} ຊິ້ນ</div></div><div class="history-items-v33">${(x.items||[]).map(i=>`<span>${safeV33(i.name)} ×${i.qty}</span>`).join('')}</div><span class="work-pill-v33 ${clsV33(x.workStatus)}">${labelV33(x.workStatus)}</span><b>${money(x.total)}</b></article>`).join('')}</div></div>`);
+  };
+  window.adminPackingV32=function(){
+    normalizeV33();
+    const q=(state.packSearch||'').trim().toLowerCase(), date=state.packDate||'', st=state.packWorkStatus||'all';
+    let list=[...(db.orders||[])].filter(o=>!String(o.status||'').includes('ຍົກເລີກ'));
+    if(date)list=list.filter(o=>(o.orderDate||orderDateV33(o))===date);
+    if(st!=='all')list=list.filter(o=>o.workStatus===st);
+    if(q)list=list.filter(o=>[o.id,o.customer?.name,o.customer?.phone,o.shipping?.carrier,o.shipping?.branch,...(o.items||[]).flatMap(i=>[i.name,i.code])].join(' ').toLowerCase().includes(q));
+    list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    return `<div class="section-title"><div><h2>📦 ຈັດເຄື່ອງ / ອໍເດີ້</h2><div class="meta">ເພີ່ມອໍເດີ້ເອງ · ເລືອກວັນທີ · ຄົ້ນຫາລູກຄ້າ · ເບິ່ງປະຫວັດ</div></div><button class="btn rose" onclick="openManualOrderV33()">＋ ເພີ່ມອໍເດີ້</button></div>
+      <div class="order-toolbar-v33"><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຊື່ / ເບີ / Order / ສິນຄ້າ" value="${safeV33(state.packSearch||'')}" oninput="state.packSearch=this.value;render()"></div><input class="date-v33" type="date" value="${safeV33(date)}" onchange="state.packDate=this.value;render()"><button class="btn light small" onclick="state.packDate=new Date().toISOString().slice(0,10);render()">ມື້ນີ້</button><button class="btn light small" onclick="state.packDate='';render()">ທຸກວັນ</button></div>
+      <div class="status-tabs-v33"><button class="${st==='all'?'active':''}" onclick="state.packWorkStatus='all';render()">ທັງໝົດ</button>${WORK_V33.map(x=>`<button class="${st===x[0]?'active':''}" onclick="state.packWorkStatus='${x[0]}';render()">${x[1]}</button>`).join('')}</div>
+      <div class="pack-count-v32">ພົບ ${list.length} ອໍເດີ້ ${date?`· ${safeV33(date)}`:'· ທຸກວັນ'}</div>
+      <div class="orders-v33">${list.map(o=>`<article class="order-card-v33"><div class="order-top-v33"><div><button class="customer-link-v33" onclick="openCustomerHistoryV33('${o.id}')">${safeV33(o.customer?.name||'-')}</button><div class="meta">${safeV33(o.customer?.phone||'-')} · ${safeV33(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div></div><div><b>${money(o.total)}</b><div class="payment-mini-v34"><span>ໂອນ <b>${money(Number(o.paid)||0)}</b></span><span>ຄ້າງ <b>${money(Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0)))}</b></span></div></div></div><div class="order-products-v33">${(o.items||[]).map(i=>`<div>${i.image?`<img src="${i.image}" class="click-img-v35" onclick="event.stopPropagation();openQuickImageV35(this.src,'${safeV33(i.name)}')">`:'<span class="noimg-v33">📦</span>'}<span><b>${safeV33(i.name)}</b><small>${safeV33(i.code||'')} · × ${i.qty}</small></span></div>`).join('')}</div><div class="order-actions-v33"><select onchange="setWorkStatusV33('${o.id}',this.value)">${WORK_V33.map(x=>`<option value="${x[0]}" ${o.workStatus===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select><span class="work-pill-v33 ${clsV33(o.workStatus)}">${labelV33(o.workStatus)}</span><button class="btn light small" onclick="copyConsignmentV32('${o.id}')">📋 Copy</button><button class="btn light small" onclick="addItemToOrderV33('${o.id}')">＋ ເພີ່ມເຄື່ອງ</button><button class="btn rose small" onclick="openPackingOrderV32('${o.id}')">ເປີດ</button></div></article>`).join('')||'<div class="empty">ບໍ່ພົບອໍເດີ້</div>'}</div>`;
+  };
+
+  const oldDashV33=adminDashboard;
+  adminDashboard=function(){ normalizeV33(); const base=oldDashV33(); const today=new Date().toISOString().slice(0,10); const todays=(db.orders||[]).filter(o=>(o.orderDate||orderDateV33(o))===today); return `<div class="today-strip-v33"><div><b>📅 ອໍເດີ້ມື້ນີ້</b><strong>${todays.length}</strong></div><button class="btn rose" onclick="state.adminTab='packing';state.packDate='${today}';render()">ເບິ່ງມື້ນີ້</button><button class="btn light" onclick="openManualOrderV33()">＋ ເພີ່ມອໍເດີ້</button></div>${base}`; };
+})();
+
+/* V36: split admin notebook into Pre-order and Ready-to-ship order systems */
+(function(){
+  const PRE_STATUSES_V36=[
+    ['not_ordered','ຍັງບໍ່ທັນສັ່ງ'],['incoming','ເຄື່ອງກຳລັງມາ'],['arrived','ຮອດແລ້ວ'],['notified','ແຈ້ງເຄື່ອງ'],['packed','ແພັກແລ້ວ'],['done','ຮຽບຮ້ອຍ'],['problem','ມີບັນຫາ'],['missing_info','ບໍ່ແຈ້ງຍອດໂອນ/ບ່ອນຝາກ'],['wait_more','ລໍຖ້າເຄື່ອງມາເພີ່ມ']
+  ];
+  const READY_STATUSES_V36=[
+    ['waiting_pack','ລໍຖ້າແພັກ'],['packing','ກຳລັງແພັກ'],['packed','ແພັກແລ້ວ'],['notified','ແຈ້ງລູກຄ້າ'],['ready_ship','ພ້ອມສົ່ງ'],['shipped','ສົ່ງແລ້ວ'],['done','ຮຽບຮ້ອຍ'],['problem','ມີບັນຫາ'],['missing_info','ບໍ່ແຈ້ງຍອດໂອນ/ບ່ອນຝາກ']
+  ];
+  const safe=v=>esc(String(v??''));
+  const mnum=v=>Math.max(0,Number(String(v??'').replace(/[^0-9.]/g,''))||0);
+  const qty=o=>(o.items||[]).reduce((s,i)=>s+(Number(i.qty)||0),0);
+  const od=o=>o.orderDate||new Date(o.createdAt||Date.now()).toISOString().slice(0,10);
+  const label=(arr,s)=>arr.find(x=>x[0]===s)?.[1]||arr[0][1];
+  const cls=s=>['problem','missing_info'].includes(s)?'bad':(['done','packed','ready_ship','shipped'].includes(s)?'good':(['arrived','notified','packing'].includes(s)?'mid':(s==='not_ordered'?'draft':'wait')));
+  function ensureTypes(){
+    (db.orders||[]).forEach(o=>{
+      if(!o.orderDate)o.orderDate=od(o);
+      if(!o.type)o.type='ready';
+      if(o.type==='preorder'&&!PRE_STATUSES_V36.some(x=>x[0]===o.workStatus))o.workStatus='incoming';
+      if(o.type==='ready'&&!READY_STATUSES_V36.some(x=>x[0]===o.readyStatus)){
+        if(o.packingState==='shipped'||String(o.status||'').includes('ຈັດສົ່ງ'))o.readyStatus='shipped';
+        else if(o.packingState==='packed')o.readyStatus='packed';
+        else o.readyStatus='waiting_pack';
+      }
+    });
+  }
+  function rowHTML(o, kind){
+    const statuses=kind==='ready'?READY_STATUSES_V36:PRE_STATUSES_V36;
+    const current=kind==='ready'?o.readyStatus:o.workStatus;
+    return `<article class="order-card-v33 order-kind-v36 ${kind}"><div class="order-top-v33"><div><div class="kind-tag-v36 ${kind}">${kind==='ready'?'⚡ ເຄື່ອງພ້ອມສົ່ງ':'🪷 Pre-order'}</div><button class="customer-link-v33" onclick="openCustomerHistoryV33('${o.id}')">${safe(o.customer?.name||'-')}</button><div class="meta">${safe(o.customer?.phone||'-')} · ${safe(o.id)} · ${new Date(o.createdAt||Date.now()).toLocaleDateString()}</div></div><div><b>${money(o.total)}</b><div class="payment-mini-v34"><span>ໂອນ <b>${money(Number(o.paid)||0)}</b></span><span>ຄ້າງ <b>${money(Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0)))}</b></span></div></div></div><div class="order-products-v33">${(o.items||[]).map(i=>`<div>${i.image?`<img src="${i.image}" class="click-img-v35" onclick="event.stopPropagation();openQuickImageV35(this.src,'${safe(i.name)}')">`:'<span class="noimg-v33">📦</span>'}<span><b>${safe(i.name)}</b><small>${safe(i.code||'')} · × ${i.qty}</small></span></div>`).join('')}</div><div class="order-actions-v33"><select onchange="${kind==='ready'?'setReadyStatusV36':'setWorkStatusV33'}('${o.id}',this.value)">${statuses.map(x=>`<option value="${x[0]}" ${current===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select><span class="work-pill-v33 ${cls(current)}">${label(statuses,current)}</span><button class="btn light small" onclick="copyConsignmentV32('${o.id}')">📋 Copy</button><button class="btn light small" onclick="addItemToOrderV33('${o.id}')">＋ ເພີ່ມເຄື່ອງ</button><button class="btn rose small" onclick="openPackingOrderV32('${o.id}')">ເປີດ</button></div></article>`;
+  }
+  function page(kind){
+    ensureTypes();
+    const isReady=kind==='ready', statuses=isReady?READY_STATUSES_V36:PRE_STATUSES_V36;
+    const q=((isReady ? (state.readySearch || '') : (state.packSearch || ''))).trim().toLowerCase();
+    const date=isReady?(state.readyDate||''):(state.packDate||'');
+    const st=isReady?(state.readyWorkStatus||'all'):(state.packWorkStatus||'all');
+    let list=[...(db.orders||[])].filter(o=>!String(o.status||'').includes('ຍົກເລີກ') && (isReady?o.type==='ready':o.type==='preorder'));
+    if(date)list=list.filter(o=>od(o)===date);
+    if(st!=='all')list=list.filter(o=>(isReady?o.readyStatus:o.workStatus)===st);
+    if(q)list=list.filter(o=>[o.id,o.customer?.name,o.customer?.phone,o.shipping?.carrier,o.shipping?.branch,...(o.items||[]).flatMap(i=>[i.name,i.code])].join(' ').toLowerCase().includes(q));
+    list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const searchKey=isReady?'readySearch':'packSearch', dateKey=isReady?'readyDate':'packDate', statusKey=isReady?'readyWorkStatus':'packWorkStatus';
+    return `<div class="section-title"><div><h2>${isReady?'⚡ ເຄື່ອງພ້ອມສົ່ງ':'🪷 Pre-order'}</h2><div class="meta">${isReady?'ອໍເດີ້ຈາກສິນຄ້າທີ່ມີຢູ່ແລ້ວ · ແພັກ · ແຈ້ງ · ສົ່ງ':'ຈົດອໍເດີ້ສິນຄ້າສັ່ງຈອງ · ຕິດຕາມເຄື່ອງ · ແຈ້ງ · ແພັກ'}</div></div><button class="btn ${isReady?'sage':'rose'}" onclick="${isReady?'openReadyOrderV36':'openManualOrderV33'}()">＋ ${isReady?'ຈົດອໍເດີ້ພ້ອມສົ່ງ':'ເພີ່ມ Pre-order'}</button></div>
+      <div class="switch-strip-v36"><button class="${!isReady?'active':''}" onclick="state.adminTab='packing';render()">🪷 Pre-order</button><button class="${isReady?'active':''}" onclick="state.adminTab='readyorders';render()">⚡ ເຄື່ອງພ້ອມສົ່ງ</button></div>
+      <div class="order-toolbar-v33"><div class="search"><span>🔎</span><input placeholder="ຄົ້ນຊື່ / ເບີ / Order / ສິນຄ້າ" value="${safe(q)}" oninput="state.${searchKey}=this.value;render()"></div><input class="date-v33" type="date" value="${safe(date)}" onchange="state.${dateKey}=this.value;render()"><button class="btn light small" onclick="state.${dateKey}=new Date().toISOString().slice(0,10);render()">ມື້ນີ້</button><button class="btn light small" onclick="state.${dateKey}='';render()">ທຸກວັນ</button></div>
+      <div class="status-tabs-v33"><button class="${st==='all'?'active':''}" onclick="state.${statusKey}='all';render()">ທັງໝົດ</button>${statuses.map(x=>`<button class="${st===x[0]?'active':''}" onclick="state.${statusKey}='${x[0]}';render()">${x[1]}</button>`).join('')}</div>
+      <div class="pack-count-v32">ພົບ ${list.length} ອໍເດີ້ ${date?`· ${safe(date)}`:'· ທຸກວັນ'}</div><div class="orders-v33">${list.map(o=>rowHTML(o,kind)).join('')||`<div class="empty">ຍັງບໍ່ມີອໍເດີ້ ${isReady?'ເຄື່ອງພ້ອມສົ່ງ':'Pre-order'}</div>`}</div>`;
+  }
+  window.adminPackingV32=function(){ return page('preorder'); };
+  window.adminReadyOrdersV36=function(){ return page('ready'); };
+  window.setReadyStatusV36=function(id,status){ const o=db.orders.find(x=>x.id===id); if(!o)return; o.readyStatus=status; if(status==='packed'||status==='ready_ship')o.packingState='packed'; if(status==='shipped'||status==='done'){o.packingState='shipped';o.shippedAt=o.shippedAt||Date.now();} saveDB();toast('ອັບເດດສະຖານະເຄື່ອງພ້ອມສົ່ງແລ້ວ');render(); };
+  window.openReadyOrderV36=function(){
+    showModal(`<div class="modal-head"><div><b>＋ ຈົດອໍເດີ້ ເຄື່ອງພ້ອມສົ່ງ</b><div class="meta">ຈົດລູກຄ້າ · ຮູບສິນຄ້າ · ລາຄາ · ຍອດໂອນ · ຍອດຄ້າງ</div></div><button class="btn light small" onclick="closeModal()">✕</button></div><div class="modal-body manual-order-v33"><div class="form-grid"><div class="field"><label>ວັນທີອໍເດີ້</label><input id="roDateV36" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>ສະຖານະ</label><select id="roStatusV36">${READY_STATUSES_V36.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div><div class="field"><label>ຊື່ລູກຄ້າ</label><input id="roNameV36" placeholder="ເຊັ່ນ Mali"></div><div class="field"><label>ເບີໂທ</label><input id="roPhoneV36" placeholder="020 / 030..."></div><div class="field"><label>ຂົນສົ່ງ / ບ່ອນຝາກ</label><input id="roCarrierV36" placeholder="ANS / HAL / ອື່ນໆ"></div><div class="field"><label>ສາຂາ / ບ້ານ</label><input id="roBranchV36" placeholder="ສາຂາ ຫຼື ບ້ານ"></div></div><div class="card manual-items-v33"><div class="section-title" style="margin-top:0"><div><h3>ສິນຄ້າພ້ອມສົ່ງ</h3><div class="meta">ເພີ່ມຮູບ + ຈຳນວນ + ລາຄາ</div></div><button class="btn light small" onclick="addReadyItemV36()">＋ ເພີ່ມລາຍການ</button></div><div id="roItemsV36"></div></div><div class="manual-summary-v34"><div class="sum-box"><span>ຍອດລວມ (ຄຳນວນເອງ)</span><b id="roTotalV36">0 ₭</b></div><div class="sum-box"><span>ຍອດໂອນ (ພິມເອງ)</span><input id="roPaidV36" type="number" min="0" value="0" oninput="recalcReadyV36()"></div><div class="sum-box balance-v34 owing"><span>ຍອດຄ້າງ (ຄຳນວນເອງ)</span><b id="roBalanceV36">0 ₭</b></div></div><div class="field"><label>ໝາຍເຫດ / ຂໍ້ມູນຝາກ</label><textarea id="roNoteV36" rows="4"></textarea></div><button class="btn sage full" onclick="saveReadyOrderV36()">ບັນທຶກອໍເດີ້ພ້ອມສົ່ງ</button></div>`); addReadyItemV36();
+  };
+  window.addReadyItemV36=function(){ const wrap=document.getElementById('roItemsV36');if(!wrap)return;const d=document.createElement('div');d.className='manual-item-row-v34 ready-item-v36';d.dataset.image='';d.innerHTML=`<label class="manual-img-v34"><span>＋ ເພີ່ມຮູບ</span><input type="file" accept="image/*" onchange="previewReadyImageV36(this)"></label><input class="roNameV36" placeholder="ຊື່/ລາຍລະອຽດສິນຄ້າ"><input class="roQtyV36" type="number" min="1" value="1" oninput="recalcReadyV36()"><input class="roPriceV36" type="number" min="0" placeholder="ລາຄາ/ຊິ້ນ" oninput="recalcReadyV36()"><div class="money-preview-v34 roSubV36">0 ₭<small>1 × 0 ₭</small></div><button class="btn danger small" type="button" onclick="this.parentElement.remove();recalcReadyV36()">✕</button>`;wrap.appendChild(d);recalcReadyV36(); };
+  window.previewReadyImageV36=function(input){const row=input.closest('.ready-item-v36');if(!row)return;const f=input.files?.[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{const max=700,sc=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);const data=c.toDataURL('image/jpeg',.76);row.dataset.image=data;row.querySelector('.manual-img-v34').innerHTML=`<img src="${data}"><input type="file" accept="image/*" onchange="previewReadyImageV36(this)">`;};img.src=e.target.result;};rd.readAsDataURL(f);};
+  window.recalcReadyV36=function(){let total=0;document.querySelectorAll('.ready-item-v36').forEach(r=>{const q=Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),p=mnum(r.querySelector('.roPriceV36')?.value),sub=q*p;total+=sub;const e=r.querySelector('.roSubV36');if(e)e.innerHTML=`${money(sub)}<small>${q} × ${money(p)}</small>`;});const paid=mnum(document.getElementById('roPaidV36')?.value),bal=Math.max(0,total-paid);if(document.getElementById('roTotalV36'))document.getElementById('roTotalV36').textContent=money(total);if(document.getElementById('roBalanceV36'))document.getElementById('roBalanceV36').textContent=money(bal);return{total,paid,balance:bal};};
+  window.saveReadyOrderV36=function(){const name=document.getElementById('roNameV36')?.value.trim(),phone=document.getElementById('roPhoneV36')?.value.trim();if(!name)return toast('ກະລຸນາປ້ອນຊື່ລູກຄ້າ','danger');const items=[...document.querySelectorAll('.ready-item-v36')].map((r,idx)=>({id:'READY-'+Date.now()+'-'+idx,name:r.querySelector('.roNameV36')?.value.trim()||`ສິນຄ້າ ${idx+1}`,code:'READY',image:r.dataset.image||'',price:mnum(r.querySelector('.roPriceV36')?.value),cost:0,qty:Math.max(1,Number(r.querySelector('.roQtyV36')?.value)||1),size:'',color:'',type:'ready'})).filter(i=>i.name||i.price||i.image);if(!items.length)return toast('ກະລຸນາເພີ່ມສິນຄ້າ','danger');const pay=recalcReadyV36(),date=document.getElementById('roDateV36').value||new Date().toISOString().slice(0,10);const o={id:'BR-'+Date.now().toString().slice(-7),manual:true,role:'customer',type:'ready',createdAt:new Date(date+'T12:00:00').getTime(),orderDate:date,customer:{name,phone},shipping:{carrier:document.getElementById('roCarrierV36').value.trim(),branch:document.getElementById('roBranchV36').value.trim(),city:'',province:'',note:document.getElementById('roNoteV36').value.trim()},items,total:pay.total,paid:pay.paid,balance:pay.balance,cost:0,profit:pay.total,status:'Ready admin',readyStatus:document.getElementById('roStatusV36').value,packingState:'new',consignText:''};db.orders.unshift(o);saveDB();closeModal();state.readyDate=date;toast('ບັນທຶກອໍເດີ້ພ້ອມສົ່ງແລ້ວ ✓');render();};
+  const oldAdminPageV36=adminPage;
+  adminPage=function(){ if(state.adminTab==='readyorders')return adminReadyOrdersV36(); return oldAdminPageV36(); };
+})();
+
+/* Bai Boua Admin V38: fixed Supabase app_state schema (data), GitHub-ready. */
+
+/* ============================================================
+   Bai Boua Admin V39 — performance + 30-day auto cleanup
+   - Completed orders stay active for 30 days, then become compact history.
+   - Manual order photos upload to Supabase Storage instead of app_state base64.
+   - Order lists show 30 records per page.
+   - Images use browser lazy loading.
+   ============================================================ */
+(function(){
+  const DAY = 24*60*60*1000;
+  const ARCHIVE_DAYS = 30;
+  const PAGE_SIZE = 30;
+  db.orderArchive = Array.isArray(db.orderArchive) ? db.orderArchive : [];
+
+  function isDone(o){
+    if(!o) return false;
+    if(o.type==='ready') return o.readyStatus==='done';
+    return o.workStatus==='done';
+  }
+  function completionTime(o){ return Number(o.completedAt||0); }
+  function compactOrder(o){
+    return {
+      id:o.id,
+      type:o.type||'preorder',
+      customer:{name:o.customer?.name||'',phone:o.customer?.phone||''},
+      total:Number(o.total)||0,
+      paid:Number(o.paid)||0,
+      balance:Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0)),
+      createdAt:Number(o.createdAt)||Date.now(),
+      completedAt:completionTime(o)||Date.now(),
+      archivedAt:Date.now(),
+      shipping:{carrier:o.shipping?.carrier||'',branch:o.shipping?.branch||''},
+      items:(o.items||[]).map(i=>({name:i.name||'',code:i.code||'',qty:Number(i.qty)||1,price:Number(i.price)||0}))
+    };
+  }
+  function storagePathFromUrl(url){
+    const marker=`/${SUPABASE_STORAGE_BUCKET}/`;
+    const i=String(url||'').indexOf(marker);
+    if(i<0) return '';
+    return decodeURIComponent(String(url).slice(i+marker.length));
+  }
+  async function deleteArchivedOrderImages(o){
+    const paths=[...(o.items||[])].map(i=>storagePathFromUrl(i.image)).filter(p=>p.startsWith('orders/'));
+    for(const path of [...new Set(paths)]){
+      try{
+        await fetch(`${SUPABASE_STORAGE_OBJECT_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`,{
+          method:'DELETE',
+          headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
+        });
+      }catch(e){ console.warn('Could not delete archived image',path,e); }
+    }
+  }
+  window.runAutoArchiveV39 = async function(showMessage=false){
+    const now=Date.now();
+    let changed=false, archived=0;
+    for(const o of (db.orders||[])){
+      if(isDone(o) && !o.completedAt){ o.completedAt=now; changed=true; }
+    }
+    const keep=[];
+    for(const o of (db.orders||[])){
+      if(isDone(o) && completionTime(o) && now-completionTime(o)>=ARCHIVE_DAYS*DAY){
+        db.orderArchive.unshift(compactOrder(o));
+        deleteArchivedOrderImages(o);
+        archived++;
+        changed=true;
+      }else keep.push(o);
+    }
+    if(changed){
+      db.orders=keep;
+      // Keep compact history bounded so app_state cannot grow forever.
+      db.orderArchive=db.orderArchive.slice(0,1500);
+      saveDB();
+    }
+    if(showMessage) toast(archived?`ຍ້າຍ ${archived} ອໍເດີ້ຄົບ 30 ມື້ເຂົ້າປະຫວັດແລ້ວ ✓`:'ຍັງບໍ່ມີອໍເດີ້ທີ່ຄົບ 30 ມື້');
+    return archived;
+  };
+
+  // Stamp completion time exactly when the admin changes status to Done.
+  const oldPreStatus = window.setWorkStatusV33;
+  if(oldPreStatus) window.setWorkStatusV33=function(id,status){
+    const o=(db.orders||[]).find(x=>x.id===id);
+    if(o){
+      if(status==='done' && !o.completedAt) o.completedAt=Date.now();
+      if(status!=='done') delete o.completedAt;
+    }
+    return oldPreStatus(id,status);
+  };
+  const oldReadyStatus = window.setReadyStatusV36;
+  if(oldReadyStatus) window.setReadyStatusV36=function(id,status){
+    const o=(db.orders||[]).find(x=>x.id===id);
+    if(o){
+      if(status==='done' && !o.completedAt) o.completedAt=Date.now();
+      if(status!=='done') delete o.completedAt;
+    }
+    return oldReadyStatus(id,status);
+  };
+
+  async function uploadOrderImage(file,index=0){
+    if(!file) return '';
+    const blob=await canvasImageBlob(file,1200,.78);
+    const ext=blob.type==='image/png'?'png':'jpg';
+    const stamp=`${Date.now()}-${Math.random().toString(36).slice(2,10)}-${index}`;
+    const path=`orders/${stamp}-${safeFileName(file.name).replace(/\.[^.]+$/,'.'+ext)}`;
+    const res=await fetch(`${SUPABASE_STORAGE_OBJECT_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`,{
+      method:'POST',
+      headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':blob.type||'application/octet-stream','x-upsert':'false'},
+      body:blob
+    });
+    if(!res.ok) throw new Error((await res.text()).slice(0,180));
+    return `${SUPABASE_STORAGE_PUBLIC_URL}/${SUPABASE_STORAGE_BUCKET}/${path}`;
+  }
+  async function setOrderPreviewImage(input,row,handlerName){
+    const f=input.files?.[0]; if(!f||!row)return;
+    const box=row.querySelector('.manual-img-v34');
+    const old=box?.innerHTML;
+    if(box) box.innerHTML='<span>⏳ ກຳລັງອັບຮູບ...</span>';
+    try{
+      const url=await uploadOrderImage(f);
+      row.dataset.image=url;
+      if(box) box.innerHTML=`<img src="${url}" loading="lazy"><input type="file" accept="image/*" onchange="${handlerName}(this)">`;
+    }catch(e){
+      console.warn(e);
+      if(box) box.innerHTML=old||`<span>＋ ເພີ່ມຮູບ</span><input type="file" accept="image/*" onchange="${handlerName}(this)">`;
+      toast('ອັບຮູບບໍ່ສຳເລັດ ລອງໃໝ່ອີກຄັ້ງ','danger');
+    }
+  }
+  window.previewManualImageV34=function(input){ setOrderPreviewImage(input,input.closest('.manual-item-row-v34'),'previewManualImageV34'); };
+  window.previewReadyImageV36=function(input){ setOrderPreviewImage(input,input.closest('.ready-item-v36'),'previewReadyImageV36'); };
+
+  function orderDate(o){ return new Date(o.createdAt||Date.now()).toISOString().slice(0,10); }
+  function filteredOrders(kind){
+    const ready=kind==='ready';
+    const q=String(ready?(state.readySearch||''):(state.packSearch||'')).trim().toLowerCase();
+    const date=ready?(state.readyDate||''):(state.packDate||'');
+    const st=ready?(state.readyWorkStatus||'all'):(state.packWorkStatus||'all');
+    let list=(db.orders||[]).filter(o=>!String(o.status||'').includes('ຍົກເລີກ') && (ready?o.type==='ready':o.type==='preorder'));
+    if(date) list=list.filter(o=>orderDate(o)===date);
+    if(st!=='all') list=list.filter(o=>(ready?o.readyStatus:o.workStatus)===st);
+    if(q) list=list.filter(o=>[o.id,o.customer?.name,o.customer?.phone,o.shipping?.carrier,o.shipping?.branch,...(o.items||[]).flatMap(i=>[i.name,i.code])].join(' ').toLowerCase().includes(q));
+    return list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  }
+  function paginateAdminPage(kind,baseFn){
+    const list=filteredOrders(kind);
+    const key=kind==='ready'?'readyPageV39':'packPageV39';
+    let page=Math.max(1,Number(state[key])||1);
+    const pages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+    if(page>pages) page=pages;
+    state[key]=page;
+    const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+    const originalOrders=db.orders;
+    const other=originalOrders.filter(o=>o.type!==kind);
+    db.orders=other.concat(slice);
+    let html='';
+    try{ html=baseFn(); } finally { db.orders=originalOrders; }
+    const start=list.length?((page-1)*PAGE_SIZE+1):0;
+    const end=Math.min(page*PAGE_SIZE,list.length);
+    const pager=`<div class="v39-pager"><span>ສະແດງ ${start}-${end} ຈາກ ${list.length} ອໍເດີ້</span><div><button class="btn light small" ${page<=1?'disabled':''} onclick="state.${key}=Math.max(1,(state.${key}||1)-1);render()">← ກ່ອນໜ້າ</button><b> ${page}/${pages} </b><button class="btn light small" ${page>=pages?'disabled':''} onclick="state.${key}=Math.min(${pages},(state.${key}||1)+1);render()">ຕໍ່ໄປ →</button></div></div>`;
+    return html+pager;
+  }
+  const basePacking=window.adminPackingV32;
+  const baseReady=window.adminReadyOrdersV36;
+  if(basePacking) window.adminPackingV32=function(){ return paginateAdminPage('preorder',basePacking); };
+  if(baseReady) window.adminReadyOrdersV36=function(){ return paginateAdminPage('ready',baseReady); };
+
+  // Reset to page 1 when filters/search change by observing state between renders.
+  const oldRenderV39=render;
+  render=function(){
+    const out=oldRenderV39.apply(this,arguments);
+    setTimeout(()=>document.querySelectorAll('img').forEach(img=>{ if(!img.hasAttribute('loading')) img.setAttribute('loading','lazy'); }),0);
+    return out;
+  };
+
+  // Run after cloud state has had time to load, and again once per hour while admin is open.
+  setTimeout(()=>runAutoArchiveV39(false),2200);
+  setInterval(()=>runAutoArchiveV39(false),60*60*1000);
+})();
